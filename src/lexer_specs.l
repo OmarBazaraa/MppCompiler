@@ -54,7 +54,7 @@ WHITESPACE          [ \t\n]+
 
 %{
 // =============
-// Rules section
+// Rules Section
 // =============
 
 // NOTE: comments in rules section must begin with whitespace,
@@ -68,9 +68,8 @@ WHITESPACE          [ \t\n]+
 
 [0-9]+                              { yylval = atoi(yytext); return NUMBER; }
 [ \t]                               ; // Ignore whitespace
-;                                   { printf("Semicolon\n"); return 0; }
-\n                                  { printf("Endline\n"); return 0; }
-.                                   { printf("Char %c\n", yytext[0]); return yytext[0]; }
+\n                                  return 0;
+.                                   return yytext[0];
 
 %{
 // =====================================================================================================
@@ -82,11 +81,17 @@ WHITESPACE          [ \t\n]+
 // User Subroutines Section
 // ========================
 
-// void main() {
-//     yylex();
+int running = 1;
+
+// int main() {
+//     while (running) {
+//         yylex();
+//     }
+// 
+//     return 0;
 // }
 
 int yywrap() {
-    printf("yywrap\n");
+    running = 0;
     return 1;
 }

@@ -27,16 +27,16 @@
 %%
 
 // =============
-// Rules section
+// Rules Section
 // =============
 
 statement:      NAME '=' expression
         |       expression              { printf("= %d\n", $1); }
         ;
 
-                // the default action that Yacc performs after every reduction,
-                // before running any explicit action code,
-                // assigns the value $1 to $$. 
+// the default action that Yacc performs after every reduction,
+// before running any explicit action code,
+// assigns the value $1 to $$. 
 
 expression:     expression '+' NUMBER   { $$ = $1 + $3; }
         |       expression '-' NUMBER   { $$ = $1 - $3; }
@@ -50,9 +50,10 @@ expression:     expression '+' NUMBER   { $$ = $1 + $3; }
 // ========================
 
 extern FILE* yyin;
+extern int running;
 
 int main () {
-    while (!feof(yyin)) {
+    while (running) {
         yyparse();
     }
 
