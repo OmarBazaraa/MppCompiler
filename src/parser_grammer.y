@@ -13,16 +13,39 @@
 
 #include <stdio.h>
 
+// Function declarations
+extern int yylex();
+void yyerror(char* s);
+
+// Global variables
+double varTable[26];
+
 // =====================================================================================================
 %}
 
+// Define the types of the symbols
+%union {
+    double val;
+    int idx;
+}
+
 // Token Definitions
 // Yacc defines the token names in the parser as C preprocessor names in "y.tab.h"
-%token NAME NUMBER
+%token <idx> NAME
+%token <val> NUMBER
+
+// Assign types for non-terminal symbols
+%type <val> expression
+
+// Assign precendence & associativity
+// Note that order matters here
+%left '-' '+'
+%left '*' '/'
+%nonassoc UMINUM
 
 // Start Symbol
 // By default, its the first LHS symbol in the rules section
-%start statement
+%start statement_list
 
 %%
 
@@ -30,17 +53,31 @@
 // Rules Section
 // =============
 
-statement:      NAME '=' expression
-        |       expression              { printf("= %d\n", $1); }
-        ;
-
 // the default action that Yacc performs after every reduction,
 // before running any explicit action code,
 // assigns the value $1 to $$. 
 
-expression:     expression '+' NUMBER   { $$ = $1 + $3; }
-        |       expression '-' NUMBER   { $$ = $1 - $3; }
-        |       NUMBER                  { $$ = $1; }
+statement_list:     statement '\n'
+        |           statement_list statement '\n'
+        ;
+
+statement:          NAME '=' expression             { varTable[$1] = $3; }
+        |           expression                      { printf("= %lf\n", $1); }
+        ;
+
+expression:         expression '+' expression       { $$ = $1 + $3; }
+        |           expression '-' expression       { $$ = $1 - $3; }
+        |           expression '*' expression       { $$ = $1 * $3; }
+        |           expression '/' expression       {
+                                                        if ($3 != 0)
+                                                            $$ = $1 / $3;
+                                                        else
+                                                            yyerror("division by zero!");
+                                                    }
+        |           '-' expression %prec UMINUM     { $$ = -$2; }
+        |           '(' expression ')'              { $$ = $2; }
+        |           NUMBER                          { $$ = $1; }
+        |           NAME                            { $$ = varTable[$1]; }
         ;
 
 %%
@@ -49,14 +86,10 @@ expression:     expression '+' NUMBER   { $$ = $1 + $3; }
 // User Subroutines Section
 // ========================
 
-extern FILE* yyin;
 extern int running;
 
 int main () {
-    while (running) {
-        yyparse();
-    }
-
+    yyparse();
     return 0;
 }
 
