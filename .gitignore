@@ -1,0 +1,9 @@
+# Visual Studio Code files
+.vscode/*
+
+# MacOS files
+.DS_Store
+
+# Other files
+out/*
+*.exe
