@@ -1,6 +1,9 @@
 clear:
 	cls
 
+copy:
+	copy src\\symbol_table.h out\\symbol_table.h
+
 lex_gen:
 	flex -o out/lexer.c src/lexer_specs.l
 
@@ -26,10 +29,11 @@ yacc_build:
 	gcc -o out/parser.exe out/lexer.o out/parser.o
 
 yacc_run:
-	out\\parser.exe < data/input.txt
+	out\\parser.exe
 
 yacc_all:
 	@make -s clear
+	@make -s copy
 	@make -s yacc_gen
 	@make -s yacc_build
 	@make -s yacc_run
