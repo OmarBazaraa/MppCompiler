@@ -2,7 +2,7 @@ clear:
 	cls
 
 copy:
-	copy src\\symbol_table.h out\\symbol_table.h
+	copy src\\tokens.h out\\tokens.h
 
 lex_gen:
 	flex -o out/lexer.c src/lexer_specs.l
@@ -11,10 +11,11 @@ lex_build:
 	gcc out/lexer.c -o out/lexer.exe
 
 lex_run:
-	out\\lexer.exe < data/input.txt
+	out\\lexer.exe
 
 lex_all:
 	@make -s clear
+	@make -s copy
 	@make -s lex_gen
 	@make -s lex_build
 	@make -s lex_run
