@@ -1,116 +1,229 @@
 %{
-// ==================
-// Definition Section
-// ==================
+#include <iostream>
+#include <string>
 
-/**
- * This is the Definition section of the Parser Specification file.
- *
- * Yacc copies the material between "%{" and "%}"
- * directly to the generated C file,
- * so you may write any valid C code here. 
- */
+#include "parse_tree.h"
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include "symbol_table.h"
+using namespace std;
 
-// Function declarations
+//
+// Functions prototypes
+//
 extern int yylex();
-void yyerror(char* s);
+void yyerror(const char* s);
 
-// =====================================================================================================
+//
+// Global variables
+//
+Node* programRoot = NULL;
 %}
 
-// Define the types of the symbols
+// =====================================================================================================
+// Symbol Types
+// ============
+
 %union {
-    double val;
-    struct symbol_table* sym_ptr;
+    Node*               node;
+    BlockNode*          block;
+    StatementNode*      statement;
+    VarDeclarationNode* varDecl;
+    FunctionNode*       function;
+    FunctionCallNode*   functionCall;
+    VarList*            paramList;
+    ExprList*           argList;
+    ExpressionNode*     expression;
+    int                 token;
+    int                 valueInt;
+    float               valueFloat;
+    char                valueChar;
+    bool                valueBool;
+    char*               valueIden;
 }
 
-// Token Definitions
-// Yacc defines the token names in the parser as C preprocessor names in "y.tab.h"
-%token <sym_ptr>    NAME
-%token <val>        NUMBER
+// =====================================================================================================
+// Tokens Definition
+// =================
 
-// Assign types for non-terminal symbols
-%type <val>         expression
+// Data types
+%token <token> TYPE_INT
+%token <token> TYPE_FLOAT
+%token <token> TYPE_CHAR
+%token <token> TYPE_BOOL
+%token <token> TYPE_VOID
 
-// Assign precendence & associativity
+// Keywords
+%token <token> CONST
+%token <token> IF
+%token <token> SWITCH
+%token <token> DEFAULT
+%token <token> FOR
+%token <token> DO
+%token <token> WHILE
+%token <token> BREAK
+%token <token> CONTINUE
+%token <token> RETURN
+
+// Operators
+%token <token> EQUAL
+%token <token> NOT_EQUAL
+%token <token> GREATER_EQUAL
+%token <token> LESS_EQUAL
+%token <token> SHIFT_LEFT
+%token <token> SHIFT_RIGHT
+%token <token> LOGICAL_AND
+%token <token> LOGICAL_OR
+
+// Values
+%token <valueIden>  IDENTIFIER
+%token <valueInt>   INTEGER
+%token <valueFloat> FLOAT
+%token <valueChar>  CHAR
+%token <valueBool>  BOOL
+
+// =====================================================================================================
+// Non-terminal Symbols Types
+// ==========================
+
+%type <block>           program stmt_list stmt_block
+%type <statement>       stmt
+%type <varDecl>         var_decl var_decl_uninit var_decl_init
+%type <function>        function function_header
+%type <functionCall>    function_call
+%type <paramList>       param_list param_list_ext
+%type <argList>         arg_list arg_list_ext
+%type <expression>      expression
+%type <token>           type
+
+// =====================================================================================================
+// Precendence & Associativity
+// ===========================
+
 // Note that order matters here
 %left '-' '+'
 %left '*' '/'
 %nonassoc UMINUM
 
-// Start Symbol
-// By default, its the first LHS symbol in the rules section
-%start statement_list
-
 %%
 
-// =============
+// =====================================================================================================
 // Rules Section
 // =============
 
-// the default action that Yacc performs after every reduction,
-// before running any explicit action code,
-// assigns the value $1 to $$. 
+program:            /* epsilon */           { programRoot = new BlockNode(); }
+    |               stmt_list               { programRoot = $1; }
+    ;
 
-statement_list:     statement '\n'
-        |           statement_list statement '\n'
-        ;
+stmt_list:          stmt                    { $$ = new BlockNode(); $$->statements.push_back($1); }
+    |               stmt_block              { $$ = new BlockNode(); $$->statements.push_back($1); }
+    |               stmt_list stmt          { $1->statements.push_back($2); }
+    |               stmt_list stmt_block    { $1->statements.push_back($2); }
+    ;
 
-statement:          NAME '=' expression             { $1->value = $3; }
-        |           expression                      { printf("= %lf\n", $1); }
-        ;
+stmt_block:         '{' '}'                 { $$ = new BlockNode(); }
+    |               '{' stmt_list '}'       { $$ = $2; }
+    ;
 
-expression:         expression '+' expression       { $$ = $1 + $3; }
-        |           expression '-' expression       { $$ = $1 - $3; }
-        |           expression '*' expression       { $$ = $1 * $3; }
-        |           expression '/' expression       {
-                                                        if ($3 != 0)
-                                                            $$ = $1 / $3;
-                                                        else
-                                                            yyerror("division by zero!");
-                                                    }
-        |           '-' expression %prec UMINUM     { $$ = -$2; }
-        |           '(' expression ')'              { $$ = $2; }
-        |           NUMBER                          { $$ = $1; }
-        |           NAME                            { $$ = $1->value; }
-        ;
+stmt:               ';'                     { $$ = new StatementNode(); }
+    |               var_decl ';'            { $$ = $1; }
+    |               expression ';'          { $$ = $1; }
+    |               function                { $$ = $1; }
+    ;
+
+// ------------------------------------------------------------
+//
+// Declaration Rules
+//
+
+var_decl:           var_decl_uninit
+    |               var_decl_init
+    ;
+
+var_decl_uninit:    type IDENTIFIER                         { $$ = new VarDeclarationNode($1, $2); }
+    |               CONST type IDENTIFIER                   { $$ = new VarDeclarationNode($2, $3, NULL, true); }
+    ;
+
+var_decl_init:      type IDENTIFIER '=' expression          { $$ = new VarDeclarationNode($1, $2, $4); }
+    |               CONST type IDENTIFIER '=' expression    { $$ = new VarDeclarationNode($2, $3, $5, true); }
+    ;
+
+// ------------------------------------------------------------
+//
+// Expression Rules
+//
+
+expression:         expression '+' expression       { $$ = new BinaryOprNode('+', $1, $3); }
+    |               expression '-' expression       { $$ = new BinaryOprNode('-', $1, $3); }
+    |               expression '*' expression       { $$ = new BinaryOprNode('*', $1, $3); }
+    |               expression '/' expression       { $$ = new BinaryOprNode('/', $1, $3); }
+    |               '-' expression %prec UMINUM     { $$ = new UnaryOprNode('-', $2); }
+    |               '(' expression ')'              { $$ = $2; }
+    |               INTEGER                         { $$ = new IntNode($1); }
+    |               FLOAT                           { $$ = new FloatNode($1); }
+    |               CHAR                            { $$ = new CharNode($1); }
+    |               BOOL                            { $$ = new BoolNode($1); }
+    |               IDENTIFIER                      { $$ = new VarNode($1); }
+    |               function_call                   { $$ = $1; }
+    ;
+
+// ------------------------------------------------------------
+//
+// Function Rules
+//
+
+function:           function_header stmt_block          { $$ = $1; $$->body = $2; }
+    ;
+
+function_header:    type IDENTIFIER '(' param_list ')'  { $$ = new FunctionNode($1, $2, *$4, NULL); delete $4; }
+    ;
+
+param_list:         /* epsilon */                       { $$ = new VarList(); }
+    |               var_decl                            { $$ = new VarList(); $$->push_back($1); }
+    |               param_list_ext ',' var_decl         { $$ = $1; $$->push_back($3); }
+    ;
+
+param_list_ext:     var_decl                            { $$ = new VarList(); $$->push_back($1); }
+    |               param_list_ext ',' var_decl         { $$ = $1; $$->push_back($3); }
+    ;
+
+function_call:      IDENTIFIER '(' arg_list ')'         { $$ = new FunctionCallNode($1, *$3); delete $3; }
+    ;
+
+arg_list:           /* epsilon */                       { $$ = new ExprList(); }
+    |               expression                          { $$ = new ExprList(); $$->push_back($1); }
+    |               arg_list_ext ',' expression         { $$ = $1; $$->push_back($3); }
+    ;
+
+arg_list_ext:       expression                          { $$ = new ExprList(); $$->push_back($1); }
+    |               arg_list_ext ',' expression         { $$ = $1; $$->push_back($3); }
+    ;
+
+// ------------------------------------------------------------
+//
+// Other Rules
+//
+
+type:               TYPE_INT        { $$ = TYPE_INT; }
+    |               TYPE_FLOAT      { $$ = TYPE_FLOAT; }
+    |               TYPE_CHAR       { $$ = TYPE_CHAR; }
+    |               TYPE_BOOL       { $$ = TYPE_BOOL; }
+    |               TYPE_VOID       { $$ = TYPE_VOID; }
+    ;
 
 %%
 
-// ========================
+// =====================================================================================================
 // User Subroutines Section
 // ========================
 
-extern int running;
-
 int main () {
     yyparse();
+
+    programRoot->print();
+    delete programRoot;
+
     return 0;
 }
 
-void yyerror(char* s) {
+void yyerror(const char* s) {
     fprintf(stderr, "%s\n", s); 
-}
-
-struct symbol_table* symbol_look(char* s) {
-    for (int i = 0; i < SYM_MAX; ++i) {
-        struct symbol_table* p = &symTable[i];
-
-        if (p->name != NULL && strcmp(s, p->name) == 0) {
-            return p;
-        }
-
-        if (p->name == NULL) {
-            p->name = strdup(s);
-            return p;
-        }
-    }
-
-    yyerror("Too many symbols");
-    exit(0);
 }

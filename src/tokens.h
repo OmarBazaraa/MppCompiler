@@ -9,7 +9,7 @@
 #define TYPE_VOID       304
 
 // Keywords
-#define COSNT           350
+#define CONST           350
 #define IF              351
 #define SWITCH          352
 #define DEFAULT         353
@@ -31,12 +31,11 @@
 #define LOGICAL_OR      407
 
 // Values
-#define INTEGER         450
-#define FLOAT           451
-#define CHAR            452
-#define BOOL            453
+#define IDENTIFIER      450
+#define INTEGER         451
+#define FLOAT           452
+#define CHAR            453
+#define BOOL            454
 
-// Others
-#define IDENTIFIER      500
 
 #endif

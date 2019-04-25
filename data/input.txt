@@ -1,0 +1,10 @@
+int omar =4;
+
+void func(int x, bool y) {
+   
+   
+    const void lol = 5;
+
+    6;
+    oamsdas;
+}

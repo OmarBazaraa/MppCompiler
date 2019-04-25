@@ -2,39 +2,23 @@ clear:
 	cls
 
 copy:
-	copy src\\tokens.h out\\tokens.h
+	copy src\\parse_tree.h out\\parse_tree.h
 
-lex_gen:
-	flex -o out/lexer.c src/lexer_specs.l
+gen:
+	flex -o out/lexer.cpp src/lexer_specs.l
+	bison -d -o out/parser.cpp src/parser_grammer.y
 
-lex_build:
-	gcc out/lexer.c -o out/lexer.exe
+build:
+	g++ -std=c++14 -c out/lexer.cpp -o out/lexer.o
+	g++ -std=c++14 -c out/parser.cpp -o out/parser.o
+	g++ -std=c++14 -o out/parser.exe out/lexer.o out/parser.o
 
-lex_run:
-	out\\lexer.exe
+run:
+	out\\parser.exe < data/input.txt
 
-lex_all:
+all:
 	@make -s clear
 	@make -s copy
-	@make -s lex_gen
-	@make -s lex_build
-	@make -s lex_run
-
-yacc_gen:
-	@make -s lex_gen
-	bison -d -o out/parser.c src/parser_grammer.y
-
-yacc_build:
-	gcc -c out/lexer.c -o out/lexer.o
-	gcc -c out/parser.c -o out/parser.o
-	gcc -o out/parser.exe out/lexer.o out/parser.o
-
-yacc_run:
-	out\\parser.exe
-
-yacc_all:
-	@make -s clear
-	@make -s copy
-	@make -s yacc_gen
-	@make -s yacc_build
-	@make -s yacc_run
+	@make -s gen
+	@make -s build
+	@make -s run
