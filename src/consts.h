@@ -1,7 +1,11 @@
 #ifndef __CONSTS_H_
 #define __CONSTS_H_
 
+/**
+ * Enum holding all the possible operators in out language.
+ */
 enum Operations {
+    ASSIGN = 100,       // a = b
     PLUS,               // a + b
     UNARY_PLUS,         // +54
     MINUS,              // a - b
