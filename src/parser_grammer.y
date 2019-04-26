@@ -28,6 +28,7 @@ Node* programRoot = NULL;
     StatementNode*      statement;
     VarDeclarationNode* varDecl;
     IfStmtNode*         ifStmt;
+    ForStmtNode*        forStmt;
     FunctionNode*       function;
     FunctionCallNode*   functionCall;
     VarList*            paramList;
@@ -90,14 +91,15 @@ Node* programRoot = NULL;
 // ==========================
 
 %type <block>           program stmt_list stmt_block
-%type <statement>       stmt branch_body
+%type <statement>       stmt branch_body for_init_stmt
 %type <varDecl>         var_decl var_decl_uninit var_decl_init
 %type <ifStmt>          if_stmt unmatched_if_stmt matched_if_stmt
+%type <forStmt>         for_stmt for_header
 %type <function>        function function_header
 %type <functionCall>    function_call
 %type <paramList>       param_list param_list_ext
 %type <argList>         arg_list arg_list_ext
-%type <expression>      expression
+%type <expression>      expression for_expr
 %type <dtype>           type
 
 // =====================================================================================================
@@ -148,6 +150,7 @@ stmt:               ';'                     { $$ = new StatementNode(); }
     |               var_decl ';'            { $$ = $1; }
     |               expression ';'          { $$ = $1; }
     |               if_stmt                 { $$ = $1; }
+    |               for_stmt                { $$ = $1; }
     |               function                { $$ = $1; }
     ;
 
@@ -233,6 +236,26 @@ unmatched_if_stmt:  IF '(' expression ')' branch_body %prec IF_UNMAT    { $$ = n
     ;
 
 matched_if_stmt:    IF '(' expression ')' branch_body ELSE branch_body  { $$ = new IfStmtNode($3, $5, $7); }
+    ;
+
+// ------------------------------------------------------------
+//
+// For Rules
+//
+
+for_stmt:           for_header branch_body                              { $$ = $1; $$->body = $2; }
+    ;
+
+for_header:         FOR '(' for_init_stmt ';' for_expr ';' for_expr ')' { $$ = new ForStmtNode($3, $5, $7, NULL); }
+    ;
+
+for_init_stmt:      /* epsilon */                                       { $$ = NULL; }
+    |               var_decl                                            { $$ = $1; }
+    |               expression                                          { $$ = $1; }
+    ;
+
+for_expr:           /* epsilon */                                       { $$ = NULL; }
+    |               expression                                          { $$ = $1; }
     ;
 
 // ------------------------------------------------------------

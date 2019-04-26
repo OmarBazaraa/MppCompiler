@@ -143,24 +143,24 @@ struct FunctionNode : public StatementNode {
 
 struct IfStmtNode : public StatementNode {
     ExpressionNode* cond;
-    StatementNode* ifStmt;
-    StatementNode* elseStmt;
+    StatementNode* ifBody;
+    StatementNode* elseBody;
 
-    IfStmtNode(ExpressionNode* cond, StatementNode* ifStmt = NULL, StatementNode* elseStmt = NULL) {
+    IfStmtNode(ExpressionNode* cond, StatementNode* ifBody = NULL, StatementNode* elseBody = NULL) {
         this->cond = cond;
-        this->ifStmt = ifStmt;
-        this->elseStmt = elseStmt;
+        this->ifBody = ifBody;
+        this->elseBody = elseBody;
     }
 
     virtual ~IfStmtNode() {
         if (cond) {
             delete cond;
         }
-        if (ifStmt) {
-            delete ifStmt;
+        if (ifBody) {
+            delete ifBody;
         }
-        if (elseStmt) {
-            delete elseStmt;
+        if (elseBody) {
+            delete elseBody;
         }
     }
 
@@ -168,13 +168,64 @@ struct IfStmtNode : public StatementNode {
         cout << string(ind, ' ') << "if (";
         cond->print(0);
         cout << ")" << endl;
-        ifStmt->print(ind + (dynamic_cast<BlockNode*>(ifStmt) ? 0 : 4));
+        ifBody->print(ind + (dynamic_cast<BlockNode*>(ifBody) ? 0 : 4));
 
-        if (elseStmt) {
+        if (elseBody) {
             cout << endl;
             cout << string(ind, ' ') << "else" << endl;
-            elseStmt->print(ind + (dynamic_cast<BlockNode*>(elseStmt) ? 0 : 4));
+            elseBody->print(ind + (dynamic_cast<BlockNode*>(elseBody) ? 0 : 4));
         }
+    }
+};
+
+struct ForStmtNode : public StatementNode {
+    StatementNode* initStmt;
+    ExpressionNode* cond;
+    ExpressionNode* inc;
+    StatementNode* body;
+
+    ForStmtNode(StatementNode* initStmt, ExpressionNode* cond, ExpressionNode* inc, StatementNode* body) {
+        this->initStmt = initStmt;
+        this->cond = cond;
+        this->inc = inc;
+        this->body = body;
+    }
+
+    virtual ~ForStmtNode() {
+        if (initStmt) {
+            delete initStmt;
+        }
+        if (cond) {
+            delete cond;
+        }
+        if (inc) {
+            delete inc;
+        }
+        if (body) {
+            delete body;
+        }
+    }
+
+    virtual void print(int ind = 0) {
+        cout << string(ind, ' ') << "for (";
+
+        if (initStmt) {
+            initStmt->print(0);
+        }
+        cout << "; ";
+
+        if (cond) {
+            cond->print(0);
+        }
+        cout << "; ";
+
+        if (inc) {
+            inc->print(0);
+        }
+
+        cout << ")" << endl;
+
+        body->print(ind + (dynamic_cast<BlockNode*>(body) ? 0 : 4));
     }
 };
 
