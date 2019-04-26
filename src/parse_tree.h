@@ -280,8 +280,9 @@ struct AssignOprNode : public ExpressionNode {
     }
 
     virtual void print(int ind = 0) {
-        cout << string(ind, ' ') << name << " = ";
+        cout << string(ind, ' ') << "(" << name << " = ";
         value->print(0);
+        cout << ")";
     }
 };
 
@@ -302,10 +303,11 @@ struct BinaryOprNode : public ExpressionNode {
     }
 
     virtual void print(int ind = 0) {
-        cout << string(ind, ' ');
+        cout << string(ind, ' ') << "(";
         lhs->print(0);
         cout << ' ' << Utils::oprToStr(opr) << ' ';
         rhs->print(0);
+        cout << ")";
     }
 };
 
@@ -323,7 +325,7 @@ struct UnaryOprNode : public ExpressionNode {
     }
 
     virtual void print(int ind = 0) {
-        cout << string(ind, ' ');
+        cout << string(ind, ' ') << "(";
 
         if (opr == OPR_SUF_INC || opr == OPR_SUF_DEC) {
             expr->print(0);
@@ -332,6 +334,8 @@ struct UnaryOprNode : public ExpressionNode {
             cout << Utils::oprToStr(opr);
             expr->print(0);
         }
+
+        cout << ")";
     }
 };
 
