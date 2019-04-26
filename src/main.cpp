@@ -70,7 +70,7 @@ void printHelp() {
     printf("%s version %s, %s\n\n", LANG_NAME, VERSION, VERSION_DATE);
     printf("Usage: %s [switches] <input_file>\n", LANG_NAME);
     printf("    -h, --help                   Print the help menu and exit.\n");
-    printf("    -v, --version                Print the compiler version and exit.\n");
+    printf("    -v, --version                Print the installed version number and exit.\n");
     printf("    -o, --output <filename>      Specify the output filename.\n");
     exit(0);
 }
