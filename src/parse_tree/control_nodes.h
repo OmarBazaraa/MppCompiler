@@ -45,4 +45,39 @@ struct IfNode : public StatementNode {
     }
 };
 
+/**
+ * The node class holding a switch statement in the parse tree.
+ */
+struct SwitchNode : public StatementNode {
+    ExpressionNode* cond;
+    CaseList caseList;
+
+    SwitchNode(ExpressionNode* cond, const CaseList& caseList) {
+        this->cond = cond;
+        this->caseList = caseList;
+    }
+
+    virtual ~SwitchNode() {
+        if (cond) {
+            delete cond;
+        }
+        
+        for (int i = 0; i < caseList.size(); ++i) {
+            delete caseList[i];
+        }
+    }
+
+    virtual void print(int ind = 0) {
+        cout << string(ind, ' ') << "switch (";
+        cond->print(0);
+        cout << ") {" << endl;
+        
+        for (int i = 0; i < caseList.size(); ++i) {
+            caseList[i]->print(ind + 4);
+        }
+
+        cout << string(ind, ' ') << "}";
+    }
+};
+
 #endif

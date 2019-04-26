@@ -1,6 +1,15 @@
 int omar =4;
 
 void func(int x, bool y) {
+    switch(56 + 95.6e5) {
+        case 4:
+            break;
+        case 9:
+        case 2:
+            continue;
+        default:
+            x = y = z = (a + b) * c;
+    }
    
     return --(x + 7);
 

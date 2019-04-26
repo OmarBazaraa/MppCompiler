@@ -125,4 +125,42 @@ struct ReturnStmtNode : public StatementNode {
     }
 };
 
+/**
+ * The node class holding a case statement in the parse tree.
+ */
+struct CaseStmtNode : public StatementNode {
+    ExpressionNode* expr;
+    StatementNode* body;
+    bool isDefault;
+
+    CaseStmtNode(ExpressionNode* expr, StatementNode* body, bool isDefault = false) {
+        this->expr = expr;
+        this->body = body;
+        this->isDefault = isDefault;
+    }
+
+    virtual ~CaseStmtNode() {
+        if (expr) {
+            delete expr;
+        }
+        if (body) {
+            delete body;
+        }
+    }
+
+    virtual void print(int ind = 0) {
+        if (isDefault) {
+            cout << string(ind, ' ') << "default:" << endl;
+        } else {
+            cout << string(ind, ' ') << "case ";
+            expr->print(0);
+            cout << ":" << endl;
+        }
+        if (body) {
+            body->print(ind + (dynamic_cast<BlockNode*>(body) ? 0 : 4));
+            cout << endl;
+        }
+    }
+};
+
 #endif

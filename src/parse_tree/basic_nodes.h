@@ -15,11 +15,14 @@
 
 struct Node;
 struct StatementNode;
-struct VarDeclarationNode;
 struct ExpressionNode;
+struct VarDeclarationNode;
+struct CaseStmtNode;
 
-typedef vector<VarDeclarationNode*> VarList;
+typedef vector<StatementNode*> StmtList;
 typedef vector<ExpressionNode*> ExprList;
+typedef vector<VarDeclarationNode*> VarList;
+typedef vector<CaseStmtNode*> CaseList;
 
 
 /**

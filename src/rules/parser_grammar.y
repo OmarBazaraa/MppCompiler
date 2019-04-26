@@ -28,6 +28,8 @@ Node* programRoot = NULL;
     StatementNode*      statement;
     VarDeclarationNode* varDecl;
     IfNode*             ifStmt;
+    SwitchNode*         switchStmt;
+    CaseStmtNode*       caseStmt;
     WhileNode*          whileStmt;
     DoWhileNode*        doWhileStmt;
     ForNode*            forStmt;
@@ -36,6 +38,7 @@ Node* programRoot = NULL;
     ReturnStmtNode*     returnStmt;
     VarList*            paramList;
     ExprList*           argList;
+    CaseList*           caseList;
     ExpressionNode*     expression;
     DataType            dtype;
     int                 token;
@@ -62,6 +65,7 @@ Node* programRoot = NULL;
 %token <token> IF
 %token <token> ELSE
 %token <token> SWITCH
+%token <token> CASE
 %token <token> DEFAULT
 %token <token> FOR
 %token <token> DO
@@ -94,9 +98,12 @@ Node* programRoot = NULL;
 // ==========================
 
 %type <block>           program stmt_list stmt_block
-%type <statement>       stmt branch_body for_init_stmt
+%type <statement>       stmt branch_body case_body for_init_stmt
 %type <varDecl>         var_decl var_decl_uninit var_decl_init
 %type <ifStmt>          if_stmt unmatched_if_stmt matched_if_stmt
+%type <switchStmt>      switch_stmt
+%type <caseStmt>        case_stmt
+%type <caseList>        switch_body case_stmt_block case_stmt_list
 %type <whileStmt>       while_stmt
 %type <doWhileStmt>     do_while_stmt
 %type <forStmt>         for_stmt for_header
@@ -158,6 +165,7 @@ stmt:               ';'                     { $$ = new StatementNode(); }
     |               var_decl ';'            { $$ = $1; }
     |               expression ';'          { $$ = $1; }
     |               if_stmt                 { $$ = $1; }
+    |               switch_stmt             { $$ = $1; }
     |               while_stmt              { $$ = $1; }
     |               do_while_stmt ';'       { $$ = $1; }
     |               for_stmt                { $$ = $1; }
@@ -247,6 +255,33 @@ unmatched_if_stmt:  IF '(' expression ')' branch_body %prec IF_UNMAT    { $$ = n
     ;
 
 matched_if_stmt:    IF '(' expression ')' branch_body ELSE branch_body  { $$ = new IfNode($3, $5, $7); }
+    ;
+
+// ------------------------------------------------------------
+//
+// Switch Rules
+//
+
+switch_stmt:        SWITCH '(' expression ')' switch_body   { $$ = new SwitchNode($3, *$5); delete $5; }
+    ;
+
+switch_body:        case_stmt_block                         { $$ = $1; }
+    ;
+
+case_stmt_block:    '{' '}'                                 { $$ = new CaseList(); }
+    |               '{' case_stmt_list '}'                  { $$ = $2; }
+    ;
+
+case_stmt_list:     case_stmt                               { $$ = new CaseList(); $$->push_back($1); }
+    |               case_stmt_list case_stmt                { $$ = $1; $$->push_back($2); }
+    ;
+
+case_stmt:          CASE expression ':' case_body           { $$ = new CaseStmtNode($2, $4); }
+    |               DEFAULT ':' case_body                   { $$ = new CaseStmtNode(NULL, $3, true); }
+    ;
+
+case_body:          /* epsilon */                           { $$ = NULL; }
+    |               stmt_list                               { $$ = $1; }
     ;
 
 // ------------------------------------------------------------
