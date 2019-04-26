@@ -2,6 +2,11 @@ int omar =4;
 
 void func(int x, bool y) {
    
+    return --(x + 7);
+
+    break;
+
+    continue;
    
     const void lol = 5;
 

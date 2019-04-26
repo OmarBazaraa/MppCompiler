@@ -33,6 +33,7 @@ Node* programRoot = NULL;
     ForNode*            forStmt;
     FunctionNode*       function;
     FunctionCallNode*   functionCall;
+    ReturnStmtNode*     returnStmt;
     VarList*            paramList;
     ExprList*           argList;
     ExpressionNode*     expression;
@@ -101,6 +102,7 @@ Node* programRoot = NULL;
 %type <forStmt>         for_stmt for_header
 %type <function>        function function_header
 %type <functionCall>    function_call
+%type <returnStmt>      return_stmt
 %type <paramList>       param_list param_list_ext
 %type <argList>         arg_list arg_list_ext
 %type <expression>      expression for_expr
@@ -151,6 +153,8 @@ stmt_block:         '{' '}'                 { $$ = new BlockNode(); }
     ;
 
 stmt:               ';'                     { $$ = new StatementNode(); }
+    |               BREAK ';'               { $$ = new BreakStmtNode(); }
+    |               CONTINUE ';'            { $$ = new ContinueStmtNode(); }
     |               var_decl ';'            { $$ = $1; }
     |               expression ';'          { $$ = $1; }
     |               if_stmt                 { $$ = $1; }
@@ -158,6 +162,7 @@ stmt:               ';'                     { $$ = new StatementNode(); }
     |               do_while_stmt ';'       { $$ = $1; }
     |               for_stmt                { $$ = $1; }
     |               function                { $$ = $1; }
+    |               return_stmt ';'         { $$ = $1; }
     ;
 
 branch_body:        stmt                    { $$ = $1; }
@@ -306,6 +311,8 @@ arg_list:           /* epsilon */                       { $$ = new ExprList(); }
 arg_list_ext:       expression                          { $$ = new ExprList(); $$->push_back($1); }
     |               arg_list_ext ',' expression         { $$ = $1; $$->push_back($3); }
     ;
+
+return_stmt:        RETURN expression                   { $$ = new ReturnStmtNode($2); }
 
 // ------------------------------------------------------------
 //

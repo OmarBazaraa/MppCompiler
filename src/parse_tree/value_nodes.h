@@ -64,4 +64,19 @@ struct BoolNode : public ExpressionNode {
     }
 };
 
+/**
+ * The node class holding a variable use in the parse tree.
+ */
+struct VarNode : public ExpressionNode {
+    string name;
+
+    VarNode(const char* name) {
+        this->name = string(name);
+    }
+
+    virtual void print(int ind = 0) {
+        cout << string(ind, ' ') << name;
+    }
+};
+
 #endif

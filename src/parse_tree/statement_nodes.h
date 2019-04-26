@@ -69,17 +69,59 @@ struct VarDeclarationNode : public StatementNode {
 };
 
 /**
- * The node class holding a variable use in the parse tree.
+ * The node class holding a break statement in the parse tree.
  */
-struct VarNode : public ExpressionNode {
-    string name;
+struct BreakStmtNode : public StatementNode {
+    BreakStmtNode() {
 
-    VarNode(const char* name) {
-        this->name = string(name);
+    }
+
+    virtual ~BreakStmtNode() {
+
     }
 
     virtual void print(int ind = 0) {
-        cout << string(ind, ' ') << name;
+        cout << string(ind, ' ') << "break;";
+    }
+};
+
+/**
+ * The node class holding a continue statement in the parse tree.
+ */
+struct ContinueStmtNode : public StatementNode {
+    ContinueStmtNode() {
+
+    }
+
+    virtual ~ContinueStmtNode() {
+
+    }
+
+    virtual void print(int ind = 0) {
+        cout << string(ind, ' ') << "continue;";
+    }
+};
+
+/**
+ * The node class holding a return statement in the parse tree.
+ */
+struct ReturnStmtNode : public StatementNode {
+    ExpressionNode* value;
+
+    ReturnStmtNode(ExpressionNode* value) {
+        this->value = value;
+    }
+
+    virtual ~ReturnStmtNode() {
+        if (value) {
+            delete value;
+        }
+    }
+
+    virtual void print(int ind = 0) {
+        cout << string(ind, ' ') << "return ";
+        value->print(0);
+        cout << ";";
     }
 };
 
