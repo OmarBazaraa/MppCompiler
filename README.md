@@ -1,18 +1,32 @@
-# Compiler
-A compiler for a simple programming language using Lex and Yacc.
+# M++ Compiler
+M++ is a simple programming language compiler similar to C++ built using Lex and Yacc.
 
 # How to Use
-### 1. Install Lex & Yacc
-Download and install **Lex** & **Yacc** compiler generating packages.
+1. Install Lex & Yacc
+   Download and install **Lex** & **Yacc** compiler generating packages.
 
-This compiler is built on:
+   This compiler is built on:
 
-| Package                 | Version        |
-| ----------------------- | -------------- |
-| Lex                     | Flex v2.6.4    |
-| Yacc                    | Bison v3.3.1   |
+   | Package                 | Version        |
+   | ----------------------- | -------------- |
+   | Lex                     | Flex v2.6.4    |
+   | Yacc                    | Bison v3.3.1   |
 
-**Download links:** [Windows](https://github.com/lexxmark/winflexbison/releases), Linux, Mac
+   **Download links:** [Windows](https://github.com/lexxmark/winflexbison/releases), Linux, Mac
+
+2. Install GCC compiler.
+3. Run `make build` from the repository's main folder to build the compiler.
+4. Run `make run` to run the recently built compiler.
+   You can change the input file from the `Makefile`.
+
+## M++ Compiler Commands
+**Sytanx**: `M++ [-h|--help] [-v|--version] [-o|--output <output_file>]  <input_file>`
+
+| Command                                         | Description                                                      |
+| ----------------------------------------------- | ---------------------------------------------------------------- |
+| `-h` or `--help`                                | Print help menu and exit.                                        |
+| `-v` or `--version`                             | Print the installed version number and exit.                     |
+| `-o` or `--output` `<filename>`                 | Specify the output filename.                                     |
 
 # Lex Usage
 
