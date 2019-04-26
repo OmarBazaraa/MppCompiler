@@ -18,11 +18,13 @@ int lineNumber = 0;
 // =====================================================================================================
 // Pattern Definitions (Substitutions)
 // ===================================
+
+// TODO: add (-|+)? to numberic values
 %}
 
 DIGIT               [0-9]
-INTEGER             (+|-)?[0-9]+
-FLOAT               (+|-)?(([0-9]*\.[0-9]+)|([0-9]+\.[0-9]*))
+INTEGER             [0-9]+
+FLOAT               (([0-9]*\.[0-9]+)|([0-9]+\.[0-9]*))
 EXP                 [eE][-+]?{INTEGER}
 REAL                ({INTEGER}{EXP}|{FLOAT}({EXP})?)
 LETTER              [a-zA-Z_]
@@ -64,12 +66,14 @@ WHITESPACE          [ \t\n]+
 %{
 // Operators
 %}
+<INITIAL>"++"                   return INC;
+<INITIAL>"--"                   return DEC;
 <INITIAL>"=="                   return EQUAL;
 <INITIAL>"!="                   return NOT_EQUAL;
 <INITIAL>">="                   return GREATER_EQUAL;
 <INITIAL>"<="                   return LESS_EQUAL;
-<INITIAL>">>"                   return SHIFT_LEFT;
-<INITIAL>"<<"                   return SHIFT_RIGHT;
+<INITIAL>"<<"                   return SHIFT_LEFT;
+<INITIAL>">>"                   return SHIFT_RIGHT;
 <INITIAL>"&&"                   return LOGICAL_AND;
 <INITIAL>"||"                   return LOGICAL_OR;
 <INITIAL>[-+*/%&|^~!<>=(){},;]  return yytext[0];

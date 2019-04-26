@@ -5,7 +5,14 @@
 #include <string>
 #include <vector>
 
+#include "consts.h"
+#include "utils.h"
+
 using namespace std;
+
+//
+// Prototypes
+//
 
 struct Node;
 struct StatementNode;
@@ -15,6 +22,7 @@ struct ExpressionNode;
 typedef vector<VarDeclarationNode*> VarList;
 typedef vector<ExpressionNode*> ExprList;
 
+// ===========================================================================
 
 struct Node {
     virtual ~Node() {}
@@ -60,12 +68,12 @@ struct BlockNode : public StatementNode {
 };
 
 struct VarDeclarationNode : public StatementNode {
-    int type;
+    DataType type;
     string name;
     ExpressionNode* value;
     bool isConst;
 
-    VarDeclarationNode(int type, const char* name, ExpressionNode* value = NULL, bool isConst = false) {
+    VarDeclarationNode(DataType type, const char* name, ExpressionNode* value = NULL, bool isConst = false) {
         this->type = type;
         this->name = string(name);
         this->value = value;
@@ -79,7 +87,13 @@ struct VarDeclarationNode : public StatementNode {
     }
 
     virtual void print(int ind = 0) {
-        cout << string(ind, ' ') << (isConst ? "const " : "var ") << name;
+        cout << string(ind, ' ');
+
+        if (isConst) {
+            cout << "const ";
+        }
+
+        cout << Utils::dtypeToStr(type) << ' ' << name;
 
         if (value) {
             cout << " = ";
@@ -89,12 +103,12 @@ struct VarDeclarationNode : public StatementNode {
 };
 
 struct FunctionNode : public StatementNode {
-    int type;
+    DataType type;
     string name;
     VarList paramList;
     BlockNode* body;
 
-    FunctionNode(int type, const char* name, const VarList& paramList, BlockNode* body) {
+    FunctionNode(DataType type, const char* name, const VarList& paramList, BlockNode* body) {
         this->type = type;
         this->name = string(name);
         this->paramList = paramList;
@@ -109,7 +123,7 @@ struct FunctionNode : public StatementNode {
     }
 
     virtual void print(int ind = 0) {
-        cout << string(ind, ' ') << "func " << name << "(";
+        cout << string(ind, ' ') << Utils::dtypeToStr(type) << ' ' << name << "(";
 
         if (paramList.size()) {
             paramList[0]->print(0);
@@ -238,11 +252,11 @@ struct AssignOprNode : public ExpressionNode {
 };
 
 struct BinaryOprNode : public ExpressionNode {
-    int opr;
+    Operator opr;
     ExpressionNode* lhs;
     ExpressionNode* rhs;
 
-    BinaryOprNode(int opr, ExpressionNode* lhs, ExpressionNode* rhs) {
+    BinaryOprNode(Operator opr, ExpressionNode* lhs, ExpressionNode* rhs) {
         this->opr = opr;
         this->lhs = lhs;
         this->rhs = rhs;
@@ -256,16 +270,16 @@ struct BinaryOprNode : public ExpressionNode {
     virtual void print(int ind = 0) {
         cout << string(ind, ' ');
         lhs->print(0);
-        cout << ' ' << opr << ' ';
+        cout << ' ' << Utils::oprToStr(opr) << ' ';
         rhs->print(0);
     }
 };
 
 struct UnaryOprNode : public ExpressionNode {
-    int opr;
+    Operator opr;
     ExpressionNode* expr;
 
-    UnaryOprNode(int opr, ExpressionNode* expr) {
+    UnaryOprNode(Operator opr, ExpressionNode* expr) {
         this->opr = opr;
         this->expr = expr;
     }
@@ -276,8 +290,14 @@ struct UnaryOprNode : public ExpressionNode {
 
     virtual void print(int ind = 0) {
         cout << string(ind, ' ');
-        cout << opr << ' ';
-        expr->print(0);
+
+        if (opr == OPR_SUF_INC || opr == OPR_SUF_DEC) {
+            expr->print(0);
+            cout << Utils::oprToStr(opr);
+        } else {
+            cout << Utils::oprToStr(opr);
+            expr->print(0);
+        }
     }
 };
 

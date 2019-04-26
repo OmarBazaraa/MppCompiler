@@ -2,7 +2,7 @@ clear:
 	cls
 
 copy:
-	copy src\\parse_tree.h out\\parse_tree.h
+	copy src\\*.h out\\*.h
 
 gen:
 	flex -o out/lexer.cpp src/lexer_specs.l
