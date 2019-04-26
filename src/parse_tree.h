@@ -119,7 +119,9 @@ struct FunctionNode : public StatementNode {
         for (int i = 0; i < paramList.size(); ++i) {
             delete paramList[i];
         }
-        delete body;
+        if (body) {
+            delete body;
+        }
     }
 
     virtual void print(int ind = 0) {
@@ -151,9 +153,12 @@ struct IfStmtNode : public StatementNode {
     }
 
     virtual ~IfStmtNode() {
-        delete cond;
-        delete ifStmt;
-
+        if (cond) {
+            delete cond;
+        }
+        if (ifStmt) {
+            delete ifStmt;
+        }
         if (elseStmt) {
             delete elseStmt;
         }
@@ -276,7 +281,9 @@ struct AssignOprNode : public ExpressionNode {
     }
 
     virtual ~AssignOprNode() {
-        delete value;
+        if (value) {
+            delete value;
+        }
     }
 
     virtual void print(int ind = 0) {
@@ -298,8 +305,12 @@ struct BinaryOprNode : public ExpressionNode {
     }
 
     virtual ~BinaryOprNode() {
-        delete lhs;
-        delete rhs;
+        if (lhs) {
+            delete lhs;
+        }
+        if (rhs) {
+            delete rhs;
+        }
     }
 
     virtual void print(int ind = 0) {
@@ -321,7 +332,9 @@ struct UnaryOprNode : public ExpressionNode {
     }
 
     virtual ~UnaryOprNode() {
-        delete expr;
+        if (expr) {
+            delete expr;
+        }
     }
 
     virtual void print(int ind = 0) {
