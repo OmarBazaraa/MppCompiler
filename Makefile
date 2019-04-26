@@ -11,10 +11,11 @@ gen:
 build:
 	g++ -std=c++14 -c out/rules/lexer.cpp -o out/lexer.o
 	g++ -std=c++14 -c out/rules/parser.cpp -o out/parser.o
-	g++ -std=c++14 -o out/parser.exe out/lexer.o out/parser.o
+	g++ -std=c++14 -c out/main.cpp -o out/main.o
+	g++ -std=c++14 -o out/M++.exe out/main.o out/lexer.o out/parser.o
 
 run:
-	out\\parser.exe < data/input.txt
+	out\\M++.exe data/input.txt
 
 all:
 	@make -s clear

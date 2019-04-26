@@ -325,15 +325,6 @@ type:               TYPE_INT        { $$ = DTYPE_INT; }
 // User Subroutines Section
 // ========================
 
-int main () {
-    yyparse();
-
-    programRoot->print();
-    delete programRoot;
-
-    return 0;
-}
-
 void yyerror(const char* s) {
     fprintf(stderr, "%s\n", s); 
 }
