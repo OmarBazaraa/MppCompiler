@@ -24,7 +24,7 @@ Run `make run` to run the recently built compiler.
 
 **_Note:_** You can change the input file from the `Makefile`.
 
-## M++ Compiler Commands
+# M++ Compiler Commands
 **Sytanx**: `M++ [-h|--help] [-v|--version] [-o|--output <output_file>]  <input_file>`
 
 | Command                                         | Description                                                      |
