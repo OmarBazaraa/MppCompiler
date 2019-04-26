@@ -33,6 +33,14 @@ void func(int x, bool y) {
         print(x);
 
 
+    while (5) {
+        
+    }
+
+    do 
+        ;
+    while (5);
+
     y = z = 7;
     
     6;

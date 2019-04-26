@@ -27,8 +27,10 @@ Node* programRoot = NULL;
     BlockNode*          block;
     StatementNode*      statement;
     VarDeclarationNode* varDecl;
-    IfStmtNode*         ifStmt;
-    ForStmtNode*        forStmt;
+    IfNode*             ifStmt;
+    WhileNode*          whileStmt;
+    DoWhileNode*        doWhileStmt;
+    ForNode*            forStmt;
     FunctionNode*       function;
     FunctionCallNode*   functionCall;
     VarList*            paramList;
@@ -94,6 +96,8 @@ Node* programRoot = NULL;
 %type <statement>       stmt branch_body for_init_stmt
 %type <varDecl>         var_decl var_decl_uninit var_decl_init
 %type <ifStmt>          if_stmt unmatched_if_stmt matched_if_stmt
+%type <whileStmt>       while_stmt
+%type <doWhileStmt>     do_while_stmt
 %type <forStmt>         for_stmt for_header
 %type <function>        function function_header
 %type <functionCall>    function_call
@@ -150,6 +154,8 @@ stmt:               ';'                     { $$ = new StatementNode(); }
     |               var_decl ';'            { $$ = $1; }
     |               expression ';'          { $$ = $1; }
     |               if_stmt                 { $$ = $1; }
+    |               while_stmt              { $$ = $1; }
+    |               do_while_stmt ';'       { $$ = $1; }
     |               for_stmt                { $$ = $1; }
     |               function                { $$ = $1; }
     ;
@@ -232,10 +238,21 @@ if_stmt:            unmatched_if_stmt
     |               matched_if_stmt
     ;
 
-unmatched_if_stmt:  IF '(' expression ')' branch_body %prec IF_UNMAT    { $$ = new IfStmtNode($3, $5); }
+unmatched_if_stmt:  IF '(' expression ')' branch_body %prec IF_UNMAT    { $$ = new IfNode($3, $5); }
     ;
 
-matched_if_stmt:    IF '(' expression ')' branch_body ELSE branch_body  { $$ = new IfStmtNode($3, $5, $7); }
+matched_if_stmt:    IF '(' expression ')' branch_body ELSE branch_body  { $$ = new IfNode($3, $5, $7); }
+    ;
+
+// ------------------------------------------------------------
+//
+// While Rules
+//
+
+while_stmt:         WHILE '(' expression ')' branch_body                { $$ = new WhileNode($3, $5); }
+    ;
+
+do_while_stmt:      DO branch_body WHILE '(' expression ')'             { $$ = new DoWhileNode($5, $2); }
     ;
 
 // ------------------------------------------------------------
@@ -246,7 +263,7 @@ matched_if_stmt:    IF '(' expression ')' branch_body ELSE branch_body  { $$ = n
 for_stmt:           for_header branch_body                              { $$ = $1; $$->body = $2; }
     ;
 
-for_header:         FOR '(' for_init_stmt ';' for_expr ';' for_expr ')' { $$ = new ForStmtNode($3, $5, $7, NULL); }
+for_header:         FOR '(' for_init_stmt ';' for_expr ';' for_expr ')' { $$ = new ForNode($3, $5, $7, NULL); }
     ;
 
 for_init_stmt:      /* epsilon */                                       { $$ = NULL; }
