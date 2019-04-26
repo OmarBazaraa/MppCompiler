@@ -2,15 +2,15 @@ clear:
 	cls
 
 copy:
-	copy src\\*.h out\\*.h
+	xcopy src out /E /y /q
 
 gen:
-	flex -o out/lexer.cpp src/lexer_specs.l
-	bison -d -o out/parser.cpp src/parser_grammer.y
+	flex -o out/rules/lexer.cpp out/rules/lexer_specs.l
+	bison -d -o out/rules/parser.cpp out/rules/parser_grammar.y
 
 build:
-	g++ -std=c++14 -c out/lexer.cpp -o out/lexer.o
-	g++ -std=c++14 -c out/parser.cpp -o out/parser.o
+	g++ -std=c++14 -c out/rules/lexer.cpp -o out/lexer.o
+	g++ -std=c++14 -c out/rules/parser.cpp -o out/parser.o
 	g++ -std=c++14 -o out/parser.exe out/lexer.o out/parser.o
 
 run:
