@@ -27,6 +27,7 @@ Node* programRoot = NULL;
     BlockNode*          block;
     StatementNode*      statement;
     VarDeclarationNode* varDecl;
+    IfStmtNode*         ifStmt;
     FunctionNode*       function;
     FunctionCallNode*   functionCall;
     VarList*            paramList;
@@ -55,6 +56,7 @@ Node* programRoot = NULL;
 // Keywords
 %token <token> CONST
 %token <token> IF
+%token <token> ELSE
 %token <token> SWITCH
 %token <token> DEFAULT
 %token <token> FOR
@@ -88,8 +90,9 @@ Node* programRoot = NULL;
 // ==========================
 
 %type <block>           program stmt_list stmt_block
-%type <statement>       stmt
+%type <statement>       stmt branch_body
 %type <varDecl>         var_decl var_decl_uninit var_decl_init
+%type <ifStmt>          if_stmt unmatched_if_stmt matched_if_stmt
 %type <function>        function function_header
 %type <functionCall>    function_call
 %type <paramList>       param_list param_list_ext
@@ -102,21 +105,24 @@ Node* programRoot = NULL;
 // ===========================
 
 // Note that order matters here
-%right  '='
-%left   LOGICAL_OR
-%left   LOGICAL_AND
-%left   '|'
-%left   '^'
-%left   '&'
-%left   EQUAL NOT_EQUAL
-%left   LESS_EQUAL GREATER_EQUAL '<' '>'
-%left   SHIFT_RIGHT SHIFT_LEFT
-%left   '-' '+'
-%left   '*' '/' '%'
-%right  '!' '~'
-%right  U_PLUS U_MINUM
-%right  PRE_INC PRE_DEC
-%left   SUF_INC SUF_DEC
+%right      '='
+%left       LOGICAL_OR
+%left       LOGICAL_AND
+%left       '|'
+%left       '^'
+%left       '&'
+%left       EQUAL NOT_EQUAL
+%left       LESS_EQUAL GREATER_EQUAL '<' '>'
+%left       SHIFT_RIGHT SHIFT_LEFT
+%left       '-' '+'
+%left       '*' '/' '%'
+%right      '!' '~'
+%right      U_PLUS U_MINUM
+%right      PRE_INC PRE_DEC
+%left       SUF_INC SUF_DEC
+
+%nonassoc   IF_UNMAT
+%nonassoc   ELSE
 
 %%
 
@@ -141,7 +147,12 @@ stmt_block:         '{' '}'                 { $$ = new BlockNode(); }
 stmt:               ';'                     { $$ = new StatementNode(); }
     |               var_decl ';'            { $$ = $1; }
     |               expression ';'          { $$ = $1; }
+    |               if_stmt                 { $$ = $1; }
     |               function                { $$ = $1; }
+    ;
+
+branch_body:        stmt                    { $$ = $1; }
+    |               stmt_block              { $$ = $1; }
     ;
 
 // ------------------------------------------------------------
@@ -190,9 +201,9 @@ expression:         IDENTIFIER '=' expression               { $$ = new AssignOpr
     |               INC expression %prec PRE_INC            { $$ = new UnaryOprNode(OPR_PRE_INC, $2); }
     |               DEC expression %prec PRE_DEC            { $$ = new UnaryOprNode(OPR_PRE_DEC, $2); }
     
-    // TODO: fix postfix inc/dec
-    // |               expression INC %prec SUF_INC            { $$ = new UnaryOprNode(OPR_SUF_INC, $2); }
-    // |               expression DEC %prec SUF_DEC            { $$ = new UnaryOprNode(OPR_SUF_DEC, $2); }
+//  TODO - fix postfix inc/dec
+//  |               expression INC %prec SUF_INC            { $$ = new UnaryOprNode(OPR_SUF_INC, $2); }
+//  |               expression DEC %prec SUF_DEC            { $$ = new UnaryOprNode(OPR_SUF_DEC, $2); }
 
     |               '+' expression %prec U_PLUS             { $$ = new UnaryOprNode(OPR_U_PLUS, $2); }
     |               '-' expression %prec U_MINUM            { $$ = new UnaryOprNode(OPR_U_MINUS, $2); }
@@ -207,6 +218,21 @@ expression:         IDENTIFIER '=' expression               { $$ = new AssignOpr
     |               BOOL                                    { $$ = new BoolNode($1); }
     |               IDENTIFIER                              { $$ = new VarNode($1); }
     |               function_call                           { $$ = $1; }
+    ;
+
+// ------------------------------------------------------------
+//
+// If Rules
+//
+
+if_stmt:            unmatched_if_stmt
+    |               matched_if_stmt
+    ;
+
+unmatched_if_stmt:  IF '(' expression ')' branch_body %prec IF_UNMAT    { $$ = new IfStmtNode($3, $5); }
+    ;
+
+matched_if_stmt:    IF '(' expression ')' branch_body ELSE branch_body  { $$ = new IfStmtNode($3, $5, $7); }
     ;
 
 // ------------------------------------------------------------

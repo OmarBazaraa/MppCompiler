@@ -5,8 +5,19 @@ void func(int x, bool y) {
    
     const void lol = 5;
 
-    x & u * 6 | 7 ^ x % (4 == 5);
+    x & u * 6 | 7 ^ x % (4 == 5) && ++y;
 
+    if (asd)
+        if (7)
+            ;
+        else {
+            omr << 1;
+        }
+
+
+    y = z = 7;
+    
     6;
+
     oamsdas;
 }

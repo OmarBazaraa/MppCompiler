@@ -139,6 +139,40 @@ struct FunctionNode : public StatementNode {
     }
 };
 
+struct IfStmtNode : public StatementNode {
+    ExpressionNode* cond;
+    StatementNode* ifStmt;
+    StatementNode* elseStmt;
+
+    IfStmtNode(ExpressionNode* cond, StatementNode* ifStmt = NULL, StatementNode* elseStmt = NULL) {
+        this->cond = cond;
+        this->ifStmt = ifStmt;
+        this->elseStmt = elseStmt;
+    }
+
+    virtual ~IfStmtNode() {
+        delete cond;
+        delete ifStmt;
+
+        if (elseStmt) {
+            delete elseStmt;
+        }
+    }
+
+    virtual void print(int ind = 0) {
+        cout << string(ind, ' ') << "if (";
+        cond->print(0);
+        cout << ")" << endl;
+        ifStmt->print(ind + (dynamic_cast<BlockNode*>(ifStmt) ? 0 : 4));
+
+        if (elseStmt) {
+            cout << endl;
+            cout << string(ind, ' ') << "else" << endl;
+            elseStmt->print(ind + (dynamic_cast<BlockNode*>(elseStmt) ? 0 : 4));
+        }
+    }
+};
+
 // ===========================================================================
 
 struct IntNode : public ExpressionNode {

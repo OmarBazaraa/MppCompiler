@@ -54,6 +54,7 @@ WHITESPACE          [ \t\n]+
 %}
 <INITIAL>"const"                return CONST;
 <INITIAL>"if"                   return IF;
+<INITIAL>"else"                 return ELSE;
 <INITIAL>"switch"               return SWITCH;
 <INITIAL>"default"              return DEFAULT;
 <INITIAL>"for"                  return FOR;
