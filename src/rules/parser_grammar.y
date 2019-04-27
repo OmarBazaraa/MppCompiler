@@ -81,8 +81,8 @@ Node* programRoot = NULL;
 %token <token> NOT_EQUAL
 %token <token> GREATER_EQUAL
 %token <token> LESS_EQUAL
-%token <token> SHIFT_LEFT
-%token <token> SHIFT_RIGHT
+%token <token> SHL
+%token <token> SHR
 %token <token> LOGICAL_AND
 %token <token> LOGICAL_OR
 
@@ -128,7 +128,7 @@ Node* programRoot = NULL;
 %left       '&'
 %left       EQUAL NOT_EQUAL
 %left       LESS_EQUAL GREATER_EQUAL '<' '>'
-%left       SHIFT_RIGHT SHIFT_LEFT
+%left       SHR SHL
 %left       '-' '+'
 %left       '*' '/' '%'
 %right      '!' '~'
@@ -209,8 +209,8 @@ expression:         IDENTIFIER '=' expression               { $$ = new AssignOpr
     |               expression '&' expression               { $$ = new BinaryOprNode(OPR_AND, $1, $3); }
     |               expression '|' expression               { $$ = new BinaryOprNode(OPR_OR, $1, $3); }
     |               expression '^' expression               { $$ = new BinaryOprNode(OPR_XOR, $1, $3); }
-    |               expression SHIFT_LEFT expression        { $$ = new BinaryOprNode(OPR_SHL, $1, $3); }
-    |               expression SHIFT_RIGHT expression       { $$ = new BinaryOprNode(OPR_SHR, $1, $3); }
+    |               expression SHL expression               { $$ = new BinaryOprNode(OPR_SHL, $1, $3); }
+    |               expression SHR expression               { $$ = new BinaryOprNode(OPR_SHR, $1, $3); }
     |               expression LOGICAL_AND expression       { $$ = new BinaryOprNode(OPR_LOGICAL_AND, $1, $3); }
     |               expression LOGICAL_OR expression        { $$ = new BinaryOprNode(OPR_LOGICAL_OR, $1, $3); }
     |               expression '>' expression               { $$ = new BinaryOprNode(OPR_GREATER, $1, $3); }
@@ -348,6 +348,8 @@ arg_list_ext:       expression                          { $$ = new ExprList(); $
     ;
 
 return_stmt:        RETURN expression                   { $$ = new ReturnStmtNode($2); }
+    |               RETURN                              { $$ = new ReturnStmtNode(NULL); }
+    ;
 
 // ------------------------------------------------------------
 //

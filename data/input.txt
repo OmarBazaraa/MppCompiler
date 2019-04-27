@@ -1,63 +1,6 @@
-int omar =4;
+int omar = 4;
 
 void func(int x, bool y) {
-    switch(56 + 95.6e5) {
-        case 4:
-            break;
-        case 9:
-        case 2:
-            continue;
-        default:
-            x = y = z = (a + b) * c;
-    }
-   
-    return --(x + 7);
-
-    break;
-
-    continue;
-   
-    const void lol = 5;
-
-    x & u * 6 | 7 ^ x % (4 == 5) && ++y;
-
-    if (asd)
-        if (7)
-            ;
-        else {
-            omr << 1;
-        }
-
-    // for statement
-    for (int i = 0; i < 6; ++i) {
-        print('7');
-        {
-            {
-            true ^ 8;
-            }
-        }
-    }
-
-    /**
-     *
-     * Block comment
-     */
-
-    for (;;)
-        print(x);
-
-
-    while (5) {
-        
-    }
-
-    do 
-        ;
-    while (5);
-
-    y = z = 7;
-    
-    6;
-
-    oamsdas;
+    if (++(x - 7 * 6))
+        return;
 }

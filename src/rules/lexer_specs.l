@@ -75,8 +75,8 @@ WHITESPACE          [ \t\n]+
 <INITIAL>"!="                       return NOT_EQUAL;
 <INITIAL>">="                       return GREATER_EQUAL;
 <INITIAL>"<="                       return LESS_EQUAL;
-<INITIAL>"<<"                       return SHIFT_LEFT;
-<INITIAL>">>"                       return SHIFT_RIGHT;
+<INITIAL>"<<"                       return SHL;
+<INITIAL>">>"                       return SHR;
 <INITIAL>"&&"                       return LOGICAL_AND;
 <INITIAL>"||"                       return LOGICAL_OR;
 <INITIAL>[-+*/%&|^~!<>=(){},:;]     return yytext[0];

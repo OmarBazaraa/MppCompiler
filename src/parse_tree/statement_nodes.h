@@ -119,8 +119,11 @@ struct ReturnStmtNode : public StatementNode {
     }
 
     virtual void print(int ind = 0) {
-        cout << string(ind, ' ') << "return ";
-        value->print(0);
+        cout << string(ind, ' ') << "return";
+        if (value) {
+            cout << " ";
+            value->print(0);
+        }
         cout << ";";
     }
 };
