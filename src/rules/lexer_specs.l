@@ -3,8 +3,13 @@
 
 #include "parser.hpp"
 
-int charCount = 0;
-int lineNumber = 0;
+#define SYNC_CURSOR     (curCursorPos += (curTokenLen = yyleng))
+
+char* curLine = NULL;
+int curLineNum = 1;
+int curCursorPos = 0;
+int curTokenLen = 0;
+
 %}
 
 %{
@@ -30,8 +35,8 @@ EXP                 [eE][-+]?{INTEGER}
 REAL                ({INTEGER}{EXP}|{FLOAT}({EXP})?)
 LETTER              [a-zA-Z_]
 IDENTIFIER          {LETTER}({LETTER}|{DIGIT})*
-LINE_COMMENT        "//"(.)*\n
-WHITESPACE          [ \t\n]+
+LINE_COMMENT        "//"(.)*
+WHITESPACE          [ \t]+
 
 %%
 
@@ -42,63 +47,77 @@ WHITESPACE          [ \t\n]+
 %}
 
 %{
+// Token localization
+%}
+\n                                  {
+                                        curLineNum++;
+                                        curCursorPos = 0;
+                                    }
+
+^.*\n                               {
+                                        if (curLine) delete curLine;
+                                        curLine = strdup(yytext);
+                                        REJECT;
+                                    }
+
+%{
 // Data types
 %}
-<INITIAL>"int"                      return TYPE_INT;
-<INITIAL>"float"                    return TYPE_FLOAT;
-<INITIAL>"char"                     return TYPE_CHAR;
-<INITIAL>"bool"                     return TYPE_BOOL;
-<INITIAL>"void"                     return TYPE_VOID;
+<INITIAL>"int"                      SYNC_CURSOR; return TYPE_INT;
+<INITIAL>"float"                    SYNC_CURSOR; return TYPE_FLOAT;
+<INITIAL>"char"                     SYNC_CURSOR; return TYPE_CHAR;
+<INITIAL>"bool"                     SYNC_CURSOR; return TYPE_BOOL;
+<INITIAL>"void"                     SYNC_CURSOR; return TYPE_VOID;
 
 %{
 // Branch tokens
 %}
-<INITIAL>"const"                    return CONST;
-<INITIAL>"if"                       return IF;
-<INITIAL>"else"                     return ELSE;
-<INITIAL>"switch"                   return SWITCH;
-<INITIAL>"case"                     return CASE;
-<INITIAL>"default"                  return DEFAULT;
-<INITIAL>"for"                      return FOR;
-<INITIAL>"do"                       return DO;
-<INITIAL>"while"                    return WHILE;
-<INITIAL>"break"                    return BREAK;
-<INITIAL>"continue"                 return CONTINUE;
-<INITIAL>"return"                   return RETURN;
+<INITIAL>"const"                    SYNC_CURSOR; return CONST;
+<INITIAL>"if"                       SYNC_CURSOR; return IF;
+<INITIAL>"else"                     SYNC_CURSOR; return ELSE;
+<INITIAL>"switch"                   SYNC_CURSOR; return SWITCH;
+<INITIAL>"case"                     SYNC_CURSOR; return CASE;
+<INITIAL>"default"                  SYNC_CURSOR; return DEFAULT;
+<INITIAL>"for"                      SYNC_CURSOR; return FOR;
+<INITIAL>"do"                       SYNC_CURSOR; return DO;
+<INITIAL>"while"                    SYNC_CURSOR; return WHILE;
+<INITIAL>"break"                    SYNC_CURSOR; return BREAK;
+<INITIAL>"continue"                 SYNC_CURSOR; return CONTINUE;
+<INITIAL>"return"                   SYNC_CURSOR; return RETURN;
 
 %{
 // Operators
 %}
-<INITIAL>"++"                       return INC;
-<INITIAL>"--"                       return DEC;
-<INITIAL>"=="                       return EQUAL;
-<INITIAL>"!="                       return NOT_EQUAL;
-<INITIAL>">="                       return GREATER_EQUAL;
-<INITIAL>"<="                       return LESS_EQUAL;
-<INITIAL>"<<"                       return SHL;
-<INITIAL>">>"                       return SHR;
-<INITIAL>"&&"                       return LOGICAL_AND;
-<INITIAL>"||"                       return LOGICAL_OR;
-<INITIAL>[-+*/%&|^~!<>=(){},:;]     return yytext[0];
+<INITIAL>"++"                       SYNC_CURSOR; return INC;
+<INITIAL>"--"                       SYNC_CURSOR; return DEC;
+<INITIAL>"=="                       SYNC_CURSOR; return EQUAL;
+<INITIAL>"!="                       SYNC_CURSOR; return NOT_EQUAL;
+<INITIAL>">="                       SYNC_CURSOR; return GREATER_EQUAL;
+<INITIAL>"<="                       SYNC_CURSOR; return LESS_EQUAL;
+<INITIAL>"<<"                       SYNC_CURSOR; return SHL;
+<INITIAL>">>"                       SYNC_CURSOR; return SHR;
+<INITIAL>"&&"                       SYNC_CURSOR; return LOGICAL_AND;
+<INITIAL>"||"                       SYNC_CURSOR; return LOGICAL_OR;
+<INITIAL>[-+*/%&|^~!<>=(){},:;]     SYNC_CURSOR; return yytext[0];
 
 %{
 // Values
 %}
-<INITIAL>{INTEGER}                  yylval.valueInt = atoi(yytext);     return INTEGER;
-<INITIAL>{REAL}                     yylval.valueFloat = atof(yytext);   return FLOAT;
-<INITIAL>(\'.\')                    yylval.valueChar = yytext[1];       return CHAR;
-<INITIAL>"true"                     yylval.valueBool = true;            return BOOL;
-<INITIAL>"false"                    yylval.valueBool = false;           return BOOL;
-<INITIAL>{IDENTIFIER}               yylval.valueIden = strdup(yytext);  return IDENTIFIER;
+<INITIAL>{INTEGER}                  SYNC_CURSOR; yylval.valueInt = atoi(yytext);     return INTEGER;
+<INITIAL>{REAL}                     SYNC_CURSOR; yylval.valueFloat = atof(yytext);   return FLOAT;
+<INITIAL>(\'.\')                    SYNC_CURSOR; yylval.valueChar = yytext[1];       return CHAR;
+<INITIAL>"true"                     SYNC_CURSOR; yylval.valueBool = true;            return BOOL;
+<INITIAL>"false"                    SYNC_CURSOR; yylval.valueBool = false;           return BOOL;
+<INITIAL>{IDENTIFIER}               SYNC_CURSOR; yylval.valueIden = strdup(yytext);  return IDENTIFIER;
 
 %{
 // Others
 %}
-<INITIAL>{WHITESPACE}               ; // Ignore whitespace
-<INITIAL>{LINE_COMMENT}             ; // Ignore comments
-<INITIAL>"/*"                       BEGIN BLOCK_COMMENT;
-<BLOCK_COMMENT>"*/"                 BEGIN INITIAL;
-<BLOCK_COMMENT>(.|\n)               ; // Ignore block comments
+<INITIAL>{WHITESPACE}               SYNC_CURSOR; // Ignore whitespace
+<INITIAL>{LINE_COMMENT}             SYNC_CURSOR; // Ignore comments
+<INITIAL>"/*"                       SYNC_CURSOR; BEGIN BLOCK_COMMENT;
+<BLOCK_COMMENT>"*/"                 SYNC_CURSOR; BEGIN INITIAL;
+<BLOCK_COMMENT>.                    SYNC_CURSOR; // Ignore block comments
 
 %%
 

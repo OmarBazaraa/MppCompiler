@@ -19,6 +19,7 @@ using namespace std;
 // External functions & variables
 //
 extern int yyparse();
+extern int yylex();
 extern FILE* yyin;
 extern Node* programRoot;
 

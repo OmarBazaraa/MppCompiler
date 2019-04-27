@@ -7,9 +7,18 @@
 using namespace std;
 
 //
-// Functions prototypes
+// External functions & variables
 //
 extern int yylex();
+extern FILE* yyin;
+extern char* curLine;
+extern int curLineNum;
+extern int curCursorPos;
+extern int curTokenLen;
+
+//
+// Functions prototypes
+//
 void yyerror(const char* s);
 
 //
