@@ -8,10 +8,14 @@
  * The node class holding a block of code in the parse tree.
  */
 struct BlockNode : public StatementNode {
-    vector<StatementNode*> statements;
+    StmtList statements;
 
     BlockNode() {
 
+    }
+
+    BlockNode(const StmtList& statements) {
+        this->statements = statements;
     }
 
     virtual ~BlockNode() {
@@ -133,10 +137,10 @@ struct ReturnStmtNode : public StatementNode {
  */
 struct CaseStmtNode : public StatementNode {
     ExpressionNode* expr;
-    StatementNode* body;
+    StmtList body;
     bool isDefault;
 
-    CaseStmtNode(ExpressionNode* expr, StatementNode* body, bool isDefault = false) {
+    CaseStmtNode(ExpressionNode* expr, const StmtList& body, bool isDefault = false) {
         this->expr = expr;
         this->body = body;
         this->isDefault = isDefault;
@@ -146,8 +150,8 @@ struct CaseStmtNode : public StatementNode {
         if (expr) {
             delete expr;
         }
-        if (body) {
-            delete body;
+        for (int i = 0; i < body.size(); ++i) {
+            delete body[i];
         }
     }
 
@@ -159,8 +163,8 @@ struct CaseStmtNode : public StatementNode {
             expr->print(0);
             cout << ":" << endl;
         }
-        if (body) {
-            body->print(ind + (dynamic_cast<BlockNode*>(body) ? 0 : 4));
+        for (int i = 0; i < body.size(); ++i) {
+            body[i]->print(ind + 4);
             cout << endl;
         }
     }

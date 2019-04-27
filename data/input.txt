@@ -3,4 +3,16 @@ int omar = 4;
 void func(int x, bool y) {
     if (++(x - 7 * 6))
         return;
+
+    switch (varX) {
+    case 5:
+        oamr;
+        ;
+        ;
+        {
+            
+        }
+    default: oasda;
+    default: x & 1;    
+    }
 }

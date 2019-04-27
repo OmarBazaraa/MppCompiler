@@ -36,8 +36,9 @@ Node* programRoot = NULL;
     FunctionNode*       function;
     FunctionCallNode*   functionCall;
     ReturnStmtNode*     returnStmt;
-    VarList*            paramList;
-    ExprList*           argList;
+    StmtList*           stmtList;
+    ExprList*           exprList;
+    VarList*            varList;
     CaseList*           caseList;
     ExpressionNode*     expression;
     DataType            dtype;
@@ -77,14 +78,14 @@ Node* programRoot = NULL;
 // Operators
 %token <token> INC
 %token <token> DEC
-%token <token> EQUAL
-%token <token> NOT_EQUAL
-%token <token> GREATER_EQUAL
-%token <token> LESS_EQUAL
 %token <token> SHL
 %token <token> SHR
 %token <token> LOGICAL_AND
 %token <token> LOGICAL_OR
+%token <token> EQUAL
+%token <token> NOT_EQUAL
+%token <token> GREATER_EQUAL
+%token <token> LESS_EQUAL
 
 // Values
 %token <valueIden>  IDENTIFIER
@@ -97,8 +98,9 @@ Node* programRoot = NULL;
 // Non-terminal Symbols Types
 // ==========================
 
-%type <block>           program stmt_list stmt_block
-%type <statement>       stmt branch_body case_body for_init_stmt
+%type <block>           program stmt_block
+%type <statement>       stmt branch_body for_init_stmt
+%type <stmtList>        stmt_list case_body
 %type <varDecl>         var_decl var_decl_uninit var_decl_init
 %type <ifStmt>          if_stmt unmatched_if_stmt matched_if_stmt
 %type <switchStmt>      switch_stmt
@@ -110,8 +112,8 @@ Node* programRoot = NULL;
 %type <function>        function function_header
 %type <functionCall>    function_call
 %type <returnStmt>      return_stmt
-%type <paramList>       param_list param_list_ext
-%type <argList>         arg_list arg_list_ext
+%type <varList>         param_list param_list_ext
+%type <exprList>        arg_list arg_list_ext
 %type <expression>      expression for_expr
 %type <dtype>           type
 
@@ -146,17 +148,17 @@ Node* programRoot = NULL;
 // =============
 
 program:            /* epsilon */           { programRoot = new BlockNode(); }
-    |               stmt_list               { programRoot = $1; }
+    |               stmt_list               { programRoot = new BlockNode(*$1); delete $1; }
     ;
 
-stmt_list:          stmt                    { $$ = new BlockNode(); $$->statements.push_back($1); }
-    |               stmt_block              { $$ = new BlockNode(); $$->statements.push_back($1); }
-    |               stmt_list stmt          { $1->statements.push_back($2); }
-    |               stmt_list stmt_block    { $1->statements.push_back($2); }
+stmt_list:          stmt                    { $$ = new StmtList(); $$->push_back($1); }
+    |               stmt_block              { $$ = new StmtList(); $$->push_back($1); }
+    |               stmt_list stmt          { $$ = $1; $$->push_back($2); }
+    |               stmt_list stmt_block    { $$ = $1; $$->push_back($2); }
     ;
 
 stmt_block:         '{' '}'                 { $$ = new BlockNode(); }
-    |               '{' stmt_list '}'       { $$ = $2; }
+    |               '{' stmt_list '}'       { $$ = new BlockNode(*$2); delete $2; }
     ;
 
 stmt:               ';'                     { $$ = new StatementNode(); }
@@ -276,11 +278,11 @@ case_stmt_list:     case_stmt                               { $$ = new CaseList(
     |               case_stmt_list case_stmt                { $$ = $1; $$->push_back($2); }
     ;
 
-case_stmt:          CASE expression ':' case_body           { $$ = new CaseStmtNode($2, $4); }
-    |               DEFAULT ':' case_body                   { $$ = new CaseStmtNode(NULL, $3, true); }
+case_stmt:          CASE expression ':' case_body           { $$ = new CaseStmtNode($2, *$4); delete $4; }
+    |               DEFAULT ':' case_body                   { $$ = new CaseStmtNode(NULL, *$3, true); delete $3; }
     ;
 
-case_body:          /* epsilon */                           { $$ = NULL; }
+case_body:          /* epsilon */                           { $$ = new StmtList(); }
     |               stmt_list                               { $$ = $1; }
     ;
 
