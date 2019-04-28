@@ -12,7 +12,6 @@
 //
 // Prototypes
 //
-
 struct Node;
 struct StatementNode;
 struct ExpressionNode;
@@ -29,7 +28,10 @@ typedef vector<CaseStmtNode*> CaseList;
  * The base class of all parse tree nodes.
  */
 struct Node {
-    virtual ~Node() {}
+
+    virtual ~Node() {
+
+    }
 
     virtual void print(int ind = 0) {
         
@@ -37,21 +39,49 @@ struct Node {
 };
 
 /**
- * The base class statement nodes in the parse tree.
+ * The base class of all statement nodes in the parse tree.
  */
-struct StatementNode : public Node {
+struct StatementNode : Node {
+    Location loc;
+
+    StatementNode() {
+
+    }
+
+    StatementNode(const Location& loc) {
+        this->loc = loc;
+    }
+
+    virtual ~StatementNode() {
+
+    }
+
     virtual void print(int ind = 0) {
         cout << string(ind, ' ') << ";" ;
     }
 };
 
 /**
- * The base class expression nodes in the parse tree.
+ * The base class of all expression nodes in the parse tree.
  */
 struct ExpressionNode : public StatementNode {
 
+    ExpressionNode() {
+
+    }
+
+    ExpressionNode(const Location& loc) : StatementNode(loc) {
+        this->loc = loc;
+    }
+
+    virtual ~ExpressionNode() {
+
+    }
 };
 
+/**
+ * The node class representing a syntax error statement.
+ */
 struct ErrorNode : public StatementNode {
     int lineNum;
     int cursorPos;

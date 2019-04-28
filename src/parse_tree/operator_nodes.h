@@ -12,7 +12,7 @@ struct AssignOprNode : public ExpressionNode {
     IdentifierNode* name;
     ExpressionNode* value;
 
-    AssignOprNode(IdentifierNode* name, ExpressionNode* value) {
+    AssignOprNode(IdentifierNode* name, ExpressionNode* value) : ExpressionNode(name->loc) {
         this->name = name;
         this->value = value;
     }
@@ -43,7 +43,7 @@ struct BinaryOprNode : public ExpressionNode {
     ExpressionNode* lhs;
     ExpressionNode* rhs;
 
-    BinaryOprNode(Operator opr, ExpressionNode* lhs, ExpressionNode* rhs) {
+    BinaryOprNode(Operator opr, ExpressionNode* lhs, ExpressionNode* rhs) : ExpressionNode(lhs->loc) {
         this->opr = opr;
         this->lhs = lhs;
         this->rhs = rhs;
@@ -74,7 +74,7 @@ struct UnaryOprNode : public ExpressionNode {
     Operator opr;
     ExpressionNode* expr;
 
-    UnaryOprNode(Operator opr, ExpressionNode* expr) {
+    UnaryOprNode(const Location& loc, Operator opr, ExpressionNode* expr) : ExpressionNode(loc) {
         this->opr = opr;
         this->expr = expr;
     }

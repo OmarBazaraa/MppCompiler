@@ -31,7 +31,6 @@ Node* programRoot = NULL;
 // ============
 
 %union {
-    Node*               node;
     BlockNode*          blockNode;
     StatementNode*      StmtNode;
     VarDeclarationNode* varDeclNode;
@@ -158,7 +157,7 @@ Node* programRoot = NULL;
 // =============
 
 program:            /* epsilon */           { programRoot = new BlockNode(); }
-    |               stmt_list               { programRoot = new BlockNode(*$1); delete $1; }
+    |               stmt_list               { programRoot = new BlockNode((*$1)[0]->loc, *$1); delete $1; }
     ;
 
 stmt_list:          stmt                    { $$ = new StmtList(); $$->push_back($1); }
@@ -167,13 +166,13 @@ stmt_list:          stmt                    { $$ = new StmtList(); $$->push_back
     |               stmt_list stmt_block    { $$ = $1; $$->push_back($2); }
     ;
 
-stmt_block:         '{' '}'                 { $$ = new BlockNode(); }
-    |               '{' stmt_list '}'       { $$ = new BlockNode(*$2); delete $2; }
+stmt_block:         '{' '}'                 { $$ = new BlockNode($<location>1); }
+    |               '{' stmt_list '}'       { $$ = new BlockNode($<location>1, *$2); delete $2; }
     ;
 
-stmt:               ';'                     { $$ = new StatementNode(); }
-    |               BREAK ';'               { $$ = new BreakStmtNode(); }
-    |               CONTINUE ';'            { $$ = new ContinueStmtNode(); }
+stmt:               ';'                     { $$ = new StatementNode($<location>1); }
+    |               BREAK ';'               { $$ = new BreakStmtNode($<location>1); }
+    |               CONTINUE ';'            { $$ = new ContinueStmtNode($<location>1); }
     |               var_decl ';'            { $$ = $1; }
     |               expression ';'          { $$ = $1; }
     |               if_stmt                 { $$ = $1; }
@@ -233,19 +232,19 @@ expression:         ident '=' expression                    { $$ = new AssignOpr
     |               expression EQUAL expression             { $$ = new BinaryOprNode(OPR_EQUAL, $1, $3); }
     |               expression NOT_EQUAL expression         { $$ = new BinaryOprNode(OPR_NOT_EQUAL, $1, $3); }
 
-    |               INC expression %prec PRE_INC            { $$ = new UnaryOprNode(OPR_PRE_INC, $2); }
-    |               DEC expression %prec PRE_DEC            { $$ = new UnaryOprNode(OPR_PRE_DEC, $2); }
+    |               INC expression %prec PRE_INC            { $$ = new UnaryOprNode($1, OPR_PRE_INC, $2); }
+    |               DEC expression %prec PRE_DEC            { $$ = new UnaryOprNode($1, OPR_PRE_DEC, $2); }
     
 //  TODO - fix postfix inc/dec
-//  |               expression INC %prec SUF_INC            { $$ = new UnaryOprNode(OPR_SUF_INC, $2); }
-//  |               expression DEC %prec SUF_DEC            { $$ = new UnaryOprNode(OPR_SUF_DEC, $2); }
+//  |               expression INC %prec SUF_INC            { $$ = new UnaryOprNode($1->loc, OPR_SUF_INC, $2); }
+//  |               expression DEC %prec SUF_DEC            { $$ = new UnaryOprNode($1->loc, OPR_SUF_DEC, $2); }
 
-    |               '+' expression %prec U_PLUS             { $$ = new UnaryOprNode(OPR_U_PLUS, $2); }
-    |               '-' expression %prec U_MINUM            { $$ = new UnaryOprNode(OPR_U_MINUS, $2); }
-    |               '~' expression                          { $$ = new UnaryOprNode(OPR_NOT, $2); }
-    |               '!' expression                          { $$ = new UnaryOprNode(OPR_LOGICAL_NOT, $2); }
+    |               '+' expression %prec U_PLUS             { $$ = new UnaryOprNode($<location>1, OPR_U_PLUS, $2); }
+    |               '-' expression %prec U_MINUM            { $$ = new UnaryOprNode($<location>1, OPR_U_MINUS, $2); }
+    |               '~' expression                          { $$ = new UnaryOprNode($<location>1, OPR_NOT, $2); }
+    |               '!' expression                          { $$ = new UnaryOprNode($<location>1, OPR_LOGICAL_NOT, $2); }
 
-    |               '(' expression ')'                      { $$ = $2; }
+    |               '(' expression ')'                      { $$ = $2; $$->loc = $<location>1; }
 
     |               value                                   { $$ = $1; }
     |               ident                                   { $$ = $1; }
@@ -261,10 +260,10 @@ if_stmt:            unmatched_if_stmt
     |               matched_if_stmt
     ;
 
-unmatched_if_stmt:  IF '(' expression ')' branch_body %prec IF_UNMAT    { $$ = new IfNode($3, $5); }
+unmatched_if_stmt:  IF '(' expression ')' branch_body %prec IF_UNMAT    { $$ = new IfNode($1, $3, $5); }
     ;
 
-matched_if_stmt:    IF '(' expression ')' branch_body ELSE branch_body  { $$ = new IfNode($3, $5, $7); }
+matched_if_stmt:    IF '(' expression ')' branch_body ELSE branch_body  { $$ = new IfNode($1, $3, $5, $7); }
     ;
 
 // ------------------------------------------------------------
@@ -272,7 +271,7 @@ matched_if_stmt:    IF '(' expression ')' branch_body ELSE branch_body  { $$ = n
 // Switch Rules
 //
 
-switch_stmt:        SWITCH '(' expression ')' switch_body   { $$ = new SwitchNode($3, *$5); delete $5; }
+switch_stmt:        SWITCH '(' expression ')' switch_body   { $$ = new SwitchNode($1, $3, *$5); delete $5; }
     ;
 
 switch_body:        case_stmt_block                         { $$ = $1; }
@@ -286,8 +285,8 @@ case_stmt_list:     case_stmt                               { $$ = new CaseList(
     |               case_stmt_list case_stmt                { $$ = $1; $$->push_back($2); }
     ;
 
-case_stmt:          CASE expression ':' case_body           { $$ = new CaseStmtNode($2, *$4); delete $4; }
-    |               DEFAULT ':' case_body                   { $$ = new CaseStmtNode(NULL, *$3, true); delete $3; }
+case_stmt:          CASE expression ':' case_body           { $$ = new CaseStmtNode($1, $2, *$4); delete $4; }
+    |               DEFAULT ':' case_body                   { $$ = new CaseStmtNode($1, NULL, *$3, true); delete $3; }
     ;
 
 case_body:          /* epsilon */                           { $$ = new StmtList(); }
@@ -299,10 +298,10 @@ case_body:          /* epsilon */                           { $$ = new StmtList(
 // While Rules
 //
 
-while_stmt:         WHILE '(' expression ')' branch_body                { $$ = new WhileNode($3, $5); }
+while_stmt:         WHILE '(' expression ')' branch_body                { $$ = new WhileNode($1, $3, $5); }
     ;
 
-do_while_stmt:      DO branch_body WHILE '(' expression ')'             { $$ = new DoWhileNode($5, $2); }
+do_while_stmt:      DO branch_body WHILE '(' expression ')'             { $$ = new DoWhileNode($1, $5, $2); }
     ;
 
 // ------------------------------------------------------------
@@ -310,10 +309,10 @@ do_while_stmt:      DO branch_body WHILE '(' expression ')'             { $$ = n
 // For Rules
 //
 
-for_stmt:           for_header branch_body                              { $$ = $1; ((ForNode*) $$)->body = $2; }
+for_stmt:           for_header branch_body                              { $$ = $1; $$->body = $2; }
     ;
 
-for_header:         FOR '(' for_init_stmt ';' for_expr ';' for_expr ')' { $$ = new ForNode($3, $5, $7, NULL); }
+for_header:         FOR '(' for_init_stmt ';' for_expr ';' for_expr ')' { $$ = new ForNode($1, $3, $5, $7, NULL); }
     ;
 
 for_init_stmt:      /* epsilon */                                       { $$ = NULL; }
@@ -357,8 +356,8 @@ arg_list_ext:       expression                          { $$ = new ExprList(); $
     |               arg_list_ext ',' expression         { $$ = $1; $$->push_back($3); }
     ;
 
-return_stmt:        RETURN expression                   { $$ = new ReturnStmtNode($2); }
-    |               RETURN                              { $$ = new ReturnStmtNode(NULL); }
+return_stmt:        RETURN expression                   { $$ = new ReturnStmtNode($1, $2); }
+    |               RETURN                              { $$ = new ReturnStmtNode($1, NULL); }
     ;
 
 // ------------------------------------------------------------
@@ -366,20 +365,20 @@ return_stmt:        RETURN expression                   { $$ = new ReturnStmtNod
 // Other Rules
 //
 
-type:               TYPE_INT        { $$ = new TypeNode(DTYPE_INT, $1); }
-    |               TYPE_FLOAT      { $$ = new TypeNode(DTYPE_FLOAT, $1); }
-    |               TYPE_CHAR       { $$ = new TypeNode(DTYPE_CHAR, $1); }
-    |               TYPE_BOOL       { $$ = new TypeNode(DTYPE_BOOL, $1); }
-    |               TYPE_VOID       { $$ = new TypeNode(DTYPE_VOID, $1); }
+type:               TYPE_INT        { $$ = new TypeNode($1, DTYPE_INT); }
+    |               TYPE_FLOAT      { $$ = new TypeNode($1, DTYPE_FLOAT); }
+    |               TYPE_CHAR       { $$ = new TypeNode($1, DTYPE_CHAR); }
+    |               TYPE_BOOL       { $$ = new TypeNode($1, DTYPE_BOOL); }
+    |               TYPE_VOID       { $$ = new TypeNode($1, DTYPE_VOID); }
     ;
 
-value:              INTEGER         { $$ = new ValueNode(DTYPE_INT, $1.value, $1.loc); delete $1.value; }
-    |               FLOAT           { $$ = new ValueNode(DTYPE_FLOAT, $1.value, $1.loc); delete $1.value; }
-    |               CHAR            { $$ = new ValueNode(DTYPE_CHAR, $1.value, $1.loc); delete $1.value; }
-    |               BOOL            { $$ = new ValueNode(DTYPE_BOOL, $1.value, $1.loc); delete $1.value; }
+value:              INTEGER         { $$ = new ValueNode($1.loc, DTYPE_INT, $1.value); delete $1.value; }
+    |               FLOAT           { $$ = new ValueNode($1.loc, DTYPE_FLOAT, $1.value); delete $1.value; }
+    |               CHAR            { $$ = new ValueNode($1.loc, DTYPE_CHAR, $1.value); delete $1.value; }
+    |               BOOL            { $$ = new ValueNode($1.loc, DTYPE_BOOL, $1.value); delete $1.value; }
     ;
 
-ident:              IDENTIFIER      { $$ = new IdentifierNode($1.value, $1.loc); delete $1.value; }
+ident:              IDENTIFIER      { $$ = new IdentifierNode($1.loc, $1.value); delete $1.value; }
     ;
 
 %%

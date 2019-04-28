@@ -15,7 +15,7 @@ struct FunctionNode : public StatementNode {
     VarList paramList;
     BlockNode* body;
 
-    FunctionNode(TypeNode* type, IdentifierNode* name, const VarList& paramList, BlockNode* body) {
+    FunctionNode(TypeNode* type, IdentifierNode* name, const VarList& paramList, BlockNode* body) : StatementNode(type->loc) {
         this->type = type;
         this->name = name;
         this->paramList = paramList;
@@ -65,7 +65,7 @@ struct FunctionCallNode : public ExpressionNode {
     IdentifierNode* name;
     ExprList argList;
 
-    FunctionCallNode(IdentifierNode* name, const ExprList& argList) {
+    FunctionCallNode(IdentifierNode* name, const ExprList& argList) : ExpressionNode(name->loc) {
         this->name = name;
         this->argList = argList;
     }
@@ -96,6 +96,5 @@ struct FunctionCallNode : public ExpressionNode {
         cout << ")";
     }
 };
-
 
 #endif

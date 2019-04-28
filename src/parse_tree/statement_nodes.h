@@ -15,7 +15,11 @@ struct BlockNode : public StatementNode {
 
     }
 
-    BlockNode(const StmtList& statements) {
+    BlockNode(const Location& loc) : StatementNode(loc) {
+
+    }
+
+    BlockNode(const Location& loc, const StmtList& statements) : StatementNode(loc) {
         this->statements = statements;
     }
 
@@ -44,7 +48,7 @@ struct VarDeclarationNode : public StatementNode {
     ExpressionNode* value;
     bool isConst;
 
-    VarDeclarationNode(TypeNode* type, IdentifierNode* name, ExpressionNode* value = NULL, bool isConst = false) {
+    VarDeclarationNode(TypeNode* type, IdentifierNode* name, ExpressionNode* value = NULL, bool isConst = false) : StatementNode(type->loc) {
         this->type = type;
         this->name = name;
         this->value = value;
@@ -85,7 +89,8 @@ struct VarDeclarationNode : public StatementNode {
  * The node class holding a break statement in the parse tree.
  */
 struct BreakStmtNode : public StatementNode {
-    BreakStmtNode() {
+
+    BreakStmtNode(const Location& loc) : StatementNode(loc) {
 
     }
 
@@ -102,7 +107,8 @@ struct BreakStmtNode : public StatementNode {
  * The node class holding a continue statement in the parse tree.
  */
 struct ContinueStmtNode : public StatementNode {
-    ContinueStmtNode() {
+
+    ContinueStmtNode(const Location& loc) : StatementNode(loc) {
 
     }
 
@@ -121,7 +127,7 @@ struct ContinueStmtNode : public StatementNode {
 struct ReturnStmtNode : public StatementNode {
     ExpressionNode* value;
 
-    ReturnStmtNode(ExpressionNode* value) {
+    ReturnStmtNode(const Location& loc, ExpressionNode* value) : StatementNode(loc) {
         this->value = value;
     }
 
@@ -149,7 +155,7 @@ struct CaseStmtNode : public StatementNode {
     StmtList body;
     bool isDefault;
 
-    CaseStmtNode(ExpressionNode* expr, const StmtList& body, bool isDefault = false) {
+    CaseStmtNode(const Location& loc, ExpressionNode* expr, const StmtList& body, bool isDefault = false) : StatementNode(loc) {
         this->expr = expr;
         this->body = body;
         this->isDefault = isDefault;

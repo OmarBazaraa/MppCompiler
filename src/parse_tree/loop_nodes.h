@@ -12,7 +12,7 @@ struct WhileNode : public StatementNode {
     ExpressionNode* cond;
     StatementNode* body;
 
-    WhileNode(ExpressionNode* cond, StatementNode* body) {
+    WhileNode(const Location& loc, ExpressionNode* cond, StatementNode* body) : StatementNode(loc) {
         this->cond = cond;
         this->body = body;
     }
@@ -41,7 +41,7 @@ struct DoWhileNode : public StatementNode {
     ExpressionNode* cond;
     StatementNode* body;
 
-    DoWhileNode(ExpressionNode* cond, StatementNode* body) {
+    DoWhileNode(const Location& loc, ExpressionNode* cond, StatementNode* body) : StatementNode(loc) {
         this->cond = cond;
         this->body = body;
     }
@@ -74,7 +74,7 @@ struct ForNode : public StatementNode {
     ExpressionNode* inc;
     StatementNode* body;
 
-    ForNode(StatementNode* initStmt, ExpressionNode* cond, ExpressionNode* inc, StatementNode* body) {
+    ForNode(const Location& loc, StatementNode* initStmt, ExpressionNode* cond, ExpressionNode* inc, StatementNode* body) : StatementNode(loc) {
         this->initStmt = initStmt;
         this->cond = cond;
         this->inc = inc;

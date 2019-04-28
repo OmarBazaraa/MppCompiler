@@ -13,7 +13,7 @@ struct IfNode : public StatementNode {
     StatementNode* ifBody;
     StatementNode* elseBody;
 
-    IfNode(ExpressionNode* cond, StatementNode* ifBody = NULL, StatementNode* elseBody = NULL) {
+    IfNode(const Location& loc, ExpressionNode* cond, StatementNode* ifBody, StatementNode* elseBody = NULL) : StatementNode(loc) {
         this->cond = cond;
         this->ifBody = ifBody;
         this->elseBody = elseBody;
@@ -52,7 +52,7 @@ struct SwitchNode : public StatementNode {
     ExpressionNode* cond;
     CaseList caseList;
 
-    SwitchNode(ExpressionNode* cond, const CaseList& caseList) {
+    SwitchNode(const Location& loc, ExpressionNode* cond, const CaseList& caseList) : StatementNode(loc) {
         this->cond = cond;
         this->caseList = caseList;
     }

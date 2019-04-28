@@ -9,11 +9,9 @@
  */
 struct TypeNode : public StatementNode {
     DataType type;
-    Location loc;
 
-    TypeNode(DataType type, const Location& loc) {
+    TypeNode(const Location& loc, DataType type) : StatementNode(loc) {
         this->type = type;
-        this->loc = loc;
     }
 
     virtual ~TypeNode() {
@@ -31,12 +29,10 @@ struct TypeNode : public StatementNode {
 struct ValueNode : public ExpressionNode {
     DataType type;
     string value;
-    Location loc;
 
-    ValueNode(DataType type, const char* value, const Location& loc) {
+    ValueNode(const Location& loc, DataType type, const char* value) : ExpressionNode(loc) {
         this->type = type;
         this->value = value;
-        this->loc = loc;
     }
 
     virtual ~ValueNode() {
@@ -53,11 +49,9 @@ struct ValueNode : public ExpressionNode {
  */
 struct IdentifierNode : public ExpressionNode {
     string name;
-    Location loc;
 
-    IdentifierNode(const char* name, const Location& loc) {
+    IdentifierNode(const Location& loc, const char* name) : ExpressionNode(loc) {
         this->name = name;
-        this->loc = loc;
     }
 
     virtual ~IdentifierNode() {
