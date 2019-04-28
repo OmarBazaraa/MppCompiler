@@ -1,0 +1,11 @@
+int n = 5;
+
+
+void func(int x, bool y) {
+	int j = 0;
+	int i = 0;
+	while(i < n) {
+		j = j + i;
+		i = i + 1;
+	}   
+}
