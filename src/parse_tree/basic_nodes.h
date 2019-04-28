@@ -98,8 +98,7 @@ struct ErrorNode : public StatementNode {
     }
 
     virtual bool analyze(Context* context) {
-        printf("%s\n", context->sourceCode[loc.lineNum - 1].c_str());
-        printf("%*s\n", loc.pos, "^");
+        context->printError(what, loc);
         return false;
     }
 

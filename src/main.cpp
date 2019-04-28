@@ -1,5 +1,4 @@
 #include <iostream>
-#include <fstream>
 #include <string>
 #include <string.h>
 
@@ -34,7 +33,6 @@ vector<string> sourceCode;
 //
 // Functions prototypes
 //
-void readSourceCode();
 void printHelp();
 void printVersion();
 void parseArguments(int argc, char* argv[]);
@@ -50,8 +48,8 @@ int main(int argc, char* argv[]) {
     // Parse incoming arguments
     parseArguments(argc, argv);
 
-    // Read the source code
-    readSourceCode();
+    // Construct a context file
+    Context context(inputFilename);
 
     // Open input file for Lex & Yacc
     yyin = fopen(inputFilename.c_str(), "r");
@@ -65,8 +63,6 @@ int main(int argc, char* argv[]) {
     yyparse();
 
     // Apply semantic check and quadruple generation
-    Context context(sourceCode);
-
     if (programRoot->analyze(&context)) {
         programRoot->print();
     }
@@ -76,29 +72,6 @@ int main(int argc, char* argv[]) {
     delete programRoot;
 
     return 0;
-}
-
-/**
- * Reads the given source code file and fills
- * the global vector {@code sourceCode}.
- */
-void readSourceCode() {
-    // Open input file
-    ifstream fin(inputFilename);
-
-    // Check that the file was opened successfully
-    if (!fin.is_open()) {
-        return;
-    }
-
-    // Read the source code line by line
-    string line;
-    while (getline(fin, line)) {
-        sourceCode.push_back(line);
-    }
-
-    // Close
-    fin.close();
 }
 
 /**
