@@ -167,6 +167,13 @@ struct FunctionCallNode : public ExpressionNode {
         }
         cout << "CALL " << name->name << endl;
     }
+	
+	virtual void generateQuad(QuadrupleContext* quadContext) {
+		for (int i = paramList.size() - 1; i >= 0; --i) {
+            paramList[i]->generateQuad(quadContext);
+        }
+		cout << "CALL " << name->name << endl;
+    }
 };
 
 #endif

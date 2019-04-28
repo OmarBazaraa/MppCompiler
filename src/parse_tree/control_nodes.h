@@ -83,6 +83,30 @@ struct IfNode : public StatementNode {
             cout << "L" << label1 << ":" << endl;
         }
     }
+	
+	virtual void generateQuad(QuadrupleContext* quadContext) {
+		int label1 = quadContext->labelCounter++;
+        cond->generateQuad(quadContext);
+		if (elseBody) {
+			int label2 = quadContext->labelCounter++;
+			cout << "JZ L" << label1 << endl;
+			
+			ifBody->generateQuad(quadContext);
+			
+			cout << "JMP L" << label2 << endl;
+			cout << "L" << label1 << ":" << endl;
+			
+			elseBody->generateQuad(quadContext);
+			
+			cout << "L" << label2 << ":" << endl;
+		} else {
+			cout << "JZ L" << label1 << endl;
+			
+			ifBody->generateQuad(quadContext);
+			
+			cout << "L" << label1 << ":" << endl;
+		}
+    }
 };
 
 /**
@@ -213,6 +237,19 @@ struct SwitchNode : public StatementNode {
     virtual void generateQuad(GenerationContext* generationContext) {
 		
     }
+	
+	virtual void generateQuad(QuadrupleContext* quadContext) {
+		int label1 = quadContext->labelCounter++;
+		quadContext->breakLabels.push(label1);
+		
+		for (int i = 0; i < caseList.size(); ++i) {
+			cond->generateQuad(quadContext);
+            caseList[i]->generateQuad(quadContext);
+        }
+		
+		quadContext->breakLabels.pop();
+		cout << "L" << label1 << ":" << endl;
+	}
 };
 
 #endif

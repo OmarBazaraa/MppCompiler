@@ -53,6 +53,10 @@ struct StatementNode {
     virtual void generateQuad(GenerationContext* generationContext) {
         
     }
+	
+	virtual void generateQuad(QuadrupleContext* quadContext) {
+        
+    }
 };
 
 /**
