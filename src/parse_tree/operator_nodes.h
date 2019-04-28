@@ -37,7 +37,7 @@ struct AssignOprNode : public ExpressionNode {
 	
 	virtual void generateQuad(QuadrupleContext* quadContext) {
 		value->generateQuad(quadContext);
-		cout << "POP " << name->name;
+		cout << "POP " << name->name << endl;
     }
 };
 
@@ -136,6 +136,7 @@ struct BinaryOprNode : public ExpressionNode {
             case OPR_NOT_EQUAL:
                 cout << "NEQ" << endl;
 				break;
+		}
     }
 };
 
@@ -197,6 +198,7 @@ struct UnaryOprNode : public ExpressionNode {
 				cout << "PUSH 1" << endl;
 				cout << "SUB" << endl;
 				break;
+		}
     }
 };
 

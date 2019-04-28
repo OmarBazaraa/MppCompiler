@@ -96,7 +96,7 @@ struct VarDeclarationNode : public StatementNode {
 			value->generateQuad(quadContext);
 		}
         
-		cout << "POP " << name->name; 
+		cout << "POP " << name->name << endl; 
     }
 };
 
@@ -170,7 +170,9 @@ struct ReturnStmtNode : public StatementNode {
     }
 	
 	virtual void generateQuad(QuadrupleContext* quadContext) {
-		value->generateQuad(quadContext);
+		if (value)
+			value->generateQuad(quadContext);
+		
 		cout << "RET" << endl;
     }
 };
