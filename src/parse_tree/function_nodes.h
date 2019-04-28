@@ -3,25 +3,32 @@
 
 #include "basic_nodes.h"
 #include "statement_nodes.h"
+#include "value_nodes.h"
 
 
 /**
  * The node class holding a function in the parse tree.
  */
 struct FunctionNode : public StatementNode {
-    DataType type;
-    string name;
+    TypeNode* type;
+    IdentifierNode* name;
     VarList paramList;
     BlockNode* body;
 
-    FunctionNode(DataType type, const char* name, const VarList& paramList, BlockNode* body) {
+    FunctionNode(TypeNode* type, IdentifierNode* name, const VarList& paramList, BlockNode* body) {
         this->type = type;
-        this->name = string(name);
+        this->name = name;
         this->paramList = paramList;
         this->body = body;
     }
 
     virtual ~FunctionNode() {
+        if (type) {
+            delete type;
+        }
+        if (name) {
+            delete name;
+        }
         for (int i = 0; i < paramList.size(); ++i) {
             delete paramList[i];
         }
@@ -31,7 +38,11 @@ struct FunctionNode : public StatementNode {
     }
 
     virtual void print(int ind = 0) {
-        cout << string(ind, ' ') << Utils::dtypeToStr(type) << ' ' << name << "(";
+        cout << string(ind, ' ');
+        type->print(0);
+        cout << " ";
+        name->print(0);
+        cout << "(";
 
         if (paramList.size()) {
             paramList[0]->print(0);
@@ -51,22 +62,27 @@ struct FunctionNode : public StatementNode {
  * The node class holding a function call expression in the parse tree.
  */
 struct FunctionCallNode : public ExpressionNode {
-    string name;
+    IdentifierNode* name;
     ExprList argList;
 
-    FunctionCallNode(const char* name, const ExprList& argList) {
-        this->name = string(name);
+    FunctionCallNode(IdentifierNode* name, const ExprList& argList) {
+        this->name = name;
         this->argList = argList;
     }
 
     virtual ~FunctionCallNode() {
+        if (name) {
+            delete name;
+        }
         for (int i = 0; i < argList.size(); ++i) {
             delete argList[i];
         }
     }
 
     virtual void print(int ind = 0) {
-        cout << string(ind, ' ') << name << "(";
+        cout << string(ind, ' ');
+        name->print(0);
+        cout << "(";
 
         if (argList.size()) {
             argList[0]->print(0);

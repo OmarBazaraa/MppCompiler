@@ -47,6 +47,7 @@ Node* programRoot = NULL;
     ExpressionNode*     exprNode;
     TypeNode*           typeNode;
     ValueNode*          valueNode;
+    IdentifierNode*     identifierNode;
 
     StmtList*           stmtList;
     ExprList*           exprList;
@@ -54,6 +55,7 @@ Node* programRoot = NULL;
     CaseList*           caseList;
 
     Token               token;
+    Location            location;
 }
 
 // =====================================================================================================
@@ -61,44 +63,44 @@ Node* programRoot = NULL;
 // =================
 
 // Data types
-%token <token> TYPE_INT
-%token <token> TYPE_FLOAT
-%token <token> TYPE_CHAR
-%token <token> TYPE_BOOL
-%token <token> TYPE_VOID
+%token <location> TYPE_INT
+%token <location> TYPE_FLOAT
+%token <location> TYPE_CHAR
+%token <location> TYPE_BOOL
+%token <location> TYPE_VOID
 
 // Keywords
-%token <token> CONST
-%token <token> IF
-%token <token> ELSE
-%token <token> SWITCH
-%token <token> CASE
-%token <token> DEFAULT
-%token <token> FOR
-%token <token> DO
-%token <token> WHILE
-%token <token> BREAK
-%token <token> CONTINUE
-%token <token> RETURN
+%token <location> CONST
+%token <location> IF
+%token <location> ELSE
+%token <location> SWITCH
+%token <location> CASE
+%token <location> DEFAULT
+%token <location> FOR
+%token <location> DO
+%token <location> WHILE
+%token <location> BREAK
+%token <location> CONTINUE
+%token <location> RETURN
 
 // Operators
-%token <token> INC
-%token <token> DEC
-%token <token> SHL
-%token <token> SHR
-%token <token> LOGICAL_AND
-%token <token> LOGICAL_OR
-%token <token> EQUAL
-%token <token> NOT_EQUAL
-%token <token> GREATER_EQUAL
-%token <token> LESS_EQUAL
+%token <location> INC
+%token <location> DEC
+%token <location> SHL
+%token <location> SHR
+%token <location> LOGICAL_AND
+%token <location> LOGICAL_OR
+%token <location> EQUAL
+%token <location> NOT_EQUAL
+%token <location> GREATER_EQUAL
+%token <location> LESS_EQUAL
 
 // Values
-%token <token> IDENTIFIER
 %token <token> INTEGER
 %token <token> FLOAT
 %token <token> CHAR
 %token <token> BOOL
+%token <token> IDENTIFIER
 
 // =====================================================================================================
 // Non-terminal Symbols Types
@@ -123,6 +125,7 @@ Node* programRoot = NULL;
 %type <exprNode>            expression for_expr
 %type <typeNode>            type
 %type <valueNode>           value
+%type <identifierNode>      ident
 
 // =====================================================================================================
 // Precendence & Associativity
@@ -196,12 +199,12 @@ var_decl:           var_decl_uninit
     |               var_decl_init
     ;
 
-var_decl_uninit:    type IDENTIFIER                         { $$ = new VarDeclarationNode($1->type, $2.value); }
-    |               CONST type IDENTIFIER                   { $$ = new VarDeclarationNode($2->type, $3.value, NULL, true); }
+var_decl_uninit:    type ident                              { $$ = new VarDeclarationNode($1, $2); }
+    |               CONST type ident                        { $$ = new VarDeclarationNode($2, $3, NULL, true); }
     ;
 
-var_decl_init:      type IDENTIFIER '=' expression          { $$ = new VarDeclarationNode($1->type, $2.value, $4); }
-    |               CONST type IDENTIFIER '=' expression    { $$ = new VarDeclarationNode($2->type, $3.value, $5, true); }
+var_decl_init:      type ident '=' expression               { $$ = new VarDeclarationNode($1, $2, $4); }
+    |               CONST type ident '=' expression         { $$ = new VarDeclarationNode($2, $3, $5, true); }
     ;
 
 // ------------------------------------------------------------
@@ -209,7 +212,7 @@ var_decl_init:      type IDENTIFIER '=' expression          { $$ = new VarDeclar
 // Expression Rules
 //
 
-expression:         IDENTIFIER '=' expression               { $$ = new AssignOprNode($1.value, $3); }
+expression:         ident '=' expression                    { $$ = new AssignOprNode($1, $3); }
 
     |               expression '+' expression               { $$ = new BinaryOprNode(OPR_ADD, $1, $3); }
     |               expression '-' expression               { $$ = new BinaryOprNode(OPR_SUB, $1, $3); }
@@ -245,6 +248,7 @@ expression:         IDENTIFIER '=' expression               { $$ = new AssignOpr
     |               '(' expression ')'                      { $$ = $2; }
 
     |               value                                   { $$ = $1; }
+    |               ident                                   { $$ = $1; }
     |               function_call                           { $$ = $1; }
     ;
 
@@ -329,7 +333,7 @@ for_expr:           /* epsilon */                                       { $$ = N
 function:           function_header stmt_block          { $$ = $1; $$->body = $2; }
     ;
 
-function_header:    type IDENTIFIER '(' param_list ')'  { $$ = new FunctionNode($1->type, $2.value, *$4, NULL); delete $4; }
+function_header:    type ident '(' param_list ')'       { $$ = new FunctionNode($1, $2, *$4, NULL); delete $4; }
     ;
 
 param_list:         /* epsilon */                       { $$ = new VarList(); }
@@ -341,7 +345,7 @@ param_list_ext:     var_decl                            { $$ = new VarList(); $$
     |               param_list_ext ',' var_decl         { $$ = $1; $$->push_back($3); }
     ;
 
-function_call:      IDENTIFIER '(' arg_list ')'         { $$ = new FunctionCallNode($1.value, *$3); delete $3; }
+function_call:      ident '(' arg_list ')'              { $$ = new FunctionCallNode($1, *$3); delete $3; }
     ;
 
 arg_list:           /* epsilon */                       { $$ = new ExprList(); }
@@ -362,18 +366,20 @@ return_stmt:        RETURN expression                   { $$ = new ReturnStmtNod
 // Other Rules
 //
 
-type:               TYPE_INT        { $$ = new TypeNode($1, DTYPE_INT); }
-    |               TYPE_FLOAT      { $$ = new TypeNode($1, DTYPE_FLOAT); }
-    |               TYPE_CHAR       { $$ = new TypeNode($1, DTYPE_CHAR); }
-    |               TYPE_BOOL       { $$ = new TypeNode($1, DTYPE_BOOL); }
-    |               TYPE_VOID       { $$ = new TypeNode($1, DTYPE_VOID); }
+type:               TYPE_INT        { $$ = new TypeNode(DTYPE_INT, $1); }
+    |               TYPE_FLOAT      { $$ = new TypeNode(DTYPE_FLOAT, $1); }
+    |               TYPE_CHAR       { $$ = new TypeNode(DTYPE_CHAR, $1); }
+    |               TYPE_BOOL       { $$ = new TypeNode(DTYPE_BOOL, $1); }
+    |               TYPE_VOID       { $$ = new TypeNode(DTYPE_VOID, $1); }
     ;
 
-value:              INTEGER         { $$ = new ValueNode($1, DTYPE_INT); }
-    |               FLOAT           { $$ = new ValueNode($1, DTYPE_FLOAT); }
-    |               CHAR            { $$ = new ValueNode($1, DTYPE_CHAR); }
-    |               BOOL            { $$ = new ValueNode($1, DTYPE_BOOL); }
-    |               IDENTIFIER      { $$ = new ValueNode($1, DTYPE_IDENTIFIER); }
+value:              INTEGER         { $$ = new ValueNode(DTYPE_INT, $1.value, $1.loc); delete $1.value; }
+    |               FLOAT           { $$ = new ValueNode(DTYPE_FLOAT, $1.value, $1.loc); delete $1.value; }
+    |               CHAR            { $$ = new ValueNode(DTYPE_CHAR, $1.value, $1.loc); delete $1.value; }
+    |               BOOL            { $$ = new ValueNode(DTYPE_BOOL, $1.value, $1.loc); delete $1.value; }
+    ;
+
+ident:              IDENTIFIER      { $$ = new IdentifierNode($1.value, $1.loc); delete $1.value; }
     ;
 
 %%

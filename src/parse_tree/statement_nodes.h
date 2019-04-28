@@ -2,6 +2,7 @@
 #define __STATEMENT_NODES_H_
 
 #include "basic_nodes.h"
+#include "value_nodes.h"
 
 
 /**
@@ -38,19 +39,25 @@ struct BlockNode : public StatementNode {
  * The node class holding a variable or constant declaration statement in the parse tree.
  */
 struct VarDeclarationNode : public StatementNode {
-    DataType type;
-    string name;
+    TypeNode* type;
+    IdentifierNode* name;
     ExpressionNode* value;
     bool isConst;
 
-    VarDeclarationNode(DataType type, const char* name, ExpressionNode* value = NULL, bool isConst = false) {
+    VarDeclarationNode(TypeNode* type, IdentifierNode* name, ExpressionNode* value = NULL, bool isConst = false) {
         this->type = type;
-        this->name = string(name);
+        this->name = name;
         this->value = value;
         this->isConst = isConst;
     }
 
     virtual ~VarDeclarationNode() {
+        if (type) {
+            delete type;
+        }
+        if (name) {
+            delete name;
+        }
         if (value) {
             delete value;
         }
@@ -63,7 +70,9 @@ struct VarDeclarationNode : public StatementNode {
             cout << "const ";
         }
 
-        cout << Utils::dtypeToStr(type) << ' ' << name;
+        type->print(0);
+        cout << " ";
+        name->print(0);
 
         if (value) {
             cout << " = ";

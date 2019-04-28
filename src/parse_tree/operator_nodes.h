@@ -2,28 +2,34 @@
 #define __OPERATOR_NODES_H_
 
 #include "basic_nodes.h"
+#include "value_nodes.h"
 
 
 /**
  * The node class holding an assignment operator in the parse tree.
  */
 struct AssignOprNode : public ExpressionNode {
-    string name;
+    IdentifierNode* name;
     ExpressionNode* value;
 
-    AssignOprNode(const char* name, ExpressionNode* value) {
-        this->name = string(name);
+    AssignOprNode(IdentifierNode* name, ExpressionNode* value) {
+        this->name = name;
         this->value = value;
     }
 
     virtual ~AssignOprNode() {
+        if (name) {
+            delete name;
+        }
         if (value) {
             delete value;
         }
     }
 
     virtual void print(int ind = 0) {
-        cout << string(ind, ' ') << "(" << name << " = ";
+        cout << string(ind, ' ') << "(";
+        name->print(0);
+        cout << " = ";
         value->print(0);
         cout << ")";
     }

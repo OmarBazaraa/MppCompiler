@@ -8,12 +8,12 @@
  * The node class holding a data type in the parse tree.
  */
 struct TypeNode : public StatementNode {
-    Token token;
     DataType type;
+    Location loc;
 
-    TypeNode(const Token& token, DataType type) {
-        this->token = token;
+    TypeNode(DataType type, const Location& loc) {
         this->type = type;
+        this->loc = loc;
     }
 
     virtual ~TypeNode() {
@@ -21,7 +21,7 @@ struct TypeNode : public StatementNode {
     }
 
     virtual void print(int ind = 0) {
-        cout << string(ind, ' ') << token.value;
+        cout << string(ind, ' ') << Utils::dtypeToStr(type);
     }
 };
 
@@ -29,12 +29,14 @@ struct TypeNode : public StatementNode {
  * The node class holding a value in the parse tree.
  */
 struct ValueNode : public ExpressionNode {
-    Token token;
     DataType type;
+    string value;
+    Location loc;
 
-    ValueNode(const Token& token, DataType type) {
-        this->token = token;
+    ValueNode(DataType type, const char* value, const Location& loc) {
         this->type = type;
+        this->value = value;
+        this->loc = loc;
     }
 
     virtual ~ValueNode() {
@@ -42,78 +44,24 @@ struct ValueNode : public ExpressionNode {
     }
 
     virtual void print(int ind = 0) {
-        cout << string(ind, ' ') << token.value;
-    }
-};
-
-/**
- * The node class holding an integer value in the parse tree.
- */
-struct IntNode : public ExpressionNode {
-    int value;
-
-    IntNode(int value) {
-        this->value = value;
-    }
-
-    virtual void print(int ind = 0) {
         cout << string(ind, ' ') << value;
     }
 };
 
 /**
- * The node class holding a floating value in the parse tree.
+ * The node class holding an identifier in the parse tree.
  */
-struct FloatNode : public ExpressionNode {
-    float value;
-
-    FloatNode(float value) {
-        this->value = value;
-    }
-
-    virtual void print(int ind = 0) {
-        cout << string(ind, ' ') << value;
-    }
-};
-
-/**
- * The node class holding a character value in the parse tree.
- */
-struct CharNode : public ExpressionNode {
-    char value;
-
-    CharNode(char value) {
-        this->value = value;
-    }
-
-    virtual void print(int ind = 0) {
-        cout << string(ind, ' ') << value;
-    }
-};
-
-/**
- * The node class holding a boolean value in the parse tree.
- */
-struct BoolNode : public ExpressionNode {
-    bool value;
-
-    BoolNode(bool value) {
-        this->value = value;
-    }
-
-    virtual void print(int ind = 0) {
-        cout << string(ind, ' ') << value;
-    }
-};
-
-/**
- * The node class holding a variable use in the parse tree.
- */
-struct VarNode : public ExpressionNode {
+struct IdentifierNode : public ExpressionNode {
     string name;
+    Location loc;
 
-    VarNode(const char* name) {
-        this->name = string(name);
+    IdentifierNode(const char* name, const Location& loc) {
+        this->name = name;
+        this->loc = loc;
+    }
+
+    virtual ~IdentifierNode() {
+
     }
 
     virtual void print(int ind = 0) {

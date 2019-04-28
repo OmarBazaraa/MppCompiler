@@ -7,9 +7,12 @@
 
 using namespace std;
 
+#define ADVANCE_CURSOR      (curCursorPos += (curTokenLen = yyleng))
+
 //
 // Functions prototypes
 //
+void saveLocation();
 void saveToken();
 
 //
@@ -62,42 +65,42 @@ WHITESPACE          [ \t]+
 %{
 // Data types
 %}
-<INITIAL>"int"                      saveToken(); return TYPE_INT;
-<INITIAL>"float"                    saveToken(); return TYPE_FLOAT;
-<INITIAL>"char"                     saveToken(); return TYPE_CHAR;
-<INITIAL>"bool"                     saveToken(); return TYPE_BOOL;
-<INITIAL>"void"                     saveToken(); return TYPE_VOID;
+<INITIAL>"int"                      saveLocation(); return TYPE_INT;
+<INITIAL>"float"                    saveLocation(); return TYPE_FLOAT;
+<INITIAL>"char"                     saveLocation(); return TYPE_CHAR;
+<INITIAL>"bool"                     saveLocation(); return TYPE_BOOL;
+<INITIAL>"void"                     saveLocation(); return TYPE_VOID;
 
 %{
 // Branch tokens
 %}
-<INITIAL>"const"                    saveToken(); return CONST;
-<INITIAL>"if"                       saveToken(); return IF;
-<INITIAL>"else"                     saveToken(); return ELSE;
-<INITIAL>"switch"                   saveToken(); return SWITCH;
-<INITIAL>"case"                     saveToken(); return CASE;
-<INITIAL>"default"                  saveToken(); return DEFAULT;
-<INITIAL>"for"                      saveToken(); return FOR;
-<INITIAL>"do"                       saveToken(); return DO;
-<INITIAL>"while"                    saveToken(); return WHILE;
-<INITIAL>"break"                    saveToken(); return BREAK;
-<INITIAL>"continue"                 saveToken(); return CONTINUE;
-<INITIAL>"return"                   saveToken(); return RETURN;
+<INITIAL>"const"                    saveLocation(); return CONST;
+<INITIAL>"if"                       saveLocation(); return IF;
+<INITIAL>"else"                     saveLocation(); return ELSE;
+<INITIAL>"switch"                   saveLocation(); return SWITCH;
+<INITIAL>"case"                     saveLocation(); return CASE;
+<INITIAL>"default"                  saveLocation(); return DEFAULT;
+<INITIAL>"for"                      saveLocation(); return FOR;
+<INITIAL>"do"                       saveLocation(); return DO;
+<INITIAL>"while"                    saveLocation(); return WHILE;
+<INITIAL>"break"                    saveLocation(); return BREAK;
+<INITIAL>"continue"                 saveLocation(); return CONTINUE;
+<INITIAL>"return"                   saveLocation(); return RETURN;
 
 %{
 // Operators
 %}
-<INITIAL>"++"                       saveToken(); return INC;
-<INITIAL>"--"                       saveToken(); return DEC;
-<INITIAL>"=="                       saveToken(); return EQUAL;
-<INITIAL>"!="                       saveToken(); return NOT_EQUAL;
-<INITIAL>">="                       saveToken(); return GREATER_EQUAL;
-<INITIAL>"<="                       saveToken(); return LESS_EQUAL;
-<INITIAL>"<<"                       saveToken(); return SHL;
-<INITIAL>">>"                       saveToken(); return SHR;
-<INITIAL>"&&"                       saveToken(); return LOGICAL_AND;
-<INITIAL>"||"                       saveToken(); return LOGICAL_OR;
-<INITIAL>[-+*/%&|^~!<>=(){},:;]     saveToken(); return yytext[0];
+<INITIAL>"++"                       saveLocation(); return INC;
+<INITIAL>"--"                       saveLocation(); return DEC;
+<INITIAL>"=="                       saveLocation(); return EQUAL;
+<INITIAL>"!="                       saveLocation(); return NOT_EQUAL;
+<INITIAL>">="                       saveLocation(); return GREATER_EQUAL;
+<INITIAL>"<="                       saveLocation(); return LESS_EQUAL;
+<INITIAL>"<<"                       saveLocation(); return SHL;
+<INITIAL>">>"                       saveLocation(); return SHR;
+<INITIAL>"&&"                       saveLocation(); return LOGICAL_AND;
+<INITIAL>"||"                       saveLocation(); return LOGICAL_OR;
+<INITIAL>[-+*/%&|^~!<>=(){},:;]     saveLocation(); return yytext[0];
 
 %{
 // Values
@@ -112,11 +115,11 @@ WHITESPACE          [ \t]+
 %{
 // Others
 %}
-<INITIAL>{WHITESPACE}               saveToken(); // Ignore whitespace
-<INITIAL>{LINE_COMMENT}             saveToken(); // Ignore comments
-<INITIAL>"/*"                       saveToken(); BEGIN BLOCK_COMMENT;
-<BLOCK_COMMENT>"*/"                 saveToken(); BEGIN INITIAL;
-<BLOCK_COMMENT>.                    saveToken(); // Ignore block comments
+<INITIAL>{WHITESPACE}               ADVANCE_CURSOR; // Ignore whitespace
+<INITIAL>{LINE_COMMENT}             ADVANCE_CURSOR; // Ignore comments
+<INITIAL>"/*"                       ADVANCE_CURSOR; BEGIN BLOCK_COMMENT;
+<BLOCK_COMMENT>"*/"                 ADVANCE_CURSOR; BEGIN INITIAL;
+<BLOCK_COMMENT>.                    ADVANCE_CURSOR; // Ignore block comments
 
 %%
 
@@ -124,13 +127,21 @@ WHITESPACE          [ \t]+
 // User Subroutines Section
 // ========================
 
+void saveLocation() {
+    yylval.location.lineNum = curLineNum;
+    yylval.location.pos = curCursorPos;
+    yylval.location.len = yyleng;
+
+    ADVANCE_CURSOR;
+}
+
 void saveToken() {
     yylval.token.value = strdup(yytext);
-    yylval.token.lineNum = curLineNum;
-    yylval.token.pos = curCursorPos;
-    yylval.token.len = curTokenLen = yyleng;
+    yylval.token.loc.lineNum = curLineNum;
+    yylval.token.loc.pos = curCursorPos;
+    yylval.token.loc.len = yyleng;
 
-    curCursorPos += yyleng;
+    ADVANCE_CURSOR;
 }
 
 int yywrap() {
