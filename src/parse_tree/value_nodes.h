@@ -5,6 +5,48 @@
 
 
 /**
+ * The node class holding a data type in the parse tree.
+ */
+struct TypeNode : public StatementNode {
+    Token token;
+    DataType type;
+
+    TypeNode(const Token& token, DataType type) {
+        this->token = token;
+        this->type = type;
+    }
+
+    virtual ~TypeNode() {
+
+    }
+
+    virtual void print(int ind = 0) {
+        cout << string(ind, ' ') << token.value;
+    }
+};
+
+/**
+ * The node class holding a value in the parse tree.
+ */
+struct ValueNode : public ExpressionNode {
+    Token token;
+    DataType type;
+
+    ValueNode(const Token& token, DataType type) {
+        this->token = token;
+        this->type = type;
+    }
+
+    virtual ~ValueNode() {
+
+    }
+
+    virtual void print(int ind = 0) {
+        cout << string(ind, ' ') << token.value;
+    }
+};
+
+/**
  * The node class holding an integer value in the parse tree.
  */
 struct IntNode : public ExpressionNode {

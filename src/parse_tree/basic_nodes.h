@@ -52,4 +52,22 @@ struct ExpressionNode : public StatementNode {
 
 };
 
+struct ErrorNode : public StatementNode {
+    int lineNum;
+    int cursorPos;
+    int tokenLen;
+    string what;
+
+    ErrorNode(int lineNum, int cursorPos, int tokenLen, const string& what) {
+        this->lineNum = lineNum;
+        this->cursorPos = cursorPos;
+        this->tokenLen = tokenLen;
+        this->what = what;
+    }
+
+    ~ErrorNode() {
+
+    }
+};
+
 #endif

@@ -8,6 +8,30 @@
 using namespace std;
 
 
+/**
+ * Struct holding the basic information of the tokens.
+ */
+struct Token {
+    char* value;
+    int lineNum;
+    int pos;
+    int len;
+};
+
+/**
+ * Struct holding the location information of the tokens.
+ */
+struct TokenLocation {
+    int lineNum;
+    int pos;
+    int len;
+};
+
+/**
+ * Collection of utility functions to be used across the entire project modules.
+ *
+ * Note that all methods in this class must be static methods.
+ */
 struct Utils {
 
     /**

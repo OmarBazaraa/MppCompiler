@@ -1,15 +1,23 @@
 %{
-#include "../parse_tree/parse_tree.h"
+#include <vector>
+#include <string>
 
+#include "../parse_tree/parse_tree.h"
 #include "parser.hpp"
 
-#define SYNC_CURSOR     (curCursorPos += (curTokenLen = yyleng))
+using namespace std;
 
-char* curLine = NULL;
+//
+// Functions prototypes
+//
+void saveToken();
+
+//
+// Global variables
+//
 int curLineNum = 1;
 int curCursorPos = 0;
 int curTokenLen = 0;
-
 %}
 
 %{
@@ -49,81 +57,81 @@ WHITESPACE          [ \t]+
 %{
 // Token localization
 %}
-\n                                  {
-                                        curLineNum++;
-                                        curCursorPos = 0;
-                                    }
-
-^.*\n                               {
-                                        if (curLine) delete curLine;
-                                        curLine = strdup(yytext);
-                                        REJECT;
-                                    }
+\n                                  curLineNum++; curCursorPos = 0;
 
 %{
 // Data types
 %}
-<INITIAL>"int"                      SYNC_CURSOR; return TYPE_INT;
-<INITIAL>"float"                    SYNC_CURSOR; return TYPE_FLOAT;
-<INITIAL>"char"                     SYNC_CURSOR; return TYPE_CHAR;
-<INITIAL>"bool"                     SYNC_CURSOR; return TYPE_BOOL;
-<INITIAL>"void"                     SYNC_CURSOR; return TYPE_VOID;
+<INITIAL>"int"                      saveToken(); return TYPE_INT;
+<INITIAL>"float"                    saveToken(); return TYPE_FLOAT;
+<INITIAL>"char"                     saveToken(); return TYPE_CHAR;
+<INITIAL>"bool"                     saveToken(); return TYPE_BOOL;
+<INITIAL>"void"                     saveToken(); return TYPE_VOID;
 
 %{
 // Branch tokens
 %}
-<INITIAL>"const"                    SYNC_CURSOR; return CONST;
-<INITIAL>"if"                       SYNC_CURSOR; return IF;
-<INITIAL>"else"                     SYNC_CURSOR; return ELSE;
-<INITIAL>"switch"                   SYNC_CURSOR; return SWITCH;
-<INITIAL>"case"                     SYNC_CURSOR; return CASE;
-<INITIAL>"default"                  SYNC_CURSOR; return DEFAULT;
-<INITIAL>"for"                      SYNC_CURSOR; return FOR;
-<INITIAL>"do"                       SYNC_CURSOR; return DO;
-<INITIAL>"while"                    SYNC_CURSOR; return WHILE;
-<INITIAL>"break"                    SYNC_CURSOR; return BREAK;
-<INITIAL>"continue"                 SYNC_CURSOR; return CONTINUE;
-<INITIAL>"return"                   SYNC_CURSOR; return RETURN;
+<INITIAL>"const"                    saveToken(); return CONST;
+<INITIAL>"if"                       saveToken(); return IF;
+<INITIAL>"else"                     saveToken(); return ELSE;
+<INITIAL>"switch"                   saveToken(); return SWITCH;
+<INITIAL>"case"                     saveToken(); return CASE;
+<INITIAL>"default"                  saveToken(); return DEFAULT;
+<INITIAL>"for"                      saveToken(); return FOR;
+<INITIAL>"do"                       saveToken(); return DO;
+<INITIAL>"while"                    saveToken(); return WHILE;
+<INITIAL>"break"                    saveToken(); return BREAK;
+<INITIAL>"continue"                 saveToken(); return CONTINUE;
+<INITIAL>"return"                   saveToken(); return RETURN;
 
 %{
 // Operators
 %}
-<INITIAL>"++"                       SYNC_CURSOR; return INC;
-<INITIAL>"--"                       SYNC_CURSOR; return DEC;
-<INITIAL>"=="                       SYNC_CURSOR; return EQUAL;
-<INITIAL>"!="                       SYNC_CURSOR; return NOT_EQUAL;
-<INITIAL>">="                       SYNC_CURSOR; return GREATER_EQUAL;
-<INITIAL>"<="                       SYNC_CURSOR; return LESS_EQUAL;
-<INITIAL>"<<"                       SYNC_CURSOR; return SHL;
-<INITIAL>">>"                       SYNC_CURSOR; return SHR;
-<INITIAL>"&&"                       SYNC_CURSOR; return LOGICAL_AND;
-<INITIAL>"||"                       SYNC_CURSOR; return LOGICAL_OR;
-<INITIAL>[-+*/%&|^~!<>=(){},:;]     SYNC_CURSOR; return yytext[0];
+<INITIAL>"++"                       saveToken(); return INC;
+<INITIAL>"--"                       saveToken(); return DEC;
+<INITIAL>"=="                       saveToken(); return EQUAL;
+<INITIAL>"!="                       saveToken(); return NOT_EQUAL;
+<INITIAL>">="                       saveToken(); return GREATER_EQUAL;
+<INITIAL>"<="                       saveToken(); return LESS_EQUAL;
+<INITIAL>"<<"                       saveToken(); return SHL;
+<INITIAL>">>"                       saveToken(); return SHR;
+<INITIAL>"&&"                       saveToken(); return LOGICAL_AND;
+<INITIAL>"||"                       saveToken(); return LOGICAL_OR;
+<INITIAL>[-+*/%&|^~!<>=(){},:;]     saveToken(); return yytext[0];
 
 %{
 // Values
 %}
-<INITIAL>{INTEGER}                  SYNC_CURSOR; yylval.valueInt = atoi(yytext);     return INTEGER;
-<INITIAL>{REAL}                     SYNC_CURSOR; yylval.valueFloat = atof(yytext);   return FLOAT;
-<INITIAL>(\'.\')                    SYNC_CURSOR; yylval.valueChar = yytext[1];       return CHAR;
-<INITIAL>"true"                     SYNC_CURSOR; yylval.valueBool = true;            return BOOL;
-<INITIAL>"false"                    SYNC_CURSOR; yylval.valueBool = false;           return BOOL;
-<INITIAL>{IDENTIFIER}               SYNC_CURSOR; yylval.valueIden = strdup(yytext);  return IDENTIFIER;
+<INITIAL>{INTEGER}                  saveToken(); return INTEGER;
+<INITIAL>{REAL}                     saveToken(); return FLOAT;
+<INITIAL>(\'.\')                    saveToken(); return CHAR;
+<INITIAL>"true"                     saveToken(); return BOOL;
+<INITIAL>"false"                    saveToken(); return BOOL;
+<INITIAL>{IDENTIFIER}               saveToken(); return IDENTIFIER;
 
 %{
 // Others
 %}
-<INITIAL>{WHITESPACE}               SYNC_CURSOR; // Ignore whitespace
-<INITIAL>{LINE_COMMENT}             SYNC_CURSOR; // Ignore comments
-<INITIAL>"/*"                       SYNC_CURSOR; BEGIN BLOCK_COMMENT;
-<BLOCK_COMMENT>"*/"                 SYNC_CURSOR; BEGIN INITIAL;
-<BLOCK_COMMENT>.                    SYNC_CURSOR; // Ignore block comments
+<INITIAL>{WHITESPACE}               saveToken(); // Ignore whitespace
+<INITIAL>{LINE_COMMENT}             saveToken(); // Ignore comments
+<INITIAL>"/*"                       saveToken(); BEGIN BLOCK_COMMENT;
+<BLOCK_COMMENT>"*/"                 saveToken(); BEGIN INITIAL;
+<BLOCK_COMMENT>.                    saveToken(); // Ignore block comments
 
 %%
 
 // =====================================================================================================
 // User Subroutines Section
 // ========================
+
+void saveToken() {
+    yylval.token.value = strdup(yytext);
+    yylval.token.lineNum = curLineNum;
+    yylval.token.pos = curCursorPos;
+    yylval.token.len = curTokenLen = yyleng;
+
+    curCursorPos += yyleng;
+}
 
 int yywrap() {
     return 1;

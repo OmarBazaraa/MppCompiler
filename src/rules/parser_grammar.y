@@ -11,7 +11,6 @@ using namespace std;
 //
 extern int yylex();
 extern FILE* yyin;
-extern char* curLine;
 extern int curLineNum;
 extern int curCursorPos;
 extern int curTokenLen;
@@ -33,30 +32,28 @@ Node* programRoot = NULL;
 
 %union {
     Node*               node;
-    BlockNode*          block;
-    StatementNode*      statement;
-    VarDeclarationNode* varDecl;
-    IfNode*             ifStmt;
-    SwitchNode*         switchStmt;
-    CaseStmtNode*       caseStmt;
-    WhileNode*          whileStmt;
-    DoWhileNode*        doWhileStmt;
-    ForNode*            forStmt;
-    FunctionNode*       function;
-    FunctionCallNode*   functionCall;
-    ReturnStmtNode*     returnStmt;
+    BlockNode*          blockNode;
+    StatementNode*      StmtNode;
+    VarDeclarationNode* varDeclNode;
+    IfNode*             ifNode;
+    SwitchNode*         switchNode;
+    CaseStmtNode*       caseStmtNode;
+    WhileNode*          whileNode;
+    DoWhileNode*        doWhileNode;
+    ForNode*            forNode;
+    FunctionNode*       functionNode;
+    FunctionCallNode*   functionCallNode;
+    ReturnStmtNode*     returnStmtNode;
+    ExpressionNode*     exprNode;
+    TypeNode*           typeNode;
+    ValueNode*          valueNode;
+
     StmtList*           stmtList;
     ExprList*           exprList;
     VarList*            varList;
     CaseList*           caseList;
-    ExpressionNode*     expression;
-    DataType            dtype;
-    int                 token;
-    int                 valueInt;
-    float               valueFloat;
-    char                valueChar;
-    bool                valueBool;
-    char*               valueIden;
+
+    Token               token;
 }
 
 // =====================================================================================================
@@ -64,11 +61,11 @@ Node* programRoot = NULL;
 // =================
 
 // Data types
-%token <dtype> TYPE_INT
-%token <dtype> TYPE_FLOAT
-%token <dtype> TYPE_CHAR
-%token <dtype> TYPE_BOOL
-%token <dtype> TYPE_VOID
+%token <token> TYPE_INT
+%token <token> TYPE_FLOAT
+%token <token> TYPE_CHAR
+%token <token> TYPE_BOOL
+%token <token> TYPE_VOID
 
 // Keywords
 %token <token> CONST
@@ -97,34 +94,35 @@ Node* programRoot = NULL;
 %token <token> LESS_EQUAL
 
 // Values
-%token <valueIden>  IDENTIFIER
-%token <valueInt>   INTEGER
-%token <valueFloat> FLOAT
-%token <valueChar>  CHAR
-%token <valueBool>  BOOL
+%token <token> IDENTIFIER
+%token <token> INTEGER
+%token <token> FLOAT
+%token <token> CHAR
+%token <token> BOOL
 
 // =====================================================================================================
 // Non-terminal Symbols Types
 // ==========================
 
-%type <block>           program stmt_block
-%type <statement>       stmt branch_body for_init_stmt
-%type <stmtList>        stmt_list case_body
-%type <varDecl>         var_decl var_decl_uninit var_decl_init
-%type <ifStmt>          if_stmt unmatched_if_stmt matched_if_stmt
-%type <switchStmt>      switch_stmt
-%type <caseStmt>        case_stmt
-%type <caseList>        switch_body case_stmt_block case_stmt_list
-%type <whileStmt>       while_stmt
-%type <doWhileStmt>     do_while_stmt
-%type <forStmt>         for_stmt for_header
-%type <function>        function function_header
-%type <functionCall>    function_call
-%type <returnStmt>      return_stmt
-%type <varList>         param_list param_list_ext
-%type <exprList>        arg_list arg_list_ext
-%type <expression>      expression for_expr
-%type <dtype>           type
+%type <blockNode>           program stmt_block
+%type <StmtNode>            stmt branch_body for_init_stmt
+%type <stmtList>            stmt_list case_body
+%type <varDeclNode>         var_decl var_decl_uninit var_decl_init
+%type <ifNode>              if_stmt unmatched_if_stmt matched_if_stmt
+%type <switchNode>          switch_stmt
+%type <caseStmtNode>        case_stmt
+%type <caseList>            switch_body case_stmt_block case_stmt_list
+%type <whileNode>           while_stmt
+%type <doWhileNode>         do_while_stmt
+%type <forNode>             for_stmt for_header
+%type <functionNode>        function function_header
+%type <functionCallNode>    function_call
+%type <returnStmtNode>      return_stmt
+%type <varList>             param_list param_list_ext
+%type <exprList>            arg_list arg_list_ext
+%type <exprNode>            expression for_expr
+%type <typeNode>            type
+%type <valueNode>           value
 
 // =====================================================================================================
 // Precendence & Associativity
@@ -182,6 +180,7 @@ stmt:               ';'                     { $$ = new StatementNode(); }
     |               for_stmt                { $$ = $1; }
     |               function                { $$ = $1; }
     |               return_stmt ';'         { $$ = $1; }
+    |               error ';'               { $$ = new ErrorNode(curLineNum, curCursorPos, curTokenLen, "invalid syntax"); }
     ;
 
 branch_body:        stmt                    { $$ = $1; }
@@ -197,12 +196,12 @@ var_decl:           var_decl_uninit
     |               var_decl_init
     ;
 
-var_decl_uninit:    type IDENTIFIER                         { $$ = new VarDeclarationNode($1, $2); }
-    |               CONST type IDENTIFIER                   { $$ = new VarDeclarationNode($2, $3, NULL, true); }
+var_decl_uninit:    type IDENTIFIER                         { $$ = new VarDeclarationNode($1->type, $2.value); }
+    |               CONST type IDENTIFIER                   { $$ = new VarDeclarationNode($2->type, $3.value, NULL, true); }
     ;
 
-var_decl_init:      type IDENTIFIER '=' expression          { $$ = new VarDeclarationNode($1, $2, $4); }
-    |               CONST type IDENTIFIER '=' expression    { $$ = new VarDeclarationNode($2, $3, $5, true); }
+var_decl_init:      type IDENTIFIER '=' expression          { $$ = new VarDeclarationNode($1->type, $2.value, $4); }
+    |               CONST type IDENTIFIER '=' expression    { $$ = new VarDeclarationNode($2->type, $3.value, $5, true); }
     ;
 
 // ------------------------------------------------------------
@@ -210,7 +209,7 @@ var_decl_init:      type IDENTIFIER '=' expression          { $$ = new VarDeclar
 // Expression Rules
 //
 
-expression:         IDENTIFIER '=' expression               { $$ = new AssignOprNode($1, $3); }
+expression:         IDENTIFIER '=' expression               { $$ = new AssignOprNode($1.value, $3); }
 
     |               expression '+' expression               { $$ = new BinaryOprNode(OPR_ADD, $1, $3); }
     |               expression '-' expression               { $$ = new BinaryOprNode(OPR_SUB, $1, $3); }
@@ -245,11 +244,7 @@ expression:         IDENTIFIER '=' expression               { $$ = new AssignOpr
 
     |               '(' expression ')'                      { $$ = $2; }
 
-    |               INTEGER                                 { $$ = new IntNode($1); }
-    |               FLOAT                                   { $$ = new FloatNode($1); }
-    |               CHAR                                    { $$ = new CharNode($1); }
-    |               BOOL                                    { $$ = new BoolNode($1); }
-    |               IDENTIFIER                              { $$ = new VarNode($1); }
+    |               value                                   { $$ = $1; }
     |               function_call                           { $$ = $1; }
     ;
 
@@ -311,7 +306,7 @@ do_while_stmt:      DO branch_body WHILE '(' expression ')'             { $$ = n
 // For Rules
 //
 
-for_stmt:           for_header branch_body                              { $$ = $1; $$->body = $2; }
+for_stmt:           for_header branch_body                              { $$ = $1; ((ForNode*) $$)->body = $2; }
     ;
 
 for_header:         FOR '(' for_init_stmt ';' for_expr ';' for_expr ')' { $$ = new ForNode($3, $5, $7, NULL); }
@@ -334,7 +329,7 @@ for_expr:           /* epsilon */                                       { $$ = N
 function:           function_header stmt_block          { $$ = $1; $$->body = $2; }
     ;
 
-function_header:    type IDENTIFIER '(' param_list ')'  { $$ = new FunctionNode($1, $2, *$4, NULL); delete $4; }
+function_header:    type IDENTIFIER '(' param_list ')'  { $$ = new FunctionNode($1->type, $2.value, *$4, NULL); delete $4; }
     ;
 
 param_list:         /* epsilon */                       { $$ = new VarList(); }
@@ -346,7 +341,7 @@ param_list_ext:     var_decl                            { $$ = new VarList(); $$
     |               param_list_ext ',' var_decl         { $$ = $1; $$->push_back($3); }
     ;
 
-function_call:      IDENTIFIER '(' arg_list ')'         { $$ = new FunctionCallNode($1, *$3); delete $3; }
+function_call:      IDENTIFIER '(' arg_list ')'         { $$ = new FunctionCallNode($1.value, *$3); delete $3; }
     ;
 
 arg_list:           /* epsilon */                       { $$ = new ExprList(); }
@@ -367,11 +362,18 @@ return_stmt:        RETURN expression                   { $$ = new ReturnStmtNod
 // Other Rules
 //
 
-type:               TYPE_INT        { $$ = DTYPE_INT; }
-    |               TYPE_FLOAT      { $$ = DTYPE_FLOAT; }
-    |               TYPE_CHAR       { $$ = DTYPE_CHAR; }
-    |               TYPE_BOOL       { $$ = DTYPE_BOOL; }
-    |               TYPE_VOID       { $$ = DTYPE_VOID; }
+type:               TYPE_INT        { $$ = new TypeNode($1, DTYPE_INT); }
+    |               TYPE_FLOAT      { $$ = new TypeNode($1, DTYPE_FLOAT); }
+    |               TYPE_CHAR       { $$ = new TypeNode($1, DTYPE_CHAR); }
+    |               TYPE_BOOL       { $$ = new TypeNode($1, DTYPE_BOOL); }
+    |               TYPE_VOID       { $$ = new TypeNode($1, DTYPE_VOID); }
+    ;
+
+value:              INTEGER         { $$ = new ValueNode($1, DTYPE_INT); }
+    |               FLOAT           { $$ = new ValueNode($1, DTYPE_FLOAT); }
+    |               CHAR            { $$ = new ValueNode($1, DTYPE_CHAR); }
+    |               BOOL            { $$ = new ValueNode($1, DTYPE_BOOL); }
+    |               IDENTIFIER      { $$ = new ValueNode($1, DTYPE_IDENTIFIER); }
     ;
 
 %%
@@ -382,4 +384,6 @@ type:               TYPE_INT        { $$ = DTYPE_INT; }
 
 void yyerror(const char* s) {
     fprintf(stderr, "%s\n", s); 
+    // printf("%s\n", sourceCode[curLineNum - 1].c_str());
+    // printf("%*s\n", curCursorPos, "^");
 }

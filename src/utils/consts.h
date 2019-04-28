@@ -42,7 +42,8 @@ enum DataType {
     DTYPE_FLOAT,
     DTYPE_CHAR,
     DTYPE_BOOL,
-    DTYPE_VOID
+    DTYPE_VOID,
+    DTYPE_IDENTIFIER
 };
 
 #endif
