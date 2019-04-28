@@ -65,19 +65,19 @@ struct WhileNode : public StatementNode {
         cout << "L" << label2 << ":" << endl;
     }
     
-    virtual void generateQuad(QuadrupleContext* quadContext) {
-        int label1 = quadContext->labelCounter++, label2 = quadContext->labelCounter++;
+    virtual void generateQuad(GenerationContext* generationContext) {
+        int label1 = generationContext->labelCounter++, label2 = generationContext->labelCounter++;
         cout << "L" << label1 << ":" << endl;
-        cond->generateQuad(quadContext);
+        cond->generateQuad(generationContext);
         cout << "JZ L" << label2 << endl;
         
-        quadContext->breakLabels.push(label2);
-        quadContext->continueLabels.push(label1);
+        generationContext->breakLabels.push(label2);
+        generationContext->continueLabels.push(label1);
         
-        body->generateQuad(quadContext);
+        body->generateQuad(generationContext);
         
-        quadContext->breakLabels.pop();
-        quadContext->continueLabels.pop();
+        generationContext->breakLabels.pop();
+        generationContext->continueLabels.pop();
         
         cout << "JMP L" << label1 << endl;
         cout << "L" << label2 << ":" << endl;
@@ -144,20 +144,20 @@ struct DoWhileNode : public StatementNode {
         cout << "L" << label3 << ":" << endl;
     }
     
-    virtual void generateQuad(QuadrupleContext* quadContext) {
-        int label1 = quadContext->labelCounter++, label2 = quadContext->labelCounter++, label3 = quadContext->labelCounter++;
+    virtual void generateQuad(GenerationContext* generationContext) {
+        int label1 = generationContext->labelCounter++, label2 = generationContext->labelCounter++, label3 = generationContext->labelCounter++;
         cout << "L" << label1 << ":" << endl;
         
-        quadContext->breakLabels.push(label3);
-        quadContext->continueLabels.push(label2);
+        generationContext->breakLabels.push(label3);
+        generationContext->continueLabels.push(label2);
         
-        body->generateQuad(quadContext);
+        body->generateQuad(generationContext);
         
-        quadContext->breakLabels.pop();
-        quadContext->continueLabels.pop();
+        generationContext->breakLabels.pop();
+        generationContext->continueLabels.pop();
         
         cout << "L" << label2 << ":" << endl;
-        cond->generateQuad(quadContext);
+        cond->generateQuad(generationContext);
         cout << "JNZ L" << label1 << endl;
         cout << "L" << label3 << ":" << endl;
     }
@@ -277,29 +277,29 @@ struct ForNode : public StatementNode {
      * 
      * L5 (exit)
      **/
-    virtual void generateQuad(QuadrupleContext* quadContext) {
-        int label1 = quadContext->labelCounter++;
-        int label2 = quadContext->labelCounter++;
-        int label3 = quadContext->labelCounter++;
-        int label4 = quadContext->labelCounter++;
-        int label5 = quadContext->labelCounter++;           
+    virtual void generateQuad(GenerationContext* generationContext) {
+        int label1 = generationContext->labelCounter++;
+        int label2 = generationContext->labelCounter++;
+        int label3 = generationContext->labelCounter++;
+        int label4 = generationContext->labelCounter++;
+        int label5 = generationContext->labelCounter++;           
                                                                                 
-        initStmt->generateQuad(quadContext);                                    
+        initStmt->generateQuad(generationContext);                                    
         cout << "L" << label1 << ":" << endl;                                   
-        cond->generateQuad(quadContext);                                        
+        cond->generateQuad(generationContext);                                        
         cout << "JMP L" << label4 << endl;                                      
         cout << "L" << label2 << ":" << endl;                                   
-        inc->generateQuad(quadContext);                                         
+        inc->generateQuad(generationContext);                                         
         cout << "JMP L" << label1 << endl;                                      
         cout << "L" << label3 << ":" << endl;   
         
-        quadContext->breakLabels.push(label5);
-        quadContext->continueLabels.push(label2);
+        generationContext->breakLabels.push(label5);
+        generationContext->continueLabels.push(label2);
         
-        body->generateQuad(quadContext);
+        body->generateQuad(generationContext);
         
-        quadContext->breakLabels.pop();
-        quadContext->continueLabels.pop();
+        generationContext->breakLabels.pop();
+        generationContext->continueLabels.pop();
         
         cout << "JMP L" << label2 << endl;                                      
         cout << "L" << label4 << ":" << endl;                                   
