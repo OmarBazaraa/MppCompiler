@@ -1,5 +1,5 @@
-#ifndef __CONTEXT_H_
-#define __CONTEXT_H_
+#ifndef __QUADRUPLE_CONTEXT_H_
+#define __QUADRUPLE_CONTEXT_H_
 
 #include <iostream>
 #include <string>
