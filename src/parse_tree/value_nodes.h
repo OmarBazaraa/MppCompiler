@@ -22,10 +22,10 @@ struct TypeNode : public StatementNode {
     virtual void print(int ind = 0) {
         cout << string(ind, ' ') << Utils::dtypeToStr(type);
     }
-	
-	virtual void generateQuad(QuadrupleContext* quadContext) {
-		// TODO: Should it be empty ?
-	}
+    
+    virtual void generateQuad(QuadrupleContext* quadContext) {
+        // TODO: Should it be empty ?
+    }
 };
 
 /**
@@ -47,11 +47,11 @@ struct ValueNode : public ExpressionNode {
     virtual void print(int ind = 0) {
         cout << string(ind, ' ') << value;
     }
-	
-	virtual void generateQuad(QuadrupleContext* quadContext) {
-		// is this correct ?
-		cout << "PUSH " << value << endl;
-	}
+    
+    virtual void generateQuad(QuadrupleContext* quadContext) {
+        // is this correct ?
+        cout << "PUSH " << value << endl;
+    }
 };
 
 /**
@@ -71,10 +71,10 @@ struct IdentifierNode : public ExpressionNode {
     virtual void print(int ind = 0) {
         cout << string(ind, ' ') << name;
     }
-	
-	virtual void generateQuad(QuadrupleContext* quadContext) {
-		cout << "PUSH " << name << endl;
-	}
+    
+    virtual void generateQuad(QuadrupleContext* quadContext) {
+        cout << "PUSH " << name << endl;
+    }
 };
 
 #endif

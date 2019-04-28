@@ -16,7 +16,7 @@ using namespace std;
 struct QuadrupleContext {
 
     stack<int> breakLabels, continueLabels;
-	int labelCounter;
+    int labelCounter;
 
     QuadrupleContext() {
         labelCounter = 1;

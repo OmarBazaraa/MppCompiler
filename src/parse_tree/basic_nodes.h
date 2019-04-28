@@ -37,8 +37,8 @@ struct Node {
     virtual void print(int ind = 0) {
         
     }
-	
-	virtual void generateQuad(QuadrupleContext* quadContext) {
+    
+    virtual void generateQuad(QuadrupleContext* quadContext) {
         
     }
 };
@@ -64,8 +64,8 @@ struct StatementNode : Node {
     virtual void print(int ind = 0) {
         cout << string(ind, ' ') << ";" ;
     }
-	
-	virtual void generateQuad(QuadrupleContext* quadContext) {
+    
+    virtual void generateQuad(QuadrupleContext* quadContext) {
         
     }
 };

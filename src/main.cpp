@@ -57,8 +57,8 @@ int main(int argc, char* argv[]) {
     }
 
     // Construct the parse tree
-	QuadrupleContext* quadContext = new QuadrupleContext();
-	
+    QuadrupleContext* quadContext = new QuadrupleContext();
+    
     yyparse();
     programRoot->generateQuad(quadContext);
     delete programRoot;
