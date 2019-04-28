@@ -190,6 +190,60 @@ struct Utils {
 
         return "#";
     }
+	
+	/**
+     * Converts the given operator into its corresponding quadruple string.
+     * 
+     * @param opr the operator to convert.
+     * 
+     * @return the corresponding quadruple string.
+     */
+	static string binOprToQuad(Operator opr) {
+		switch (opr) {
+            case OPR_ADD:
+                return "ADD";
+            case OPR_SUB:
+                return "SUB";
+            case OPR_MUL:
+                return "MUL";
+            case OPR_DIV:
+                return "DIV";
+            case OPR_MOD:
+                return "MOD";
+            case OPR_AND:
+                return "AND";
+            case OPR_OR:
+                return "OR";
+            case OPR_XOR:
+                return "XOR";
+            case OPR_NOT:
+                return "NOT";
+            case OPR_SHL:
+                return "SHL";
+            case OPR_SHR:
+                return "SHR";
+            case OPR_LOGICAL_AND:
+                return "LAND";
+            case OPR_LOGICAL_OR:
+                return "LOR";
+            case OPR_LOGICAL_NOT:
+                return "LNOT";
+            case OPR_GREATER:
+                return "GT";
+            case OPR_GREATER_EQUAL:
+                return "GTE";
+            case OPR_LESS:
+                return "LT";
+            case OPR_LESS_EQUAL:
+                return "LTE";
+            case OPR_EQUAL:
+                return "EQU";
+            case OPR_NOT_EQUAL:
+                return "NEQ";
+        }
+		
+		return "#";
+	}
 
     /**
      * Checks whether the given type is an integer data type.

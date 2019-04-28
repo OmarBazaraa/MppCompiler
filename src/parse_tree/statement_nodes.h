@@ -52,8 +52,8 @@ struct BlockNode : public StatementNode {
         }
         return ret += string(ind, ' ') + "}";
     }
-	
-	virtual void generateQuad(QuadrupleContext* quadContext) {
+    
+    virtual void generateQuad(QuadrupleContext* quadContext) {
         for (int i = 0; i < statements.size(); ++i) {
             statements[i]->generateQuad(quadContext);
         }
@@ -123,13 +123,13 @@ struct VarDeclarationNode : public StatementNode {
         }
         return ret;
     }
-	
-	virtual void generateQuad(QuadrupleContext* quadContext) {
-		if (value) {
-			value->generateQuad(quadContext);
-		}
+    
+    virtual void generateQuad(QuadrupleContext* quadContext) {
+        if (value) {
+            value->generateQuad(quadContext);
+        }
         
-		cout << "POP " << name->name << endl; 
+        cout << "POP " << name->name << endl; 
     }
 };
 
@@ -152,9 +152,9 @@ struct BreakStmtNode : public StatementNode {
     virtual string toString(int ind = 0) {
         return string(ind, ' ') + "break";
     }
-	
-	virtual void generateQuad(QuadrupleContext* quadContext) {
-		cout << "JMP L" << quadContext->breakLabels.top() << endl; 
+    
+    virtual void generateQuad(QuadrupleContext* quadContext) {
+        cout << "JMP L" << quadContext->breakLabels.top() << endl; 
     }
 };
 
@@ -177,9 +177,9 @@ struct ContinueStmtNode : public StatementNode {
     virtual string toString(int ind = 0) {
         return string(ind, ' ') + "continue";
     }
-	
-	virtual void generateQuad(QuadrupleContext* quadContext) {
-		cout << "JMP L" << quadContext->continueLabels.top() << endl; 
+    
+    virtual void generateQuad(QuadrupleContext* quadContext) {
+        cout << "JMP L" << quadContext->continueLabels.top() << endl; 
     }
 };
 
@@ -232,12 +232,12 @@ struct ReturnStmtNode : public StatementNode {
         }
         return ret;
     }
-	
-	virtual void generateQuad(QuadrupleContext* quadContext) {
-		if (value)
-			value->generateQuad(quadContext);
-		
-		cout << "RET" << endl;
+    
+    virtual void generateQuad(QuadrupleContext* quadContext) {
+        if (value)
+            value->generateQuad(quadContext);
+        
+        cout << "RET" << endl;
     }
 };
 
