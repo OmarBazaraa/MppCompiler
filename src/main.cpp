@@ -3,6 +3,7 @@
 #include <string.h>
 
 #include "context/scope_context.h"
+#include "context/quadruple_context.h"
 #include "parse_tree/parse_tree.h"
 #include "utils/utils.h"
 #include "utils/consts.h"
@@ -60,11 +61,13 @@ int main(int argc, char* argv[]) {
     }
 
     // Construct the parse tree
+	QuadrupleContext* quadContext = new QuadrupleContext();
+	
     yyparse();
 
     // Apply semantic check and quadruple generation
     if (programRoot->analyze(&context)) {
-        cout << programRoot->toString() << endl;
+        programRoot->generateQuad(quadContext);
     }
 
     // Finalize and release allocated memory
