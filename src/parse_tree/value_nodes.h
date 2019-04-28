@@ -1,7 +1,7 @@
 #ifndef __VALUE_NODES_H_
 #define __VALUE_NODES_H_
 
-#include "../context/quadruple_context.h"
+#include "../context/generation_context.h"
 #include "basic_nodes.h"
 
 
@@ -23,7 +23,7 @@ struct TypeNode : public StatementNode {
         cout << string(ind, ' ') << Utils::dtypeToStr(type);
     }
     
-    virtual void generateQuad(QuadrupleContext* quadContext) {
+    virtual void generateQuad(GenerationContext* generationContext) {
         // TODO: Should it be empty ?
     }
 };
@@ -48,7 +48,7 @@ struct ValueNode : public ExpressionNode {
         cout << string(ind, ' ') << value;
     }
     
-    virtual void generateQuad(QuadrupleContext* quadContext) {
+    virtual void generateQuad(GenerationContext* generationContext) {
         // is this correct ?
         cout << "PUSH " << value << endl;
     }
@@ -72,7 +72,7 @@ struct IdentifierNode : public ExpressionNode {
         cout << string(ind, ' ') << name;
     }
     
-    virtual void generateQuad(QuadrupleContext* quadContext) {
+    virtual void generateQuad(GenerationContext* generationContext) {
         cout << "PUSH " << name << endl;
     }
 };

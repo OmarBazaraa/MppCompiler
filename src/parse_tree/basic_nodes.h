@@ -5,7 +5,7 @@
 #include <string>
 #include <vector>
 
-#include "../context/quadruple_context.h"
+#include "../context/generation_context.h"
 #include "../utils/consts.h"
 #include "../utils/utils.h"
 
@@ -38,7 +38,7 @@ struct Node {
         
     }
     
-    virtual void generateQuad(QuadrupleContext* quadContext) {
+    virtual void generateQuad(GenerationContext* generationContext) {
         
     }
 };
@@ -65,7 +65,7 @@ struct StatementNode : Node {
         cout << string(ind, ' ') << ";" ;
     }
     
-    virtual void generateQuad(QuadrupleContext* quadContext) {
+    virtual void generateQuad(GenerationContext* generationContext) {
         
     }
 };

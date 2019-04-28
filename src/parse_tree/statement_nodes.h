@@ -1,7 +1,7 @@
 #ifndef __STATEMENT_NODES_H_
 #define __STATEMENT_NODES_H_
 
-#include "../context/quadruple_context.h"
+#include "../context/generation_context.h"
 #include "basic_nodes.h"
 #include "value_nodes.h"
 
@@ -39,9 +39,9 @@ struct BlockNode : public StatementNode {
         cout << string(ind, ' ') << "}";
     }
     
-    virtual void generateQuad(QuadrupleContext* quadContext) {
+    virtual void generateQuad(GenerationContext* generationContext) {
         for (int i = 0; i < statements.size(); ++i) {
-            statements[i]->generateQuad(quadContext);
+            statements[i]->generateQuad(generationContext);
         }
     }
 };
@@ -91,9 +91,9 @@ struct VarDeclarationNode : public StatementNode {
         }
     }
     
-    virtual void generateQuad(QuadrupleContext* quadContext) {
+    virtual void generateQuad(GenerationContext* generationContext) {
         if (value) {
-            value->generateQuad(quadContext);
+            value->generateQuad(generationContext);
         }
         
         cout << "POP " << name->name << endl; 
@@ -117,8 +117,8 @@ struct BreakStmtNode : public StatementNode {
         cout << string(ind, ' ') << "break;";
     }
     
-    virtual void generateQuad(QuadrupleContext* quadContext) {
-        cout << "JMP L" << quadContext->breakLabels.top() << endl; 
+    virtual void generateQuad(GenerationContext* generationContext) {
+        cout << "JMP L" << generationContext->breakLabels.top() << endl; 
     }
 };
 
@@ -139,8 +139,8 @@ struct ContinueStmtNode : public StatementNode {
         cout << string(ind, ' ') << "continue;";
     }
     
-    virtual void generateQuad(QuadrupleContext* quadContext) {
-        cout << "JMP L" << quadContext->continueLabels.top() << endl; 
+    virtual void generateQuad(GenerationContext* generationContext) {
+        cout << "JMP L" << generationContext->continueLabels.top() << endl; 
     }
 };
 
@@ -169,9 +169,9 @@ struct ReturnStmtNode : public StatementNode {
         cout << ";";
     }
     
-    virtual void generateQuad(QuadrupleContext* quadContext) {
+    virtual void generateQuad(GenerationContext* generationContext) {
         if (value)
-            value->generateQuad(quadContext);
+            value->generateQuad(generationContext);
         
         cout << "RET" << endl;
     }
@@ -214,19 +214,19 @@ struct CaseStmtNode : public StatementNode {
         }
     }
     
-    virtual void generateQuad(QuadrupleContext* quadContext) {
+    virtual void generateQuad(GenerationContext* generationContext) {
         if (isDefault) {
             for (int i = 0; i < body.size(); ++i) {
-                body[i]->generateQuad(quadContext);
+                body[i]->generateQuad(generationContext);
             }
         }
         else {
-            int label1 = quadContext->labelCounter++;
-            expr->generateQuad(quadContext);
+            int label1 = generationContext->labelCounter++;
+            expr->generateQuad(generationContext);
             cout << "JZ L" << label1 << endl;
             
             for (int i = 0; i < body.size(); ++i) {
-                body[i]->generateQuad(quadContext);
+                body[i]->generateQuad(generationContext);
             }
             
             cout << "L" << label1 << endl;
