@@ -1,6 +1,7 @@
 #ifndef __LOOP_NODES_H_
 #define __LOOP_NODES_H_
 
+#include "../context/quadruple_context.h"
 #include "basic_nodes.h"
 #include "statement_nodes.h"
 
@@ -45,6 +46,24 @@ struct WhileNode : public StatementNode {
         ret += body->toString(ind + (dynamic_cast<BlockNode*>(body) ? 0 : 4));
         return ret;
     }
+	
+	virtual void generateQuad(QuadrupleContext* quadContext) {
+		int label1 = quadContext->labelCounter++, label2 = quadContext->labelCounter++;
+		cout << "L" << label1 << ":" << endl;
+		cond->generateQuad(quadContext);
+		cout << "JZ L" << label2 << endl;
+		
+		quadContext->breakLabels.push(label2);
+		quadContext->continueLabels.push(label1);
+		
+		body->generateQuad(quadContext);
+		
+		quadContext->breakLabels.pop();
+		quadContext->continueLabels.pop();
+		
+		cout << "JMP L" << label1 << endl;
+		cout << "L" << label2 << ":" << endl;
+    }
 };
 
 /**
@@ -87,6 +106,24 @@ struct DoWhileNode : public StatementNode {
         ret += body->toString(ind + (dynamic_cast<BlockNode*>(body) ? 0 : 4)) + "\n";
         ret += string(ind, ' ') + "while (" + cond->toString() + ");";
         return ret;
+    }
+	
+	virtual void generateQuad(QuadrupleContext* quadContext) {
+		int label1 = quadContext->labelCounter++, label2 = quadContext->labelCounter++, label3 = quadContext->labelCounter++;
+		cout << "L" << label1 << ":" << endl;
+		
+		quadContext->breakLabels.push(label3);
+		quadContext->continueLabels.push(label2);
+		
+		body->generateQuad(quadContext);
+		
+		quadContext->breakLabels.pop();
+		quadContext->continueLabels.pop();
+		
+		cout << "L" << label2 << ":" << endl;
+		cond->generateQuad(quadContext);
+		cout << "JNZ L" << label1 << endl;
+		cout << "L" << label3 << ":" << endl;
     }
 };
 
@@ -141,6 +178,52 @@ struct ForNode : public StatementNode {
         ret += ")\n";
         ret += body->toString(ind + (dynamic_cast<BlockNode*>(body) ? 0 : 4));
         return ret;
+    }
+	/**
+	 * InitStmt Code
+	 * L1: Cond Code
+	 * JMP L4
+	 * 
+	 * L2: Inc. Code
+	 * JMP L1
+	 * 
+	 * L3: Body Code
+	 * JMP L2
+	 *
+	 * L4: JMP L5 if Condition is false
+	 * JMP L3
+	 * 
+	 * L5 (exit)
+	 **/
+	virtual void generateQuad(QuadrupleContext* quadContext) {
+		int label1 = quadContext->labelCounter++;
+		int label2 = quadContext->labelCounter++;
+		int label3 = quadContext->labelCounter++;
+		int label4 = quadContext->labelCounter++;
+		int label5 = quadContext->labelCounter++;			
+																				
+		initStmt->generateQuad(quadContext);									
+		cout << "L" << label1 << ":" << endl;									
+		cond->generateQuad(quadContext);										
+		cout << "JMP L" << label4 << endl;										
+		cout << "L" << label2 << ":" << endl;									
+		inc->generateQuad(quadContext);											
+		cout << "JMP L" << label1 << endl;										
+		cout << "L" << label3 << ":" << endl;	
+		
+		quadContext->breakLabels.push(label5);
+		quadContext->continueLabels.push(label2);
+		
+		body->generateQuad(quadContext);
+		
+		quadContext->breakLabels.pop();
+		quadContext->continueLabels.pop();
+		
+		cout << "JMP L" << label2 << endl;										
+		cout << "L" << label4 << ":" << endl;									
+		cout << "JZ L" << label5 << endl;										
+		cout << "JMP L" << label3 << endl;										
+		cout << "L" << label5 << ":" << endl;
     }
 };
 
