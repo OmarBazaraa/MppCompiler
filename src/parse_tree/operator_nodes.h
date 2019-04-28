@@ -1,7 +1,7 @@
 #ifndef __OPERATOR_NODES_H_
 #define __OPERATOR_NODES_H_
 
-#include "../context/quadruple_context.h"
+#include "../context/generation_context.h"
 #include "basic_nodes.h"
 #include "value_nodes.h"
 
@@ -57,8 +57,8 @@ struct AssignOprNode : public ExpressionNode {
         return string(ind, ' ') + "(" + lhs->toString() + " = " + rhs->toString() + ")";
     }
     
-    virtual void generateQuad(QuadrupleContext* quadContext) {
-        value->generateQuad(quadContext);
+    virtual void generateQuad(GenerationContext* generationContext) {
+        value->generateQuad(generationContext);
         cout << "POP " << name->name << endl;
     }
 };
@@ -114,9 +114,9 @@ struct BinaryOprNode : public ExpressionNode {
         return string(ind, ' ') + "(" + lhs->toString() + " " + Utils::oprToStr(opr) + " " + rhs->toString() + ")";
     }
     
-    virtual void generateQuad(QuadrupleContext* quadContext) {
-        lhs->generateQuad(quadContext);
-        rhs->generateQuad(quadContext);
+    virtual void generateQuad(GenerationContext* generationContext) {
+        lhs->generateQuad(generationContext);
+        rhs->generateQuad(generationContext);
         cout << Utils::binOprToQuad(opr) << endl;
     }
 };
@@ -187,29 +187,29 @@ struct UnaryOprNode : public ExpressionNode {
         return ret += ")";
     }
     
-    virtual void generateQuad(QuadrupleContext* quadContext) {
+    virtual void generateQuad(GenerationContext* generationContext) {
         switch (opr) {
             case OPR_U_MINUS:
-                expr->generateQuad(quadContext);
+                expr->generateQuad(generationContext);
                 cout << "NEG" << endl;
                 break;
             case OPR_PRE_INC:
-                expr->generateQuad(quadContext);
+                expr->generateQuad(generationContext);
                 cout << "PUSH 1" << endl;
                 cout << "ADD" << endl;
                 break;
             case OPR_SUF_INC:
-                expr->generateQuad(quadContext);
+                expr->generateQuad(generationContext);
                 cout << "PUSH 1" << endl;
                 cout << "ADD" << endl;
                 break;
             case OPR_PRE_DEC:
-                expr->generateQuad(quadContext);
+                expr->generateQuad(generationContext);
                 cout << "PUSH 1" << endl;
                 cout << "SUB" << endl;
                 break;
             case OPR_SUF_DEC:
-                expr->generateQuad(quadContext);
+                expr->generateQuad(generationContext);
                 cout << "PUSH 1" << endl;
                 cout << "SUB" << endl;
                 break;

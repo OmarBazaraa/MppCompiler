@@ -9,7 +9,7 @@
 
 #include "../symbol_table/symbol_table.h"
 
-#include "../context/quadruple_context.h"
+#include "../context/generation_context.h"
 
 #include "../utils/consts.h"
 #include "../utils/utils.h"
@@ -50,7 +50,7 @@ struct StatementNode {
         return string(ind, ' ') + ";" ;
     }
     
-    virtual void generateQuad(QuadrupleContext* quadContext) {
+    virtual void generateQuad(GenerationContext* generationContext) {
         
     }
 };
@@ -78,7 +78,7 @@ struct ExpressionNode : public StatementNode {
         }
     }
     
-    virtual void generateQuad(QuadrupleContext* quadContext) {
+    virtual void generateQuad(GenerationContext* generationContext) {
         
     }
 };
