@@ -2,6 +2,7 @@
 #include <string>
 #include <string.h>
 
+#include "context/quadruple_context.h"
 #include "parse_tree/parse_tree.h"
 #include "utils/utils.h"
 #include "utils/consts.h"
@@ -56,8 +57,10 @@ int main(int argc, char* argv[]) {
     }
 
     // Construct the parse tree
+	QuadrupleContext* quadContext = new QuadrupleContext();
+	
     yyparse();
-    programRoot->print();
+    programRoot->generateQuad(quadContext);
     delete programRoot;
 
     return 0;
