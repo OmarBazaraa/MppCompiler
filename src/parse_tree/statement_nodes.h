@@ -1,6 +1,7 @@
 #ifndef __STATEMENT_NODES_H_
 #define __STATEMENT_NODES_H_
 
+#include "../context/quadruple_context.h"
 #include "basic_nodes.h"
 #include "value_nodes.h"
 
@@ -36,6 +37,12 @@ struct BlockNode : public StatementNode {
             cout << endl;
         }
         cout << string(ind, ' ') << "}";
+    }
+	
+	virtual void generateQuad(QuadrupleContext* quadContext) {
+        for (int i = 0; i < statements.size(); ++i) {
+            statements[i]->generateQuad(quadContext);
+        }
     }
 };
 
@@ -83,6 +90,14 @@ struct VarDeclarationNode : public StatementNode {
             value->print(0);
         }
     }
+	
+	virtual void generateQuad(QuadrupleContext* quadContext) {
+		if (value) {
+			value->generateQuad(quadContext);
+		}
+        
+		cout << "POP " << name->name; 
+    }
 };
 
 /**
@@ -101,6 +116,10 @@ struct BreakStmtNode : public StatementNode {
     virtual void print(int ind = 0) {
         cout << string(ind, ' ') << "break;";
     }
+	
+	virtual void generateQuad(QuadrupleContext* quadContext) {
+		cout << "JMP L" << quadContext->breakLabels.top() << endl; 
+    }
 };
 
 /**
@@ -118,6 +137,10 @@ struct ContinueStmtNode : public StatementNode {
 
     virtual void print(int ind = 0) {
         cout << string(ind, ' ') << "continue;";
+    }
+	
+	virtual void generateQuad(QuadrupleContext* quadContext) {
+		cout << "JMP L" << quadContext->continueLabels.top() << endl; 
     }
 };
 
@@ -144,6 +167,11 @@ struct ReturnStmtNode : public StatementNode {
             value->print(0);
         }
         cout << ";";
+    }
+	
+	virtual void generateQuad(QuadrupleContext* quadContext) {
+		value->generateQuad(quadContext);
+		cout << "RET" << endl;
     }
 };
 
@@ -182,6 +210,25 @@ struct CaseStmtNode : public StatementNode {
             body[i]->print(ind + 4);
             cout << endl;
         }
+    }
+	
+	virtual void generateQuad(QuadrupleContext* quadContext) {
+		if (isDefault) {
+			for (int i = 0; i < body.size(); ++i) {
+				body[i]->generateQuad(quadContext);
+			}
+		}
+		else {
+			int label1 = quadContext->labelCounter++;
+			expr->generateQuad(quadContext);
+			cout << "JZ L" << label1 << endl;
+			
+			for (int i = 0; i < body.size(); ++i) {
+				body[i]->generateQuad(quadContext);
+			}
+			
+			cout << "L" << label1 << endl;
+		}
     }
 };
 

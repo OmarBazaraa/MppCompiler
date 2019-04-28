@@ -1,6 +1,7 @@
 #ifndef __OPERATOR_NODES_H_
 #define __OPERATOR_NODES_H_
 
+#include "../context/quadruple_context.h"
 #include "basic_nodes.h"
 #include "value_nodes.h"
 
@@ -32,6 +33,11 @@ struct AssignOprNode : public ExpressionNode {
         cout << " = ";
         value->print(0);
         cout << ")";
+    }
+	
+	virtual void generateQuad(QuadrupleContext* quadContext) {
+		value->generateQuad(quadContext);
+		cout << "POP " << name->name;
     }
 };
 
@@ -65,6 +71,72 @@ struct BinaryOprNode : public ExpressionNode {
         rhs->print(0);
         cout << ")";
     }
+	
+	virtual void generateQuad(QuadrupleContext* quadContext) {
+		lhs->generateQuad(quadContext);
+		rhs->generateQuad(quadContext);
+		switch (opr) {
+            case OPR_ADD:
+                cout << "ADD" << endl;
+				break;
+            case OPR_SUB:
+                cout << "SUB" << endl;
+				break;
+            case OPR_MUL:
+                cout << "MUL" << endl;
+				break;
+            case OPR_DIV:
+                cout << "DIV" << endl;
+				break;
+            case OPR_MOD:
+                cout << "MOD" << endl;
+				break;
+            case OPR_AND:
+                cout << "AND" << endl;
+				break;
+            case OPR_OR:
+                cout << "OR" << endl;
+				break;
+            case OPR_XOR:
+                cout << "XOR" << endl;
+				break;
+            case OPR_NOT:
+                cout << "NOT" << endl;
+				break;
+            case OPR_SHL:
+                cout << "SHL" << endl;
+				break;
+            case OPR_SHR:
+                cout << "SHR" << endl;
+				break;
+            case OPR_LOGICAL_AND:
+                cout << "LAND" << endl;
+				break;
+            case OPR_LOGICAL_OR:
+                cout << "LOR" << endl;
+				break;
+            case OPR_LOGICAL_NOT:
+                cout << "LNOT" << endl;
+				break;
+            case OPR_GREATER:
+                cout << "GT" << endl;
+				break;
+            case OPR_GREATER_EQUAL:
+                cout << "GTE" << endl;
+				break;
+            case OPR_LESS:
+                cout << "LT" << endl;
+				break;
+            case OPR_LESS_EQUAL:
+                cout << "LTE" << endl;
+				break;
+            case OPR_EQUAL:
+                cout << "EQU" << endl;
+				break;
+            case OPR_NOT_EQUAL:
+                cout << "NEQ" << endl;
+				break;
+    }
 };
 
 /**
@@ -97,6 +169,34 @@ struct UnaryOprNode : public ExpressionNode {
         }
 
         cout << ")";
+    }
+	
+	virtual void generateQuad(QuadrupleContext* quadContext) {
+		switch (opr) {
+            case OPR_U_MINUS:
+                expr->generateQuad(quadContext);
+				cout << "NEG" << endl;
+				break;
+            case OPR_PRE_INC:
+				expr->generateQuad(quadContext);
+				cout << "PUSH 1" << endl;
+				cout << "ADD" << endl;
+				break;
+            case OPR_SUF_INC:
+                expr->generateQuad(quadContext);
+				cout << "PUSH 1" << endl;
+				cout << "ADD" << endl;
+				break;
+            case OPR_PRE_DEC:
+				expr->generateQuad(quadContext);
+				cout << "PUSH 1" << endl;
+				cout << "SUB" << endl;
+				break;
+            case OPR_SUF_DEC:
+                expr->generateQuad(quadContext);
+				cout << "PUSH 1" << endl;
+				cout << "SUB" << endl;
+				break;
     }
 };
 
