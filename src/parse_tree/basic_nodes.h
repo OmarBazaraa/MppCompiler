@@ -49,8 +49,8 @@ struct StatementNode {
     virtual string toString(int ind = 0) {
         return string(ind, ' ') + ";" ;
     }
-	
-	virtual void generateQuad(QuadrupleContext* quadContext) {
+    
+    virtual void generateQuad(QuadrupleContext* quadContext) {
         
     }
 };
@@ -77,8 +77,8 @@ struct ExpressionNode : public StatementNode {
             return Utils::dtypeToStr(type);
         }
     }
-	
-	virtual void generateQuad(QuadrupleContext* quadContext) {
+    
+    virtual void generateQuad(QuadrupleContext* quadContext) {
         
     }
 };

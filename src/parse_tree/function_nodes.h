@@ -80,14 +80,14 @@ struct FunctionNode : public StatementNode {
         ret += body->toString(ind);
         return ret;
     }
-	
-	virtual void generateQuad(QuadrupleContext* quadContext) {
-		cout << "PROC " << name->name << endl;
-		for (int i = 0; i < paramList.size(); ++i) {
+    
+    virtual void generateQuad(QuadrupleContext* quadContext) {
+        cout << "PROC " << name->name << endl;
+        for (int i = 0; i < paramList.size(); ++i) {
             paramList[i]->generateQuad(quadContext);
         }
-		body->generateQuad(quadContext);
-		cout << "ENDP " << name->name << endl;
+        body->generateQuad(quadContext);
+        cout << "ENDP " << name->name << endl;
     } 
 };
 
@@ -160,12 +160,12 @@ struct FunctionCallNode : public ExpressionNode {
         }
         return ret += ")";
     }
-	
-	virtual void generateQuad(QuadrupleContext* quadContext) {
-		for (int i = argList.size() - 1; i >= 0; --i) {
+    
+    virtual void generateQuad(QuadrupleContext* quadContext) {
+        for (int i = argList.size() - 1; i >= 0; --i) {
             argList[i]->generateQuad(quadContext);
         }
-		cout << "CALL " << name->name << endl;
+        cout << "CALL " << name->name << endl;
     }
 };
 
