@@ -9,6 +9,8 @@
 
 #include "../symbol_table/symbol_table.h"
 
+#include "../context/quadruple_context.h"
+
 #include "../utils/consts.h"
 #include "../utils/utils.h"
 
@@ -47,6 +49,10 @@ struct StatementNode {
     virtual string toString(int ind = 0) {
         return string(ind, ' ') + ";" ;
     }
+	
+	virtual void generateQuad(QuadrupleContext* quadContext) {
+        
+    }
 };
 
 /**
@@ -70,6 +76,10 @@ struct ExpressionNode : public StatementNode {
         } else {
             return Utils::dtypeToStr(type);
         }
+    }
+	
+	virtual void generateQuad(QuadrupleContext* quadContext) {
+        
     }
 };
 
@@ -104,6 +114,10 @@ struct ExprContainerNode : public ExpressionNode {
 
     virtual string toString(int ind = 0) {
         return expr->toString(ind);
+    }
+	
+	virtual void generateQuad(QuadrupleContext* quadContext) {
+        
     }
 };
 

@@ -1,6 +1,7 @@
 #ifndef __STATEMENT_NODES_H_
 #define __STATEMENT_NODES_H_
 
+#include "../context/quadruple_context.h"
 #include "basic_nodes.h"
 #include "value_nodes.h"
 
@@ -50,6 +51,12 @@ struct BlockNode : public StatementNode {
             ret += statements[i]->toString(ind + 4) + "\n";
         }
         return ret += string(ind, ' ') + "}";
+    }
+	
+	virtual void generateQuad(QuadrupleContext* quadContext) {
+        for (int i = 0; i < statements.size(); ++i) {
+            statements[i]->generateQuad(quadContext);
+        }
     }
 };
 
@@ -116,6 +123,14 @@ struct VarDeclarationNode : public StatementNode {
         }
         return ret;
     }
+	
+	virtual void generateQuad(QuadrupleContext* quadContext) {
+		if (value) {
+			value->generateQuad(quadContext);
+		}
+        
+		cout << "POP " << name->name; 
+    }
 };
 
 /**
@@ -137,6 +152,10 @@ struct BreakStmtNode : public StatementNode {
     virtual string toString(int ind = 0) {
         return string(ind, ' ') + "break";
     }
+	
+	virtual void generateQuad(QuadrupleContext* quadContext) {
+		cout << "JMP L" << quadContext->breakLabels.top() << endl; 
+    }
 };
 
 /**
@@ -157,6 +176,10 @@ struct ContinueStmtNode : public StatementNode {
 
     virtual string toString(int ind = 0) {
         return string(ind, ' ') + "continue";
+    }
+	
+	virtual void generateQuad(QuadrupleContext* quadContext) {
+		cout << "JMP L" << quadContext->continueLabels.top() << endl; 
     }
 };
 
@@ -208,6 +231,11 @@ struct ReturnStmtNode : public StatementNode {
             ret += " " + value->toString();
         }
         return ret;
+    }
+	
+	virtual void generateQuad(QuadrupleContext* quadContext) {
+		value->generateQuad(quadContext);
+		cout << "RET" << endl;
     }
 };
 

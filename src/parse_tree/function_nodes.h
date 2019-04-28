@@ -1,6 +1,7 @@
 #ifndef __FUNCTION_NODES_H_
 #define __FUNCTION_NODES_H_
 
+#include "../context/quadruple_context.h"
 #include "basic_nodes.h"
 #include "statement_nodes.h"
 #include "value_nodes.h"
@@ -79,6 +80,15 @@ struct FunctionNode : public StatementNode {
         ret += body->toString(ind);
         return ret;
     }
+	
+	virtual void generateQuad(QuadrupleContext* quadContext) {
+		cout << "PROC " << name->name << endl;
+		for (int i = 0; i < paramList.size(); ++i) {
+            paramList[i]->generateQuad(quadContext);
+        }
+		body->generateQuad(quadContext);
+		cout << "ENDP " << name->name << endl;
+    } 
 };
 
 /**
@@ -149,6 +159,13 @@ struct FunctionCallNode : public ExpressionNode {
             ret += (i > 0 ? ", " : "") + argList[i]->toString();
         }
         return ret += ")";
+    }
+	
+	virtual void generateQuad(QuadrupleContext* quadContext) {
+		for (int i = paramList.size() - 1; i >= 0; --i) {
+            paramList[i]->generateQuad(quadContext);
+        }
+		cout << "CALL " << name->name << endl;
     }
 };
 
