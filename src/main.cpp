@@ -2,12 +2,8 @@
 #include <string>
 #include <string.h>
 
-<<<<<<< HEAD
 #include "context/scope_context.h"
 #include "context/generation_context.h"
-=======
-#include "context/quadruple_context.h"
->>>>>>> Added quad generation to the main
 #include "parse_tree/parse_tree.h"
 #include "utils/utils.h"
 #include "utils/consts.h"
@@ -65,7 +61,6 @@ int main(int argc, char* argv[]) {
     }
 
     // Construct the parse tree
-<<<<<<< HEAD
     GenerationContext* generationContext = new GenerationContext();
     
     yyparse();
@@ -77,12 +72,6 @@ int main(int argc, char* argv[]) {
 
     // Finalize and release allocated memory
     fclose(yyin);
-=======
-	QuadrupleContext* quadContext = new QuadrupleContext();
-	
-    yyparse();
-    programRoot->generateQuad(quadContext);
->>>>>>> Added quad generation to the main
     delete programRoot;
 
     return 0;
