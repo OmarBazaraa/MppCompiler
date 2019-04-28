@@ -1,5 +1,5 @@
-#ifndef __QUADRUPLE_CONTEXT_H_
-#define __QUADRUPLE_CONTEXT_H_
+#ifndef __GENERATION_CONTEXT_H_
+#define __GENERATION_CONTEXT_H_
 
 #include <iostream>
 #include <string>
@@ -13,12 +13,12 @@ using namespace std;
 /**
  * Struct holding the current context in the quadruple generation phase.
  */
-struct QuadrupleContext {
+struct GenerationContext {
 
     stack<int> breakLabels, continueLabels;
     int labelCounter;
 
-    QuadrupleContext() {
+    GenerationContext() {
         labelCounter = 1;
     }
 };
