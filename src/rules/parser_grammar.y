@@ -10,10 +10,7 @@ using namespace std;
 // External functions & variables
 //
 extern int yylex();
-extern FILE* yyin;
-extern int curLineNum;
-extern int curCursorPos;
-extern int curTokenLen;
+extern Location curLoc;
 
 //
 // Functions prototypes
@@ -182,7 +179,7 @@ stmt:               ';'                     { $$ = new StatementNode($<location>
     |               for_stmt                { $$ = $1; }
     |               function                { $$ = $1; }
     |               return_stmt ';'         { $$ = $1; }
-    |               error ';'               { $$ = new ErrorNode(curLineNum, curCursorPos, curTokenLen, "invalid syntax"); }
+    |               error ';'               { $$ = new ErrorNode(curLoc, "invalid syntax"); yyerrok; }
     ;
 
 branch_body:        stmt                    { $$ = $1; }
@@ -388,7 +385,7 @@ ident:              IDENTIFIER      { $$ = new IdentifierNode($1.loc, $1.value);
 // ========================
 
 void yyerror(const char* s) {
-    fprintf(stderr, "%s\n", s); 
+    // fprintf(stderr, "%s\n", s); 
     // printf("%s\n", sourceCode[curLineNum - 1].c_str());
     // printf("%*s\n", curCursorPos, "^");
 }

@@ -5,6 +5,7 @@
 #include <string>
 #include <vector>
 
+#include "../context/context.h"
 #include "../utils/consts.h"
 #include "../utils/utils.h"
 
@@ -31,6 +32,10 @@ struct Node {
 
     virtual ~Node() {
 
+    }
+    
+    virtual bool analyze(Context* context) {
+        return true;
     }
 
     virtual void print(int ind = 0) {
@@ -73,30 +78,33 @@ struct ExpressionNode : public StatementNode {
     ExpressionNode(const Location& loc) : StatementNode(loc) {
         this->loc = loc;
     }
-
-    virtual ~ExpressionNode() {
-
-    }
 };
 
 /**
  * The node class representing a syntax error statement.
  */
 struct ErrorNode : public StatementNode {
-    int lineNum;
-    int cursorPos;
-    int tokenLen;
     string what;
 
-    ErrorNode(int lineNum, int cursorPos, int tokenLen, const string& what) {
-        this->lineNum = lineNum;
-        this->cursorPos = cursorPos;
-        this->tokenLen = tokenLen;
+    ErrorNode(const Location& loc, const string& what) {
+        this->loc = loc;
         this->what = what;
+
+        this->loc.pos -= this->loc.len - 1;
     }
 
     ~ErrorNode() {
 
+    }
+
+    virtual bool analyze(Context* context) {
+        printf("%s\n", context->sourceCode[loc.lineNum - 1].c_str());
+        printf("%*s\n", loc.pos, "^");
+        return false;
+    }
+
+    virtual void print(int ind) {
+        cout << string(ind, ' ') << "ERROR;" ;
     }
 };
 

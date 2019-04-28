@@ -26,6 +26,13 @@ struct WhileNode : public StatementNode {
         }
     }
 
+    virtual bool analyze(Context* context) {
+        bool ret = true;
+        ret &= cond->analyze(context );
+        ret &= body->analyze(context );
+        return ret;
+    }
+
     virtual void print(int ind = 0) {
         cout << string(ind, ' ') << "while (";
         cond->print(0);
@@ -53,6 +60,13 @@ struct DoWhileNode : public StatementNode {
         if (body) {
             delete body;
         }
+    }
+
+    virtual bool analyze(Context* context) {
+        bool ret = true;
+        ret &= cond->analyze(context);
+        ret &= body->analyze(context);
+        return ret;
     }
 
     virtual void print(int ind = 0) {
@@ -94,6 +108,24 @@ struct ForNode : public StatementNode {
         if (body) {
             delete body;
         }
+    }
+
+    virtual bool analyze(Context* context) {
+        bool ret = true;
+
+        if (initStmt) {
+            ret &= initStmt->analyze(context);
+        }
+        if (cond) {
+            ret &= cond->analyze(context);
+        }
+        if (inc) {
+            ret &= inc->analyze(context);
+        }
+        
+        ret &= body->analyze(context);
+
+        return ret;
     }
 
     virtual void print(int ind = 0) {

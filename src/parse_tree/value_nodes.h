@@ -18,6 +18,10 @@ struct TypeNode : public StatementNode {
 
     }
 
+    virtual bool analyze(Context* context) {
+        return true;
+    }
+
     virtual void print(int ind = 0) {
         cout << string(ind, ' ') << Utils::dtypeToStr(type);
     }
@@ -39,6 +43,10 @@ struct ValueNode : public ExpressionNode {
 
     }
 
+    virtual bool analyze(Context* context) {
+        return true;
+    }
+
     virtual void print(int ind = 0) {
         cout << string(ind, ' ') << value;
     }
@@ -56,6 +64,10 @@ struct IdentifierNode : public ExpressionNode {
 
     virtual ~IdentifierNode() {
 
+    }
+
+    virtual bool analyze(Context* context) {
+        return true;
     }
 
     virtual void print(int ind = 0) {

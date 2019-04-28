@@ -26,6 +26,10 @@ struct AssignOprNode : public ExpressionNode {
         }
     }
 
+    virtual bool analyze(Context* context) {
+        return name->analyze(context) && value->analyze(context);
+    }
+
     virtual void print(int ind = 0) {
         cout << string(ind, ' ') << "(";
         name->print(0);
@@ -58,6 +62,10 @@ struct BinaryOprNode : public ExpressionNode {
         }
     }
 
+    virtual bool analyze(Context* context) {
+        return lhs->analyze(context) && rhs->analyze(context);
+    }
+
     virtual void print(int ind = 0) {
         cout << string(ind, ' ') << "(";
         lhs->print(0);
@@ -83,6 +91,10 @@ struct UnaryOprNode : public ExpressionNode {
         if (expr) {
             delete expr;
         }
+    }
+
+    virtual bool analyze(Context* context) {
+        return expr->analyze(context);
     }
 
     virtual void print(int ind = 0) {

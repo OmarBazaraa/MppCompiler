@@ -1,9 +1,9 @@
 int omar = 4;
 
-//return int x if {};
+return int x;
 
-/*
- *
+/**
+ * Block comment
  */
 
 void func(int x, bool y) {
@@ -14,17 +14,5 @@ void func(int x, bool y) {
         for (int j = 0; j < m; ++j)
             ;
             ;
-    }
-
-    switch (varX) {
-    case 5:
-        oamr;
-        ;
-        ;
-        {
-            
-        }
-    default: oasda;
-    default: x & 1;    
     }
 }

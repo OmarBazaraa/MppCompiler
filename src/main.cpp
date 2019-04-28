@@ -1,7 +1,9 @@
 #include <iostream>
+#include <fstream>
 #include <string>
 #include <string.h>
 
+#include "context/context.h"
 #include "parse_tree/parse_tree.h"
 #include "utils/utils.h"
 #include "utils/consts.h"
@@ -19,7 +21,6 @@ using namespace std;
 // External functions & variables
 //
 extern int yyparse();
-extern int yylex();
 extern FILE* yyin;
 extern Node* programRoot;
 
@@ -28,10 +29,12 @@ extern Node* programRoot;
 //
 string inputFilename;
 string outputFilename = "out.o";
+vector<string> sourceCode;
 
 //
 // Functions prototypes
 //
+void readSourceCode();
 void printHelp();
 void printVersion();
 void parseArguments(int argc, char* argv[]);
@@ -47,7 +50,10 @@ int main(int argc, char* argv[]) {
     // Parse incoming arguments
     parseArguments(argc, argv);
 
-    // Open input file
+    // Read the source code
+    readSourceCode();
+
+    // Open input file for Lex & Yacc
     yyin = fopen(inputFilename.c_str(), "r");
 
     if (yyin == NULL) {
@@ -57,10 +63,42 @@ int main(int argc, char* argv[]) {
 
     // Construct the parse tree
     yyparse();
-    programRoot->print();
+
+    // Apply semantic check and quadruple generation
+    Context context(sourceCode);
+
+    if (programRoot->analyze(&context)) {
+        programRoot->print();
+    }
+
+    // Finalize and release allocated memory
+    fclose(yyin);
     delete programRoot;
 
     return 0;
+}
+
+/**
+ * Reads the given source code file and fills
+ * the global vector {@code sourceCode}.
+ */
+void readSourceCode() {
+    // Open input file
+    ifstream fin(inputFilename);
+
+    // Check that the file was opened successfully
+    if (!fin.is_open()) {
+        return;
+    }
+
+    // Read the source code line by line
+    string line;
+    while (getline(fin, line)) {
+        sourceCode.push_back(line);
+    }
+
+    // Close
+    fin.close();
 }
 
 /**

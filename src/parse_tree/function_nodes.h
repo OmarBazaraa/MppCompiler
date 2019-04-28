@@ -37,6 +37,21 @@ struct FunctionNode : public StatementNode {
         }
     }
 
+    virtual bool analyze(Context* context) {
+        bool ret = true;
+
+        ret &= type->analyze(context);
+        ret &= name->analyze(context);
+
+        for (int i = 0; i < paramList.size(); ++i) {
+            ret &= paramList[i]->analyze(context);
+        }
+
+        ret &= body->analyze(context);
+
+        return ret;
+    }
+
     virtual void print(int ind = 0) {
         cout << string(ind, ' ');
         type->print(0);
@@ -50,7 +65,7 @@ struct FunctionNode : public StatementNode {
 
         for (int i = 1; i < paramList.size(); ++i) {
             cout << ", ";
-            paramList[0]->print(0);
+            paramList[i]->print(0);
         }
 
         cout << ")" << endl;
@@ -79,6 +94,18 @@ struct FunctionCallNode : public ExpressionNode {
         }
     }
 
+    virtual bool analyze(Context* context) {
+        bool ret = true;
+
+        ret &= name->analyze(context);
+
+        for (int i = 0; i < argList.size(); ++i) {
+            ret &= argList[i]->analyze(context);
+        }
+
+        return ret;
+    }
+
     virtual void print(int ind = 0) {
         cout << string(ind, ' ');
         name->print(0);
@@ -90,7 +117,7 @@ struct FunctionCallNode : public ExpressionNode {
 
         for (int i = 1; i < argList.size(); ++i) {
             cout << ", ";
-            argList[0]->print(0);
+            argList[i]->print(0);
         }
 
         cout << ")";

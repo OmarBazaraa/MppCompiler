@@ -31,6 +31,18 @@ struct IfNode : public StatementNode {
         }
     }
 
+    virtual bool analyze(Context* context) {
+        bool ret = true;
+        ret &= cond->analyze(context);
+        ret &= ifBody->analyze(context);
+
+        if (elseBody) {
+            ret &= elseBody->analyze(context);
+        }
+
+        return ret;
+    }
+
     virtual void print(int ind = 0) {
         cout << string(ind, ' ') << "if (";
         cond->print(0);
@@ -47,6 +59,8 @@ struct IfNode : public StatementNode {
 
 /**
  * The node class holding a switch statement in the parse tree.
+ * 
+ * TODO: redefine Switch Case grammar.
  */
 struct SwitchNode : public StatementNode {
     ExpressionNode* cond;
@@ -65,6 +79,10 @@ struct SwitchNode : public StatementNode {
         for (int i = 0; i < caseList.size(); ++i) {
             delete caseList[i];
         }
+    }
+
+    virtual bool analyze(Context* context) {
+        return true;
     }
 
     virtual void print(int ind = 0) {

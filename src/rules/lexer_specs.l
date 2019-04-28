@@ -7,7 +7,7 @@
 
 using namespace std;
 
-#define ADVANCE_CURSOR      (curCursorPos += (curTokenLen = yyleng))
+#define ADVANCE_CURSOR      (curLoc.pos += yyleng)
 
 //
 // Functions prototypes
@@ -18,9 +18,7 @@ void saveToken();
 //
 // Global variables
 //
-int curLineNum = 1;
-int curCursorPos = 0;
-int curTokenLen = 0;
+Location curLoc = {1,0,0};
 %}
 
 %{
@@ -60,7 +58,7 @@ WHITESPACE          [ \t]+
 %{
 // Token localization
 %}
-\n                                  curLineNum++; curCursorPos = 0;
+\n                                  curLoc.lineNum++; curLoc.pos = 0;
 
 %{
 // Data types
@@ -100,7 +98,8 @@ WHITESPACE          [ \t]+
 <INITIAL>">>"                       saveLocation(); return SHR;
 <INITIAL>"&&"                       saveLocation(); return LOGICAL_AND;
 <INITIAL>"||"                       saveLocation(); return LOGICAL_OR;
-<INITIAL>[-+*/%&|^~!<>=(){},:;]     saveLocation(); return yytext[0];
+<INITIAL>[-+*/%&|^~!<>=(){}[\],:;]  saveLocation(); return yytext[0];
+
 
 %{
 // Values
@@ -121,6 +120,8 @@ WHITESPACE          [ \t]+
 <BLOCK_COMMENT>"*/"                 ADVANCE_CURSOR; BEGIN INITIAL;
 <BLOCK_COMMENT>.                    ADVANCE_CURSOR; // Ignore block comments
 
+<INITIAL>.                          saveLocation(); return yytext[0];
+
 %%
 
 // =====================================================================================================
@@ -128,18 +129,18 @@ WHITESPACE          [ \t]+
 // ========================
 
 void saveLocation() {
-    yylval.location.lineNum = curLineNum;
-    yylval.location.pos = curCursorPos;
-    yylval.location.len = yyleng;
+    curLoc.len = yyleng;
+
+    yylval.location = curLoc;
 
     ADVANCE_CURSOR;
 }
 
 void saveToken() {
+    curLoc.len = yyleng;
+
     yylval.token.value = strdup(yytext);
-    yylval.token.loc.lineNum = curLineNum;
-    yylval.token.loc.pos = curCursorPos;
-    yylval.token.loc.len = yyleng;
+    yylval.token.loc = curLoc;
 
     ADVANCE_CURSOR;
 }

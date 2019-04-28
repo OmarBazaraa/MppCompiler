@@ -29,6 +29,14 @@ struct BlockNode : public StatementNode {
         }
     }
 
+    virtual bool analyze(Context* context) {
+        bool ret = true;
+        for (int i = 0; i < statements.size(); ++i) {
+            ret &= statements[i]->analyze(context);
+        }
+        return ret;
+    }
+
     virtual void print(int ind = 0) {
         cout << string(ind, ' ') << "{" << endl;
         for (int i = 0; i < statements.size(); ++i) {
@@ -67,6 +75,18 @@ struct VarDeclarationNode : public StatementNode {
         }
     }
 
+    virtual bool analyze(Context* context) {
+        bool ret = true;
+        ret &= type->analyze(context);
+        ret &= name->analyze(context);
+
+        if (value) {
+            ret &= value->analyze(context);
+        }
+
+        return ret;
+    }
+
     virtual void print(int ind = 0) {
         cout << string(ind, ' ');
 
@@ -98,6 +118,10 @@ struct BreakStmtNode : public StatementNode {
 
     }
 
+    virtual bool analyze(Context* context) {
+        return true;
+    }
+
     virtual void print(int ind = 0) {
         cout << string(ind, ' ') << "break;";
     }
@@ -114,6 +138,10 @@ struct ContinueStmtNode : public StatementNode {
 
     virtual ~ContinueStmtNode() {
 
+    }
+
+    virtual bool analyze(Context* context) {
+        return true;
     }
 
     virtual void print(int ind = 0) {
@@ -137,6 +165,16 @@ struct ReturnStmtNode : public StatementNode {
         }
     }
 
+    virtual bool analyze(Context* context) {
+        bool ret = true;
+
+        if (value) {
+            ret &= value->analyze(context);
+        }
+        
+        return ret;
+    }
+
     virtual void print(int ind = 0) {
         cout << string(ind, ' ') << "return";
         if (value) {
@@ -149,6 +187,8 @@ struct ReturnStmtNode : public StatementNode {
 
 /**
  * The node class holding a case statement in the parse tree.
+ * 
+ * TODO: redefine Switch Case grammar.
  */
 struct CaseStmtNode : public StatementNode {
     ExpressionNode* expr;
@@ -168,6 +208,10 @@ struct CaseStmtNode : public StatementNode {
         for (int i = 0; i < body.size(); ++i) {
             delete body[i];
         }
+    }
+
+    virtual bool analyze(Context* context) {
+        return true;
     }
 
     virtual void print(int ind = 0) {
