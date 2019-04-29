@@ -21,9 +21,11 @@ using namespace std;
 struct Scope {
     ScopeType type;
     SymbolTable table;
+    Symbol* sym;
 
-    Scope(ScopeType type) {
+    Scope(ScopeType type, Symbol* sym = NULL) {
         this->type = type;
+        this->sym = sym;
     }
 };
 
@@ -31,9 +33,19 @@ struct Scope {
  * Struct holding the current context in the semantic analyzing phase.
  */
 class ScopeContext {
+private:
+    //
+    // Private member variables
+    //
     string sourceFilename;
     vector<string> sourceCode;
     vector<Scope*> scopes;
+
+public:
+    //
+    // Public member variables
+    //
+    bool declareFuncParams = false;
 
 public:
 
@@ -50,8 +62,8 @@ public:
      * 
      * @param type the type of the scope to add.
      */
-    void addScope(ScopeType type) {
-        scopes.push_back(new Scope(type));
+    void addScope(ScopeType type, Symbol* sym = NULL) {
+        scopes.push_back(new Scope(type, sym));
     }
 
     /**
@@ -100,6 +112,21 @@ public:
         for (int i = (int) scopes.size() - 1; i >= 0; --i) {
             if (scopes[i]->table.count(identifier)) {
                 return scopes[i]->table[identifier];
+            }
+        }
+
+        return NULL;
+    }
+
+    /**
+     * Searches for the inner most function scope and returns its definition.
+     * 
+     * @return a pointer to the function definition if found, or {@code NULL} if not available.
+     */
+    Symbol* getFunctionSymbol() {
+        for (int i = (int) scopes.size() - 1; i >= 0; --i) {
+            if (scopes[i]->type == SCOPE_FUNCTION) {
+                return scopes[i]->sym;
             }
         }
 

@@ -91,13 +91,19 @@ struct VarDeclarationNode : public StatementNode {
             context->printError("'" + var.header() + "' redeclared", name->loc);
             ret = false;
         }
-        else if (var.isConst && value == NULL) {
+
+        if (value) {
+            ret &= value->analyze(context);
+        }
+
+        if (context->declareFuncParams && var.isInitialized) {
+            context->printError("default function parameters are not allowed", value->loc);
+            ret = false;
+        }
+        else if (var.isConst && !var.isInitialized && !context->declareFuncParams) {
             context->printError("uninitialized const '" + name->name + "'", name->loc);
             ret = false;
         }
-
-        // TODO: add flag to know if the variable is a function parameter or nor
-        // TODO: check value expression        
 
         return ret;
     }
@@ -117,17 +123,11 @@ struct VarDeclarationNode : public StatementNode {
  */
 struct BreakStmtNode : public StatementNode {
 
-    BreakStmtNode(const Location& loc) : StatementNode(loc) {
-
-    }
-
-    virtual ~BreakStmtNode() {
-
-    }
+    BreakStmtNode(const Location& loc) : StatementNode(loc) {}
 
     virtual bool analyze(ScopeContext* context) {
         if (!context->hasBreakScope()) {
-            context->printError("break statement not within loop or switch", loc);
+            context->printError("break-statement not within loop or switch", loc);
             return false;
         }
 
@@ -144,17 +144,11 @@ struct BreakStmtNode : public StatementNode {
  */
 struct ContinueStmtNode : public StatementNode {
 
-    ContinueStmtNode(const Location& loc) : StatementNode(loc) {
-
-    }
-
-    virtual ~ContinueStmtNode() {
-
-    }
+    ContinueStmtNode(const Location& loc) : StatementNode(loc) {}
 
     virtual bool analyze(ScopeContext* context) {
         if (!context->hasLoopScope()) {
-            context->printError("continue statement not within loop", loc);
+            context->printError("continue-statement not within loop", loc);
             return false;
         }
 
@@ -181,14 +175,25 @@ struct ReturnStmtNode : public StatementNode {
     }
 
     virtual bool analyze(ScopeContext* context) {
-        if (!context->hasFunctionScope()) {
-            context->printError("return statement not within function", loc);
+        Func* func = (Func*) context->getFunctionSymbol();
+
+        if (func == NULL) {
+            context->printError("return-statement not within function", loc);
             return false;
         }
 
-        // TODO: check return type
+        bool ret = value->analyze(context);
+
+        if (value == NULL && func->type != DTYPE_VOID) {
+            context->printError("return-statement with no value, in function returning '" + Utils::dtypeToStr(func->type) + "'", loc);
+            ret = false;
+        }
+        else if (value != NULL && func->type == DTYPE_VOID) {
+            context->printError("return-statement with a value, in function returning 'void'", value->loc);
+            ret = false;
+        }
         
-        return true;
+        return ret;
     }
 
     virtual void print(int ind = 0) {

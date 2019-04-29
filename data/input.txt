@@ -1,6 +1,10 @@
-;
+const int x = 0;
 
-void f() {
+void fun(const int x) {
+
+}
+
+void f(void x, int y = 1, int y) {
     int print() {
 
     }
@@ -13,7 +17,7 @@ f();
 return;
 
 if (4) {
-    
+
 }
 
 

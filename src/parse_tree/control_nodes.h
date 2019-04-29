@@ -27,7 +27,7 @@ struct IfNode : public StatementNode {
 
     virtual bool analyze(ScopeContext* context) {
         if (context->isGlobalScope()) {
-            context->printError("if statement is not allowed in global scope", loc);
+            context->printError("if-statement is not allowed in global scope", loc);
             return false;
         }
 

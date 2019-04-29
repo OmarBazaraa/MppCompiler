@@ -53,11 +53,13 @@ struct FunctionNode : public StatementNode {
             ret = false;
         }
 
-        context->addScope(SCOPE_FUNCTION);
+        context->addScope(SCOPE_FUNCTION, &func);
 
+        context->declareFuncParams = true;
         for (int i = 0; i < paramList.size(); ++i) {
             ret &= paramList[i]->analyze(context);
         }
+        context->declareFuncParams = false;
         
         ret &= body->analyze(context);
 
@@ -101,9 +103,16 @@ struct FunctionCallNode : public ExpressionNode {
             context->printError("'" + name->name + "' was not declared in this scope", loc);
             ret = false;
         }
-
-        if (dynamic_cast<Func*>(ptr) == NULL) {
+        else if (dynamic_cast<Func*>(ptr) == NULL) {
             context->printError("'" + name->name + "' cannot be used as a function", loc);
+            ret = false;
+        }
+        else if (argList.size() > ((Func*) ptr)->paramList.size()) {
+            context->printError("too many arguments to function '" + ((Func*) ptr)->header() + "'", loc);
+            ret = false;
+        }
+        else if (argList.size() < ((Func*) ptr)->paramList.size()) {
+            context->printError("too few arguments to function '" + ((Func*) ptr)->header() + "'", loc);
             ret = false;
         }
 
