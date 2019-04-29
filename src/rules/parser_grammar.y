@@ -123,6 +123,8 @@ StatementNode* programRoot = NULL;
 %type <valueNode>           value
 %type <identifierNode>      ident
 
+%type <location>            '-' '+' '*' '/' '%' '&' '|' '^' '~' '!' '<' '>' '=' '(' ')' '{' '}' '[' ']' ',' ':' ';'
+
 // =====================================================================================================
 // Precendence & Associativity
 // ===========================
@@ -170,8 +172,8 @@ stmt_block:         '{' '}'                 { $$ = new BlockNode($<location>1); 
 stmt:               ';'                     { $$ = new StatementNode($<location>1); }
     |               BREAK ';'               { $$ = new BreakStmtNode($<location>1); }
     |               CONTINUE ';'            { $$ = new ContinueStmtNode($<location>1); }
+    |               expression ';'          { $$ = new ExprContainerNode($1->loc, $1); }
     |               var_decl ';'            { $$ = $1; }
-    |               expression ';'          { $$ = $1; }
     |               if_stmt                 { $$ = $1; }
     |               switch_stmt             { $$ = $1; }
     |               while_stmt              { $$ = $1; }
@@ -208,40 +210,40 @@ var_decl_init:      type ident '=' expression               { $$ = new VarDeclar
 // Expression Rules
 //
 
-expression:         ident '=' expression                    { $$ = new AssignOprNode($1, $3); }
+expression:         ident '=' expression                    { $$ = new AssignOprNode($2, $1, $3); }
 
-    |               expression '+' expression               { $$ = new BinaryOprNode(OPR_ADD, $1, $3); }
-    |               expression '-' expression               { $$ = new BinaryOprNode(OPR_SUB, $1, $3); }
-    |               expression '*' expression               { $$ = new BinaryOprNode(OPR_MUL, $1, $3); }
-    |               expression '/' expression               { $$ = new BinaryOprNode(OPR_DIV, $1, $3); }
-    |               expression '%' expression               { $$ = new BinaryOprNode(OPR_MOD, $1, $3); }
-    |               expression '&' expression               { $$ = new BinaryOprNode(OPR_AND, $1, $3); }
-    |               expression '|' expression               { $$ = new BinaryOprNode(OPR_OR, $1, $3); }
-    |               expression '^' expression               { $$ = new BinaryOprNode(OPR_XOR, $1, $3); }
-    |               expression SHL expression               { $$ = new BinaryOprNode(OPR_SHL, $1, $3); }
-    |               expression SHR expression               { $$ = new BinaryOprNode(OPR_SHR, $1, $3); }
-    |               expression LOGICAL_AND expression       { $$ = new BinaryOprNode(OPR_LOGICAL_AND, $1, $3); }
-    |               expression LOGICAL_OR expression        { $$ = new BinaryOprNode(OPR_LOGICAL_OR, $1, $3); }
-    |               expression '>' expression               { $$ = new BinaryOprNode(OPR_GREATER, $1, $3); }
-    |               expression GREATER_EQUAL expression     { $$ = new BinaryOprNode(OPR_GREATER_EQUAL, $1, $3); }
-    |               expression '<' expression               { $$ = new BinaryOprNode(OPR_LESS, $1, $3); }
-    |               expression LESS_EQUAL expression        { $$ = new BinaryOprNode(OPR_LESS_EQUAL, $1, $3); }
-    |               expression EQUAL expression             { $$ = new BinaryOprNode(OPR_EQUAL, $1, $3); }
-    |               expression NOT_EQUAL expression         { $$ = new BinaryOprNode(OPR_NOT_EQUAL, $1, $3); }
+    |               expression '+' expression               { $$ = new BinaryOprNode($2, OPR_ADD, $1, $3); }
+    |               expression '-' expression               { $$ = new BinaryOprNode($2, OPR_SUB, $1, $3); }
+    |               expression '*' expression               { $$ = new BinaryOprNode($2, OPR_MUL, $1, $3); }
+    |               expression '/' expression               { $$ = new BinaryOprNode($2, OPR_DIV, $1, $3); }
+    |               expression '%' expression               { $$ = new BinaryOprNode($2, OPR_MOD, $1, $3); }
+    |               expression '&' expression               { $$ = new BinaryOprNode($2, OPR_AND, $1, $3); }
+    |               expression '|' expression               { $$ = new BinaryOprNode($2, OPR_OR, $1, $3); }
+    |               expression '^' expression               { $$ = new BinaryOprNode($2, OPR_XOR, $1, $3); }
+    |               expression SHL expression               { $$ = new BinaryOprNode($2, OPR_SHL, $1, $3); }
+    |               expression SHR expression               { $$ = new BinaryOprNode($2, OPR_SHR, $1, $3); }
+    |               expression LOGICAL_AND expression       { $$ = new BinaryOprNode($2, OPR_LOGICAL_AND, $1, $3); }
+    |               expression LOGICAL_OR expression        { $$ = new BinaryOprNode($2, OPR_LOGICAL_OR, $1, $3); }
+    |               expression '>' expression               { $$ = new BinaryOprNode($2, OPR_GREATER, $1, $3); }
+    |               expression GREATER_EQUAL expression     { $$ = new BinaryOprNode($2, OPR_GREATER_EQUAL, $1, $3); }
+    |               expression '<' expression               { $$ = new BinaryOprNode($2, OPR_LESS, $1, $3); }
+    |               expression LESS_EQUAL expression        { $$ = new BinaryOprNode($2, OPR_LESS_EQUAL, $1, $3); }
+    |               expression EQUAL expression             { $$ = new BinaryOprNode($2, OPR_EQUAL, $1, $3); }
+    |               expression NOT_EQUAL expression         { $$ = new BinaryOprNode($2, OPR_NOT_EQUAL, $1, $3); }
 
     |               INC expression %prec PRE_INC            { $$ = new UnaryOprNode($1, OPR_PRE_INC, $2); }
     |               DEC expression %prec PRE_DEC            { $$ = new UnaryOprNode($1, OPR_PRE_DEC, $2); }
     
 //  TODO - fix postfix inc/dec
-//  |               expression INC %prec SUF_INC            { $$ = new UnaryOprNode($1->loc, OPR_SUF_INC, $2); }
-//  |               expression DEC %prec SUF_DEC            { $$ = new UnaryOprNode($1->loc, OPR_SUF_DEC, $2); }
+//  |               expression INC %prec SUF_INC            { $$ = new UnaryOprNode($2, OPR_SUF_INC, $1); }
+//  |               expression DEC %prec SUF_DEC            { $$ = new UnaryOprNode($2, OPR_SUF_DEC, $1); }
 
-    |               '+' expression %prec U_PLUS             { $$ = new UnaryOprNode($<location>1, OPR_U_PLUS, $2); }
-    |               '-' expression %prec U_MINUM            { $$ = new UnaryOprNode($<location>1, OPR_U_MINUS, $2); }
-    |               '~' expression                          { $$ = new UnaryOprNode($<location>1, OPR_NOT, $2); }
-    |               '!' expression                          { $$ = new UnaryOprNode($<location>1, OPR_LOGICAL_NOT, $2); }
+    |               '+' expression %prec U_PLUS             { $$ = new UnaryOprNode($1, OPR_U_PLUS, $2); }
+    |               '-' expression %prec U_MINUM            { $$ = new UnaryOprNode($1, OPR_U_MINUS, $2); }
+    |               '~' expression                          { $$ = new UnaryOprNode($1, OPR_NOT, $2); }
+    |               '!' expression                          { $$ = new UnaryOprNode($1, OPR_LOGICAL_NOT, $2); }
 
-    |               '(' expression ')'                      { $$ = $2; $$->loc = $<location>1; }
+    |               '(' expression ')'                      { $$ = new ExprContainerNode($1, $2); }
 
     |               value                                   { $$ = $1; }
     |               ident                                   { $$ = $1; }

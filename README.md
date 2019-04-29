@@ -39,6 +39,7 @@ Run `make run` to run the recently built compiler.
 2. `continue`-statement outside `for`, `while`, or `do-while` scopes.
 3. `break`-statement outside `for`, `while`, `do-while`, or `switch` scopes.
 4. `return`-statement outside function scope.
+5. `case`-statement outside switch scope. _[TODO]_
 
 ### Identifier-related errors
 1. Variable, constant, or functions re-declaration in the same scope.
@@ -47,6 +48,11 @@ Run `make run` to run the recently built compiler.
 ### Variable-related errors
 1. Variable or constant declared with type `void`
 2. Constant declaration without initialization.
+3. Constant value assignment after declaration. _[TODO]_
+
+### Value-related errors
+1. Invalid operand types. (i.e. operands of type `void`)
+2. Increment and decrement operators with `rvalue` operand. _[TODO]_
 
 ### Function-related errors
 1. Function parameter with default value.

@@ -27,7 +27,6 @@ struct TypeNode : public StatementNode {
  * The node class holding a value in the parse tree.
  */
 struct ValueNode : public ExpressionNode {
-    DataType type;
     string value;
 
     ValueNode(const Location& loc, DataType type, const char* value) : ExpressionNode(loc) {
@@ -60,9 +59,10 @@ struct IdentifierNode : public ExpressionNode {
         if (ptr == NULL) {
             context->printError("'" + name + "' was not declared in this scope", loc);
             return false;
+        } else {
+            type = ptr->type;
+            return true;
         }
-
-        return true;
     }
 
     virtual void print(int ind = 0) {

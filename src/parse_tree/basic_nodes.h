@@ -55,10 +55,15 @@ struct StatementNode {
  * The base class of all expression nodes in the parse tree.
  */
 struct ExpressionNode : public StatementNode {
+    DataType type = DTYPE_ERROR;
 
     ExpressionNode() {}
 
     ExpressionNode(const Location& loc) : StatementNode(loc) {}
+
+    virtual DataType getType() {
+        return type;
+    }
 };
 
 /**

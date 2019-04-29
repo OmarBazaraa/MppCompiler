@@ -93,7 +93,9 @@ struct VarDeclarationNode : public StatementNode {
         }
 
         if (value) {
+            context->initializeVar = true;
             ret &= value->analyze(context);
+            context->initializeVar = false;
         }
 
         if (context->declareFuncParams && var.isInitialized) {

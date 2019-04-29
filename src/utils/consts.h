@@ -36,20 +36,24 @@ enum Operator {
 
 /**
  * Enum holding all the possible data types in our language.
+ * 
+ * Note that order matter.
+ * DON'T CHANGE ENUM ORDER.
  */
 enum DataType {
-    DTYPE_INT = 300,
-    DTYPE_FLOAT,
-    DTYPE_CHAR,
+    DTYPE_VOID = 300,
     DTYPE_BOOL,
-    DTYPE_VOID,
+    DTYPE_CHAR,
+    DTYPE_INT,
+    DTYPE_FLOAT,
+    DTYPE_ERROR
 };
 
 /**
  * Enum holding different scope types.
  */
 enum ScopeType {
-    SCOPE_BLOCK,
+    SCOPE_BLOCK = 500,
     SCOPE_FUNCTION,
     SCOPE_LOOP,
     SCOPE_IF,

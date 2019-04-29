@@ -114,6 +114,8 @@ struct FunctionCallNode : public ExpressionNode {
         else if (argList.size() < ((Func*) ptr)->paramList.size()) {
             context->printError("too few arguments to function '" + ((Func*) ptr)->header() + "'", loc);
             ret = false;
+        } else {
+            type = ptr->type;
         }
 
         for (int i = 0; i < argList.size(); ++i) {

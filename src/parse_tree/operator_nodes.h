@@ -6,13 +6,45 @@
 
 
 /**
+ * An expression node container class.
+ */
+struct ExprContainerNode : public ExpressionNode {
+    ExpressionNode* expr;
+
+    ExprContainerNode(const Location& loc, ExpressionNode* expr) : ExpressionNode(loc) {
+        this->expr = expr;
+    }
+
+    virtual ~ExprContainerNode() {
+        if (expr) delete expr;
+    }
+
+    virtual bool analyze(ScopeContext* context) {
+        if (!context->initializeVar && context->isGlobalScope()) {
+            context->printError("expression is not allowed in global scope", loc);
+            return false;
+        }
+
+        bool ret = expr->analyze(context);
+        type = expr->type;
+        return ret;
+    }
+
+    virtual void print(int ind = 0) {
+        cout << string(ind, ' ') << "(";
+        expr->print(0);
+        cout << ")";
+    }
+};
+
+/**
  * The node class holding an assignment operator in the parse tree.
  */
 struct AssignOprNode : public ExpressionNode {
     IdentifierNode* name;
     ExpressionNode* value;
 
-    AssignOprNode(IdentifierNode* name, ExpressionNode* value) : ExpressionNode(name->loc) {
+    AssignOprNode(const Location& loc, IdentifierNode* name, ExpressionNode* value) : ExpressionNode(loc) {
         this->name = name;
         this->value = value;
     }
@@ -23,20 +55,16 @@ struct AssignOprNode : public ExpressionNode {
     }
 
     virtual bool analyze(ScopeContext* context) {
-        bool ret = true;
+        bool ret = name->analyze(context) && value->analyze(context);
+
+        type = name->type;
 
         Symbol* ptr = context->getSymbol(name->name);
 
-        if (ptr == NULL) {
-            context->printError("'" + name->name + "' was not declared in this scope", loc);
-            ret = false;
-        }
-        else if (dynamic_cast<Var*>(ptr) == NULL) {
+        if (ptr != NULL && dynamic_cast<Var*>(ptr) == NULL) {
             context->printError("assignment of function '" + ptr->header() + "'", value->loc);
             ret = false;
         }
-
-        ret &= value->analyze(context);
 
         return ret;
     }
@@ -58,7 +86,7 @@ struct BinaryOprNode : public ExpressionNode {
     ExpressionNode* lhs;
     ExpressionNode* rhs;
 
-    BinaryOprNode(Operator opr, ExpressionNode* lhs, ExpressionNode* rhs) : ExpressionNode(lhs->loc) {
+    BinaryOprNode(const Location& loc, Operator opr, ExpressionNode* lhs, ExpressionNode* rhs) : ExpressionNode(loc) {
         this->opr = opr;
         this->lhs = lhs;
         this->rhs = rhs;
@@ -70,7 +98,18 @@ struct BinaryOprNode : public ExpressionNode {
     }
 
     virtual bool analyze(ScopeContext* context) {
-        return lhs->analyze(context) && rhs->analyze(context);
+        bool ret = lhs->analyze(context) && rhs->analyze(context);
+
+        if (lhs->type == DTYPE_VOID || rhs->type == DTYPE_VOID) {
+            context->printError("invalid operands of types '" + 
+                Utils::dtypeToStr(lhs->type) + "' and '" + Utils::dtypeToStr(rhs->type) +
+                "' to binary operator '" + Utils::oprToStr(opr) + "'", loc);
+            ret = false;
+        }
+
+        type = max(lhs->type, rhs->type); // Note that lhs & rhs types are computed after calling analyze function
+
+        return ret;
     }
 
     virtual void print(int ind = 0) {
@@ -99,7 +138,17 @@ struct UnaryOprNode : public ExpressionNode {
     }
 
     virtual bool analyze(ScopeContext* context) {
-        return expr->analyze(context);
+        bool ret = expr->analyze(context);
+
+        if (expr->type == DTYPE_VOID) {
+            context->printError("invalid operand of type '" + 
+                Utils::dtypeToStr(expr->type) + "' to unary 'operator" + Utils::oprToStr(opr) + "'", loc);
+            ret = false;
+        }
+
+        type = expr->type;
+
+        return ret;
     }
 
     virtual void print(int ind = 0) {

@@ -132,6 +132,7 @@ void saveLocation() {
     curLoc.len = yyleng;
 
     yylval.location = curLoc;
+    yylval.location.pos++;
 
     ADVANCE_CURSOR;
 }
