@@ -48,7 +48,7 @@ Run `make run` to run the recently built compiler.
 ### Variable-related errors
 1. Variable or constant declared with type `void`
 2. Constant declaration without initialization.
-3. Constant value assignment after declaration. _[TODO]_
+3. Constant value assignment after declaration.
 
 ### Value-related errors
 1. Invalid operand types. (i.e. operands of type `void`)

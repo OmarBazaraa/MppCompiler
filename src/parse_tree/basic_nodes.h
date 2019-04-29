@@ -67,6 +67,36 @@ struct ExpressionNode : public StatementNode {
 };
 
 /**
+ * An expression container class.
+ */
+struct ExprContainerNode : public ExpressionNode {
+    ExpressionNode* expr;
+
+    ExprContainerNode(const Location& loc, ExpressionNode* expr) : ExpressionNode(loc) {
+        this->expr = expr;
+    }
+
+    virtual ~ExprContainerNode() {
+        if (expr) delete expr;
+    }
+
+    virtual bool analyze(ScopeContext* context) {
+        if (!context->initializeVar && context->isGlobalScope()) {
+            context->printError("expression is not allowed in global scope", loc);
+            return false;
+        }
+
+        bool ret = expr->analyze(context);
+        type = expr->type;
+        return ret;
+    }
+
+    virtual void print(int ind = 0) {
+        expr->print(ind);
+    }
+};
+
+/**
  * The node class representing a syntax error statement.
  */
 struct ErrorNode : public StatementNode {

@@ -6,38 +6,6 @@
 
 
 /**
- * An expression node container class.
- */
-struct ExprContainerNode : public ExpressionNode {
-    ExpressionNode* expr;
-
-    ExprContainerNode(const Location& loc, ExpressionNode* expr) : ExpressionNode(loc) {
-        this->expr = expr;
-    }
-
-    virtual ~ExprContainerNode() {
-        if (expr) delete expr;
-    }
-
-    virtual bool analyze(ScopeContext* context) {
-        if (!context->initializeVar && context->isGlobalScope()) {
-            context->printError("expression is not allowed in global scope", loc);
-            return false;
-        }
-
-        bool ret = expr->analyze(context);
-        type = expr->type;
-        return ret;
-    }
-
-    virtual void print(int ind = 0) {
-        cout << string(ind, ' ') << "(";
-        expr->print(0);
-        cout << ")";
-    }
-};
-
-/**
  * The node class holding an assignment operator in the parse tree.
  */
 struct AssignOprNode : public ExpressionNode {
@@ -61,9 +29,15 @@ struct AssignOprNode : public ExpressionNode {
 
         Symbol* ptr = context->getSymbol(name->name);
 
-        if (ptr != NULL && dynamic_cast<Var*>(ptr) == NULL) {
-            context->printError("assignment of function '" + ptr->header() + "'", value->loc);
-            ret = false;
+        if (ptr != NULL) {
+            if (dynamic_cast<Var*>(ptr) == NULL) {
+                context->printError("assignment of function '" + ptr->header() + "'", value->loc);
+                ret = false;
+            }
+            else if (((Var*) ptr)->isConst) {
+                context->printError("assignment of read-only variable '" + ptr->header() + "'", value->loc);
+                ret = false;
+            }
         }
 
         return ret;

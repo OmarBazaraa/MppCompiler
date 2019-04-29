@@ -1,12 +1,10 @@
-5 + 7;
-
 void f(int x) {
-    const int x;
+    
 }
 
 int main() {
+    f = (8 + 7);
 
-    5    + f();
-
-    (5 + x) * 4;
+    const int x;
+    x = 1;
 }
