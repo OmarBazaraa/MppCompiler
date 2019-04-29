@@ -25,7 +25,7 @@ Run `make run` to run the recently built compiler.
 **_Note:_** You can change the input file from the `Makefile`.
 
 # M++ Compiler Commands
-**Sytanx**: `M++ [-h|--help] [-v|--version] [-o|--output <output_file>]  <input_file>`
+**Syntax**: `M++ [-h|--help] [-v|--version] [-o|--output <output_file>]  <input_file>`
 
 | Command                                         | Description                                                      |
 | ----------------------------------------------- | ---------------------------------------------------------------- |
@@ -33,15 +33,15 @@ Run `make run` to run the recently built compiler.
 | `-v` or `--version`                             | Print the installed version number and exit.                     |
 | `-o` or `--output` `<filename>`                 | Specify the output filename.                                     |
 
-# Semantic Errors Deteced by M++
+# Semantic Errors Detected by M++
 ### Scope-related errors
 1. Code blocks or statements (other than variable, constants, and function declaration/definition) in the global scope.
 2. `continue`-statement outside `for`, `while`, or `do-while` scopes.
 3. `break`-statement outside `for`, `while`, `do-while`, or `switch` scopes.
 4. `return`-statement outside function scope.
 
-### Identifier declaration errors
-1. Variable, constant, or functions redeclaration in the same scope.
+### Identifier-related errors
+1. Variable, constant, or functions re-declaration in the same scope.
 2. Undeclared identifier access.
 
 ### Variable-related errors
@@ -53,7 +53,7 @@ Run `make run` to run the recently built compiler.
 2. Value returned in `void` function and vice-versa.
 3. Variable or constant call as a function.
 4. Function call with more/less arguments than its parameters.
-5. Function definition ouside the global scope.
+5. Function definition outside the global scope.
 
 # Lex Usage
 
