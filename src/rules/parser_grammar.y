@@ -20,7 +20,7 @@ void yyerror(const char* s);
 //
 // Global variables
 //
-Node* programRoot = NULL;
+StatementNode* programRoot = NULL;
 %}
 
 // =====================================================================================================

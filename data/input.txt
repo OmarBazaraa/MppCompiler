@@ -1,17 +1,22 @@
-int omar = 4;
-
-int omar;
-
-const int x;
-
-return 5;
-
-break;
+;
 
 void f() {
+    int print() {
 
+    }
 }
 
-f = 5;
+f();
 
-5 + (wael + 6);
+5 + 6;
+
+return;
+
+if (4) {
+    
+}
+
+
+{
+    omar;
+}

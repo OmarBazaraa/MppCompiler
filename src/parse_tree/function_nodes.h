@@ -41,6 +41,11 @@ struct FunctionNode : public StatementNode {
     }
 
     virtual bool analyze(ScopeContext* context) {
+        if (!context->isGlobalScope()) {
+            context->printError("a function-definition is not allowed here", name->loc);
+            return false;
+        }
+
         bool ret = true;
 
         if (!context->declareSymbol(&func)) {
@@ -62,7 +67,7 @@ struct FunctionNode : public StatementNode {
     }
 
     virtual void print(int ind = 0) {
-        cout << string(ind, ' ') << func.header();
+        cout << string(ind, ' ') << func.header() << endl;
         body->print(ind);
     }
 };

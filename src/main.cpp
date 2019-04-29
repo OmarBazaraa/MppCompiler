@@ -21,7 +21,7 @@ using namespace std;
 //
 extern int yyparse();
 extern FILE* yyin;
-extern Node* programRoot;
+extern StatementNode* programRoot;
 
 //
 // Global Variables

@@ -11,13 +11,9 @@
 struct BlockNode : public StatementNode {
     StmtList statements;
 
-    BlockNode() {
+    BlockNode() {}
 
-    }
-
-    BlockNode(const Location& loc) : StatementNode(loc) {
-
-    }
+    BlockNode(const Location& loc) : StatementNode(loc) {}
 
     BlockNode(const Location& loc, const StmtList& statements) : StatementNode(loc) {
         this->statements = statements;
@@ -30,6 +26,11 @@ struct BlockNode : public StatementNode {
     }
 
     virtual bool analyze(ScopeContext* context) {
+        if (context->isGlobalScope()) {
+            context->printError("block is not allowed in global scope", loc);
+            return false;
+        }
+
         bool ret = true;
 
         context->addScope(SCOPE_BLOCK);

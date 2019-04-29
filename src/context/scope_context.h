@@ -63,6 +63,15 @@ public:
     }
 
     /**
+     * Checks whether the current scope is the global scope within this context or not.
+     * 
+     * @return {@code true} if the current scope is the global scope; {@code false} otherwise.
+     */
+    bool isGlobalScope() {
+        return scopes.size() == 1;
+    }
+
+    /**
      * Declares a new symbol in the the lastly added scope in this context.
      * 
      * @param sym the symbol to add.

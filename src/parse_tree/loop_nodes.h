@@ -23,6 +23,11 @@ struct WhileNode : public StatementNode {
     }
 
     virtual bool analyze(ScopeContext* context) {
+        if (context->isGlobalScope()) {
+            context->printError("while statement is not allowed in global scope", loc);
+            return false;
+        }
+
         bool ret = true;
 
         context->addScope(SCOPE_LOOP);
@@ -61,6 +66,11 @@ struct DoWhileNode : public StatementNode {
     }
 
     virtual bool analyze(ScopeContext* context) {
+        if (context->isGlobalScope()) {
+            context->printError("do while statement is not allowed in global scope", loc);
+            return false;
+        }
+
         bool ret = true;
 
         context->addScope(SCOPE_LOOP);
@@ -107,20 +117,18 @@ struct ForNode : public StatementNode {
     }
 
     virtual bool analyze(ScopeContext* context) {
+        if (context->isGlobalScope()) {
+            context->printError("for statement is not allowed in global scope", loc);
+            return false;
+        }
+
         bool ret = true;
 
         context->addScope(SCOPE_IF);
 
-        if (initStmt) {
-            ret &= initStmt->analyze(context);
-        }
-        if (cond) {
-            ret &= cond->analyze(context);
-        }
-        if (inc) {
-            ret &= inc->analyze(context);
-        }
-        
+        if (initStmt) ret &= initStmt->analyze(context);
+        if (cond) ret &= cond->analyze(context);
+        if (inc) ret &= inc->analyze(context);
         ret &= body->analyze(context);
 
         context->popScope();
