@@ -25,12 +25,6 @@ struct Scope {
     Scope(ScopeType type) {
         this->type = type;
     }
-
-    ~Scope() {
-        for (auto& it : table) {
-            delete it.second;
-        }
-    }
 };
 
 /**
@@ -39,7 +33,6 @@ struct Scope {
 class Context {
     string sourceFilename;
     vector<string> sourceCode;
-
     vector<Scope*> scopes;
 
 public:
@@ -74,7 +67,7 @@ public:
      * 
      * @param sym the symbol to add.
      * 
-     * @return {@code true} if the symbol was declared successfully; {@code false} otherwise.
+     * @return {@code true} if the symbol was declared successfully; {@code false} if already declared.
      */
     bool declareSymbol(Symbol* sym) {
         SymbolTable& table = scopes.back()->table;
@@ -106,8 +99,7 @@ public:
 
     /**
      * Checks whether this context has a scope that can accept
-     * break statement or not.
-     * That is, a loop scope or switch scope.
+     * break statement or not. That is, a loop scope or switch scope.
      * 
      * @return {@code true} if this context has a break scope, {@code false} otherwise.
      */
@@ -123,12 +115,11 @@ public:
 
     /**
      * Checks whether this context has a scope that can accept
-     * continue statement or not.
-     * That is, a loop scope.
+     * continue statement or not. That is, a loop scope.
      * 
      * @return {@code true} if this context has a continue scope, {@code false} otherwise.
      */
-    bool hasContinueScope() {
+    bool hasLoopScope() {
         for (int i = (int) scopes.size() - 1; i >= 0; --i) {
             if (scopes[i]->type == SCOPE_LOOP) {
                 return true;
@@ -140,12 +131,11 @@ public:
 
     /**
      * Checks whether this context has a scope that can accept
-     * return statement or not.
-     * That is, a function scope.
+     * return statement or not. That is, a function scope.
      * 
      * @return {@code true} if this context has a continue scope, {@code false} otherwise.
      */
-    bool hasReturnScope() {
+    bool hasFunctionScope() {
         for (int i = (int) scopes.size() - 1; i >= 0; --i) {
             if (scopes[i]->type == SCOPE_FUNCTION) {
                 return true;
@@ -171,6 +161,7 @@ public:
     }
 
 private:
+
     /**
      * Reads the given source code file and fills
      * the global vector {@code sourceCode}.
@@ -194,7 +185,5 @@ private:
         fin.close();
     }
 };
-
-
 
 #endif

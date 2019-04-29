@@ -20,10 +20,6 @@ struct Symbol {
     DataType type;
     string identifier;
 
-    virtual ~Symbol() {
-
-    };
-
     virtual string header() {
         return Utils::dtypeToStr(type) + " " + identifier;;
     }

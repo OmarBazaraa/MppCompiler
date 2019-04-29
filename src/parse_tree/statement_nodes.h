@@ -152,7 +152,7 @@ struct ContinueStmtNode : public StatementNode {
     }
 
     virtual bool analyze(Context* context) {
-        if (!context->hasContinueScope()) {
+        if (!context->hasLoopScope()) {
             context->printError("continue statement not within loop", loc);
             return false;
         }
@@ -180,7 +180,7 @@ struct ReturnStmtNode : public StatementNode {
     }
 
     virtual bool analyze(Context* context) {
-        if (!context->hasReturnScope()) {
+        if (!context->hasFunctionScope()) {
             context->printError("return statement not within function", loc);
             return false;
         }
