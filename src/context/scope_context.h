@@ -30,7 +30,7 @@ struct Scope {
 /**
  * Struct holding the current context in the semantic analyzing phase.
  */
-class Context {
+class ScopeContext {
     string sourceFilename;
     vector<string> sourceCode;
     vector<Scope*> scopes;
@@ -40,7 +40,7 @@ public:
     /**
      * Constructs a new context object.
      */
-    Context(const string& sourceFilename) {
+    ScopeContext(const string& sourceFilename) {
         this->sourceFilename = sourceFilename;
         this->readSourceCode();
     }

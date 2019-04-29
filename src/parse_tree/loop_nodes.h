@@ -22,7 +22,7 @@ struct WhileNode : public StatementNode {
         if (body) delete body;
     }
 
-    virtual bool analyze(Context* context) {
+    virtual bool analyze(ScopeContext* context) {
         bool ret = true;
 
         context->addScope(SCOPE_LOOP);
@@ -60,7 +60,7 @@ struct DoWhileNode : public StatementNode {
         if (body) delete body;
     }
 
-    virtual bool analyze(Context* context) {
+    virtual bool analyze(ScopeContext* context) {
         bool ret = true;
 
         context->addScope(SCOPE_LOOP);
@@ -106,7 +106,7 @@ struct ForNode : public StatementNode {
         if (body) delete body;
     }
 
-    virtual bool analyze(Context* context) {
+    virtual bool analyze(ScopeContext* context) {
         bool ret = true;
 
         context->addScope(SCOPE_IF);

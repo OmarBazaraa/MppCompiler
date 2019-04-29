@@ -5,7 +5,7 @@
 #include <string>
 #include <vector>
 
-#include "../context/context.h"
+#include "../context/scope_context.h"
 
 #include "../symbol_table/symbol_table.h"
 
@@ -37,7 +37,7 @@ struct Node {
 
     }
     
-    virtual bool analyze(Context* context) {
+    virtual bool analyze(ScopeContext* context) {
         return true;
     }
 
@@ -96,7 +96,7 @@ struct ErrorNode : public StatementNode {
         this->loc.pos -= this->loc.len - 1;
     }
 
-    virtual bool analyze(Context* context) {
+    virtual bool analyze(ScopeContext* context) {
         context->printError(what, loc);
         return false;
     }

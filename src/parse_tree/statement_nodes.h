@@ -29,7 +29,7 @@ struct BlockNode : public StatementNode {
         }
     }
 
-    virtual bool analyze(Context* context) {
+    virtual bool analyze(ScopeContext* context) {
         bool ret = true;
 
         context->addScope(SCOPE_BLOCK);
@@ -79,7 +79,7 @@ struct VarDeclarationNode : public StatementNode {
         if (value) delete value;
     }
 
-    virtual bool analyze(Context* context) {
+    virtual bool analyze(ScopeContext* context) {
         bool ret = true;
 
         if (type->type == DTYPE_VOID) {
@@ -124,7 +124,7 @@ struct BreakStmtNode : public StatementNode {
 
     }
 
-    virtual bool analyze(Context* context) {
+    virtual bool analyze(ScopeContext* context) {
         if (!context->hasBreakScope()) {
             context->printError("break statement not within loop or switch", loc);
             return false;
@@ -151,7 +151,7 @@ struct ContinueStmtNode : public StatementNode {
 
     }
 
-    virtual bool analyze(Context* context) {
+    virtual bool analyze(ScopeContext* context) {
         if (!context->hasLoopScope()) {
             context->printError("continue statement not within loop", loc);
             return false;
@@ -179,7 +179,7 @@ struct ReturnStmtNode : public StatementNode {
         if (value) delete value;
     }
 
-    virtual bool analyze(Context* context) {
+    virtual bool analyze(ScopeContext* context) {
         if (!context->hasFunctionScope()) {
             context->printError("return statement not within function", loc);
             return false;
@@ -225,7 +225,7 @@ struct CaseStmtNode : public StatementNode {
         }
     }
 
-    virtual bool analyze(Context* context) {
+    virtual bool analyze(ScopeContext* context) {
         return true;
     }
 

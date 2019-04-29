@@ -22,7 +22,7 @@ struct AssignOprNode : public ExpressionNode {
         if (value) delete value;
     }
 
-    virtual bool analyze(Context* context) {
+    virtual bool analyze(ScopeContext* context) {
         bool ret = true;
 
         Symbol* ptr = context->getSymbol(name->name);
@@ -69,7 +69,7 @@ struct BinaryOprNode : public ExpressionNode {
         if (rhs) delete rhs;
     }
 
-    virtual bool analyze(Context* context) {
+    virtual bool analyze(ScopeContext* context) {
         return lhs->analyze(context) && rhs->analyze(context);
     }
 
@@ -98,7 +98,7 @@ struct UnaryOprNode : public ExpressionNode {
         if (expr) delete expr;
     }
 
-    virtual bool analyze(Context* context) {
+    virtual bool analyze(ScopeContext* context) {
         return expr->analyze(context);
     }
 

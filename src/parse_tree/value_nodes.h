@@ -14,7 +14,7 @@ struct TypeNode : public StatementNode {
         this->type = type;
     }
 
-    virtual bool analyze(Context* context) {
+    virtual bool analyze(ScopeContext* context) {
         return true;
     }
 
@@ -35,7 +35,7 @@ struct ValueNode : public ExpressionNode {
         this->value = value;
     }
 
-    virtual bool analyze(Context* context) {
+    virtual bool analyze(ScopeContext* context) {
         return true;
     }
 
@@ -54,7 +54,7 @@ struct IdentifierNode : public ExpressionNode {
         this->name = name;
     }
 
-    virtual bool analyze(Context* context) {
+    virtual bool analyze(ScopeContext* context) {
         Symbol* ptr = context->getSymbol(name);
 
         if (ptr == NULL) {

@@ -2,7 +2,7 @@
 #include <string>
 #include <string.h>
 
-#include "context/context.h"
+#include "context/scope_context.h"
 #include "parse_tree/parse_tree.h"
 #include "utils/utils.h"
 #include "utils/consts.h"
@@ -49,7 +49,7 @@ int main(int argc, char* argv[]) {
     parseArguments(argc, argv);
 
     // Construct a context file
-    Context context(inputFilename);
+    ScopeContext context(inputFilename);
 
     // Open input file for Lex & Yacc
     yyin = fopen(inputFilename.c_str(), "r");

@@ -25,7 +25,7 @@ struct IfNode : public StatementNode {
         if (elseBody) delete elseBody;
     }
 
-    virtual bool analyze(Context* context) {
+    virtual bool analyze(ScopeContext* context) {
         bool ret = true;
 
         context->addScope(SCOPE_IF);
@@ -78,7 +78,7 @@ struct SwitchNode : public StatementNode {
         }
     }
 
-    virtual bool analyze(Context* context) {
+    virtual bool analyze(ScopeContext* context) {
         return true;
     }
 

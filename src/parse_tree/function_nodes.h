@@ -40,7 +40,7 @@ struct FunctionNode : public StatementNode {
         }
     }
 
-    virtual bool analyze(Context* context) {
+    virtual bool analyze(ScopeContext* context) {
         bool ret = true;
 
         if (!context->declareSymbol(&func)) {
@@ -81,13 +81,13 @@ struct FunctionCallNode : public ExpressionNode {
 
     virtual ~FunctionCallNode() {
         if (name) delete name;
-        
+
         for (int i = 0; i < argList.size(); ++i) {
             delete argList[i];
         }
     }
 
-    virtual bool analyze(Context* context) {
+    virtual bool analyze(ScopeContext* context) {
         bool ret = true;
 
         Symbol* ptr = context->getSymbol(name->name);
