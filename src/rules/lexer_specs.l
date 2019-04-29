@@ -141,6 +141,7 @@ void saveToken() {
 
     yylval.token.value = strdup(yytext);
     yylval.token.loc = curLoc;
+    yylval.token.loc.pos++;
 
     ADVANCE_CURSOR;
 }

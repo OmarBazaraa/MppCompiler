@@ -33,12 +33,17 @@ struct IfNode : public StatementNode {
 
     virtual bool analyze(Context* context) {
         bool ret = true;
+
+        context->addScope(SCOPE_IF);
+
         ret &= cond->analyze(context);
         ret &= ifBody->analyze(context);
 
         if (elseBody) {
             ret &= elseBody->analyze(context);
         }
+
+        context->popScope();
 
         return ret;
     }
@@ -60,7 +65,7 @@ struct IfNode : public StatementNode {
 /**
  * The node class holding a switch statement in the parse tree.
  * 
- * TODO: redefine Switch Case grammar.
+ * TODO: redefine switch case grammar.
  */
 struct SwitchNode : public StatementNode {
     ExpressionNode* cond;

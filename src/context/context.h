@@ -7,6 +7,8 @@
 #include <vector>
 #include <map>
 
+#include "../symbol_table/symbol_table.h"
+
 #include "../utils/utils.h"
 #include "../utils/consts.h"
 
@@ -14,11 +16,31 @@ using namespace std;
 
 
 /**
+ * Struct holding scope information.
+ */
+struct Scope {
+    ScopeType type;
+    SymbolTable table;
+
+    Scope(ScopeType type) {
+        this->type = type;
+    }
+
+    ~Scope() {
+        for (auto& it : table) {
+            delete it.second;
+        }
+    }
+};
+
+/**
  * Struct holding the current context in the semantic analyzing phase.
  */
 class Context {
     string sourceFilename;
     vector<string> sourceCode;
+
+    vector<Scope*> scopes;
 
 public:
 
@@ -31,12 +53,121 @@ public:
     }
 
     /**
+     * Adds a new scope to this context.
+     * 
+     * @param type the type of the scope to add.
+     */
+    void addScope(ScopeType type) {
+        scopes.push_back(new Scope(type));
+    }
+
+    /**
+     * Removes the lastly added scope from this context.
+     */
+    void popScope() {
+        delete scopes.back();
+        scopes.pop_back();
+    }
+
+    /**
+     * Declares a new symbol in the the lastly added scope in this context.
+     * 
+     * @param sym the symbol to add.
+     * 
+     * @return {@code true} if the symbol was declared successfully; {@code false} otherwise.
+     */
+    bool declareSymbol(Symbol* sym) {
+        SymbolTable& table = scopes.back()->table;
+
+        if (table.count(sym->identifier)) {
+            return false;
+        }
+
+        table[sym->identifier] = sym;
+        return true;
+    }
+
+    /**
+     * Searches for the given identifier in the symbol table.
+     * 
+     * @param identifier the name of the symbol to search for.
+     * 
+     * @return a pointer on the found symbol table entry, or {@code NULL} if not available.
+     */
+    Symbol* getSymbol(const string& identifier) {
+        for (int i = (int) scopes.size() - 1; i >= 0; --i) {
+            if (scopes[i]->table.count(identifier)) {
+                return scopes[i]->table[identifier];
+            }
+        }
+
+        return NULL;
+    }
+
+    /**
+     * Checks whether this context has a scope that can accept
+     * break statement or not.
+     * That is, a loop scope or switch scope.
+     * 
+     * @return {@code true} if this context has a break scope, {@code false} otherwise.
+     */
+    bool hasBreakScope() {
+        for (int i = (int) scopes.size() - 1; i >= 0; --i) {
+            if (scopes[i]->type == SCOPE_LOOP || scopes[i]->type == SCOPE_SWITCH) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /**
+     * Checks whether this context has a scope that can accept
+     * continue statement or not.
+     * That is, a loop scope.
+     * 
+     * @return {@code true} if this context has a continue scope, {@code false} otherwise.
+     */
+    bool hasContinueScope() {
+        for (int i = (int) scopes.size() - 1; i >= 0; --i) {
+            if (scopes[i]->type == SCOPE_LOOP) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /**
+     * Checks whether this context has a scope that can accept
+     * return statement or not.
+     * That is, a function scope.
+     * 
+     * @return {@code true} if this context has a continue scope, {@code false} otherwise.
+     */
+    bool hasReturnScope() {
+        for (int i = (int) scopes.size() - 1; i >= 0; --i) {
+            if (scopes[i]->type == SCOPE_FUNCTION) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /**
      * Prints error message at the given location in this context.
      */
     void printError(const string& what, const Location& loc) {
         fprintf(stderr, "%s:%d:%d: error: %s\n", sourceFilename.c_str(), loc.lineNum, loc.pos, what.c_str());
         fprintf(stderr, "%s\n", sourceCode[loc.lineNum - 1].c_str());
-        fprintf(stderr, "%*s\n", loc.pos, "^");
+        fprintf(stderr, "%*s", loc.pos, "^");
+
+        if (loc.len > 1) {
+            fprintf(stderr, "%s", string(loc.len - 1, '~').c_str());
+        }
+
+        fprintf(stderr, "\n");
     }
 
 private:
@@ -63,5 +194,7 @@ private:
         fin.close();
     }
 };
+
+
 
 #endif

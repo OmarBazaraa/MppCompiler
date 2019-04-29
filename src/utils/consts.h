@@ -45,4 +45,15 @@ enum DataType {
     DTYPE_VOID,
 };
 
+/**
+ * Enum holding different scope types.
+ */
+enum ScopeType {
+    SCOPE_BLOCK,
+    SCOPE_FUNCTION,
+    SCOPE_LOOP,
+    SCOPE_IF,
+    SCOPE_SWITCH,
+};
+
 #endif

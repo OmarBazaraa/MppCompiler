@@ -27,7 +27,22 @@ struct AssignOprNode : public ExpressionNode {
     }
 
     virtual bool analyze(Context* context) {
-        return name->analyze(context) && value->analyze(context);
+        bool ret = true;
+
+        Symbol* ptr = context->getSymbol(name->name);
+
+        if (ptr == NULL) {
+            context->printError("'" + name->name + "' was not declared in this scope", loc);
+            ret = false;
+        }
+        else if (dynamic_cast<Var*>(ptr) == NULL) {
+            context->printError("assignment of function '" + ptr->header() + "'", value->loc);
+            ret = false;
+        }
+
+        ret &= value->analyze(context);
+
+        return ret;
     }
 
     virtual void print(int ind = 0) {

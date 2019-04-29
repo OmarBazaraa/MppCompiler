@@ -1,18 +1,27 @@
 int omar = 4;
 
+int omar;
+
+const int x;
+
 return int x;
+
+return 5;
 
 /**
  * Block comment
  */
 
 void func(int x, bool y) {
+    
     if (++(x - 7 * 6))
         return;
 
+    
     for (int i = 0; i < n; ++i) {
         for (int j = 0; j < m; ++j)
             ;
             ;
     }
+    
 }

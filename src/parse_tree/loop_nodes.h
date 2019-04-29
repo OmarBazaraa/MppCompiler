@@ -28,8 +28,14 @@ struct WhileNode : public StatementNode {
 
     virtual bool analyze(Context* context) {
         bool ret = true;
-        ret &= cond->analyze(context );
-        ret &= body->analyze(context );
+
+        context->addScope(SCOPE_LOOP);
+
+        ret &= cond->analyze(context);
+        ret &= body->analyze(context);
+
+        context->popScope();
+
         return ret;
     }
 
@@ -64,8 +70,14 @@ struct DoWhileNode : public StatementNode {
 
     virtual bool analyze(Context* context) {
         bool ret = true;
+
+        context->addScope(SCOPE_LOOP);
+
         ret &= cond->analyze(context);
         ret &= body->analyze(context);
+
+        context->popScope();
+
         return ret;
     }
 
@@ -113,6 +125,8 @@ struct ForNode : public StatementNode {
     virtual bool analyze(Context* context) {
         bool ret = true;
 
+        context->addScope(SCOPE_IF);
+
         if (initStmt) {
             ret &= initStmt->analyze(context);
         }
@@ -124,6 +138,8 @@ struct ForNode : public StatementNode {
         }
         
         ret &= body->analyze(context);
+
+        context->popScope();
 
         return ret;
     }

@@ -67,6 +67,13 @@ struct IdentifierNode : public ExpressionNode {
     }
 
     virtual bool analyze(Context* context) {
+        Symbol* ptr = context->getSymbol(name);
+
+        if (ptr == NULL) {
+            context->printError("'" + name + "' was not declared in this scope", loc);
+            return false;
+        }
+
         return true;
     }
 

@@ -31,9 +31,15 @@ struct BlockNode : public StatementNode {
 
     virtual bool analyze(Context* context) {
         bool ret = true;
+
+        context->addScope(SCOPE_BLOCK);
+
         for (int i = 0; i < statements.size(); ++i) {
             ret &= statements[i]->analyze(context);
         }
+
+        context->popScope();
+
         return ret;
     }
 
@@ -75,14 +81,39 @@ struct VarDeclarationNode : public StatementNode {
         }
     }
 
+    Var* toVar() {
+        Var* var = new Var();
+
+        var->type = type->type;
+        var->identifier = name->name;
+        var->isConst = isConst;
+        var->isInitialized = (value != NULL);
+
+        return var;
+    }
+
+    string header() {
+        return (isConst ? "const " : "") + Utils::dtypeToStr(type->type) + " " + name->name;
+    }
+
     virtual bool analyze(Context* context) {
         bool ret = true;
-        ret &= type->analyze(context);
-        ret &= name->analyze(context);
 
-        if (value) {
-            ret &= value->analyze(context);
+        if (type->type == DTYPE_VOID) {
+            context->printError("variable or field '" + name->name + "' declared void", name->loc);
+            ret = false;
         }
+        else if (!context->declareSymbol(toVar())) {
+            context->printError("'" + header() + "' redeclared", name->loc);
+            ret = false;
+        }
+        else if (isConst && value == NULL) {
+            context->printError("uninitialized const '" + name->name + "'", name->loc);
+            ret = false;
+        }
+
+        // TODO: add flag to know if the variable is a function parameter or nor
+        // TODO: check value expression        
 
         return ret;
     }
@@ -119,6 +150,11 @@ struct BreakStmtNode : public StatementNode {
     }
 
     virtual bool analyze(Context* context) {
+        if (!context->hasBreakScope()) {
+            context->printError("break statement not within loop or switch", loc);
+            return false;
+        }
+
         return true;
     }
 
@@ -141,6 +177,11 @@ struct ContinueStmtNode : public StatementNode {
     }
 
     virtual bool analyze(Context* context) {
+        if (!context->hasContinueScope()) {
+            context->printError("continue statement not within loop", loc);
+            return false;
+        }
+
         return true;
     }
 
@@ -166,13 +207,14 @@ struct ReturnStmtNode : public StatementNode {
     }
 
     virtual bool analyze(Context* context) {
-        bool ret = true;
-
-        if (value) {
-            ret &= value->analyze(context);
+        if (!context->hasReturnScope()) {
+            context->printError("return statement not within function", loc);
+            return false;
         }
+
+        // TODO: check return type
         
-        return ret;
+        return true;
     }
 
     virtual void print(int ind = 0) {
@@ -188,7 +230,7 @@ struct ReturnStmtNode : public StatementNode {
 /**
  * The node class holding a case statement in the parse tree.
  * 
- * TODO: redefine Switch Case grammar.
+ * TODO: redefine switch case grammar.
  */
 struct CaseStmtNode : public StatementNode {
     ExpressionNode* expr;

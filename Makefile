@@ -21,6 +21,7 @@ build:
 	@make -s comp
 
 run:
+	@make -s clear
 	out\\M++.exe data/input.txt
 
 all:

@@ -6,6 +6,9 @@
 #include <vector>
 
 #include "../context/context.h"
+
+#include "../symbol_table/symbol_table.h"
+
 #include "../utils/consts.h"
 #include "../utils/utils.h"
 

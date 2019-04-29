@@ -37,17 +37,54 @@ struct FunctionNode : public StatementNode {
         }
     }
 
+    Func* toFunc() {
+        Func* func = new Func();
+
+        func->type = type->type;
+        func->identifier = name->name;
+
+        for (int i = 0; i < paramList.size(); ++i) {
+            Var var;
+            var.type = paramList[i]->type->type;
+            var.identifier = paramList[i]->name->name;
+            var.isConst = paramList[i]->isConst;
+            var.isInitialized = (paramList[i]->value != NULL);
+
+            func->paramList.push_back(var);
+        }
+
+        return func;
+    }
+
+    string header() {
+        string ret = Utils::dtypeToStr(type->type) + " " + name->name + "(";
+        for (int i = 0; i < paramList.size(); ++i) {
+            if (i > 0) {
+                ret += ", ";
+            }
+            ret += Utils::dtypeToStr(paramList[i]->type->type);
+        }
+        ret += ")";
+        return ret;
+    }
+
     virtual bool analyze(Context* context) {
         bool ret = true;
 
-        ret &= type->analyze(context);
-        ret &= name->analyze(context);
+        if (!context->declareSymbol(toFunc())) {
+            context->printError("'" + header() + "' redeclared", name->loc);
+            ret = false;
+        }
+
+        context->addScope(SCOPE_FUNCTION);
 
         for (int i = 0; i < paramList.size(); ++i) {
             ret &= paramList[i]->analyze(context);
         }
-
+        
         ret &= body->analyze(context);
+
+        context->popScope();
 
         return ret;
     }
@@ -97,7 +134,17 @@ struct FunctionCallNode : public ExpressionNode {
     virtual bool analyze(Context* context) {
         bool ret = true;
 
-        ret &= name->analyze(context);
+        Symbol* ptr = context->getSymbol(name->name);
+
+        if (ptr == NULL) {
+            context->printError("'" + name->name + "' was not declared in this scope", loc);
+            ret = false;
+        }
+
+        if (dynamic_cast<Func*>(ptr) == NULL) {
+            context->printError("'" + name->name + "' cannot be used as a function", loc);
+            ret = false;
+        }
 
         for (int i = 0; i < argList.size(); ++i) {
             ret &= argList[i]->analyze(context);
