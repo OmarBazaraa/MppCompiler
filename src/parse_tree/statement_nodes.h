@@ -60,40 +60,23 @@ struct VarDeclarationNode : public StatementNode {
     TypeNode* type;
     IdentifierNode* name;
     ExpressionNode* value;
-    bool isConst;
+    Var var;
 
     VarDeclarationNode(TypeNode* type, IdentifierNode* name, ExpressionNode* value = NULL, bool isConst = false) : StatementNode(type->loc) {
         this->type = type;
         this->name = name;
         this->value = value;
-        this->isConst = isConst;
+
+        this->var.type = type->type;
+        this->var.identifier = name->name;
+        this->var.isConst = isConst;
+        this->var.isInitialized = (value != NULL);
     }
 
     virtual ~VarDeclarationNode() {
-        if (type) {
-            delete type;
-        }
-        if (name) {
-            delete name;
-        }
-        if (value) {
-            delete value;
-        }
-    }
-
-    Var* toVar() {
-        Var* var = new Var();
-
-        var->type = type->type;
-        var->identifier = name->name;
-        var->isConst = isConst;
-        var->isInitialized = (value != NULL);
-
-        return var;
-    }
-
-    string header() {
-        return (isConst ? "const " : "") + Utils::dtypeToStr(type->type) + " " + name->name;
+        if (type) delete type;
+        if (name) delete name;
+        if (value) delete value;
     }
 
     virtual bool analyze(Context* context) {
@@ -103,11 +86,11 @@ struct VarDeclarationNode : public StatementNode {
             context->printError("variable or field '" + name->name + "' declared void", name->loc);
             ret = false;
         }
-        else if (!context->declareSymbol(toVar())) {
-            context->printError("'" + header() + "' redeclared", name->loc);
+        else if (!context->declareSymbol(&var)) {
+            context->printError("'" + var.header() + "' redeclared", name->loc);
             ret = false;
         }
-        else if (isConst && value == NULL) {
+        else if (var.isConst && value == NULL) {
             context->printError("uninitialized const '" + name->name + "'", name->loc);
             ret = false;
         }
@@ -119,15 +102,7 @@ struct VarDeclarationNode : public StatementNode {
     }
 
     virtual void print(int ind = 0) {
-        cout << string(ind, ' ');
-
-        if (isConst) {
-            cout << "const ";
-        }
-
-        type->print(0);
-        cout << " ";
-        name->print(0);
+        cout << string(ind, ' ') << var.header();
 
         if (value) {
             cout << " = ";
@@ -201,9 +176,7 @@ struct ReturnStmtNode : public StatementNode {
     }
 
     virtual ~ReturnStmtNode() {
-        if (value) {
-            delete value;
-        }
+        if (value) delete value;
     }
 
     virtual bool analyze(Context* context) {

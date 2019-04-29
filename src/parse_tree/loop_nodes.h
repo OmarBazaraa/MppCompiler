@@ -18,12 +18,8 @@ struct WhileNode : public StatementNode {
     }
 
     virtual ~WhileNode() {
-        if (cond) {
-            delete cond;
-        }
-        if (body) {
-            delete body;
-        }
+        if (cond) delete cond;
+        if (body) delete body;
     }
 
     virtual bool analyze(Context* context) {
@@ -60,12 +56,8 @@ struct DoWhileNode : public StatementNode {
     }
 
     virtual ~DoWhileNode() {
-        if (cond) {
-            delete cond;
-        }
-        if (body) {
-            delete body;
-        }
+        if (cond) delete cond;
+        if (body) delete body;
     }
 
     virtual bool analyze(Context* context) {
@@ -108,18 +100,10 @@ struct ForNode : public StatementNode {
     }
 
     virtual ~ForNode() {
-        if (initStmt) {
-            delete initStmt;
-        }
-        if (cond) {
-            delete cond;
-        }
-        if (inc) {
-            delete inc;
-        }
-        if (body) {
-            delete body;
-        }
+        if (initStmt) delete initStmt;
+        if (cond) delete cond;
+        if (inc) delete inc;
+        if (body) delete body;
     }
 
     virtual bool analyze(Context* context) {

@@ -18,12 +18,8 @@ struct AssignOprNode : public ExpressionNode {
     }
 
     virtual ~AssignOprNode() {
-        if (name) {
-            delete name;
-        }
-        if (value) {
-            delete value;
-        }
+        if (name) delete name;
+        if (value) delete value;
     }
 
     virtual bool analyze(Context* context) {
@@ -69,12 +65,8 @@ struct BinaryOprNode : public ExpressionNode {
     }
 
     virtual ~BinaryOprNode() {
-        if (lhs) {
-            delete lhs;
-        }
-        if (rhs) {
-            delete rhs;
-        }
+        if (lhs) delete lhs;
+        if (rhs) delete rhs;
     }
 
     virtual bool analyze(Context* context) {
@@ -103,9 +95,7 @@ struct UnaryOprNode : public ExpressionNode {
     }
 
     virtual ~UnaryOprNode() {
-        if (expr) {
-            delete expr;
-        }
+        if (expr) delete expr;
     }
 
     virtual bool analyze(Context* context) {

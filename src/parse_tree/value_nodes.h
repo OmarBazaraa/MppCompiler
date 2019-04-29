@@ -14,10 +14,6 @@ struct TypeNode : public StatementNode {
         this->type = type;
     }
 
-    virtual ~TypeNode() {
-
-    }
-
     virtual bool analyze(Context* context) {
         return true;
     }
@@ -39,10 +35,6 @@ struct ValueNode : public ExpressionNode {
         this->value = value;
     }
 
-    virtual ~ValueNode() {
-
-    }
-
     virtual bool analyze(Context* context) {
         return true;
     }
@@ -60,10 +52,6 @@ struct IdentifierNode : public ExpressionNode {
 
     IdentifierNode(const Location& loc, const char* name) : ExpressionNode(loc) {
         this->name = name;
-    }
-
-    virtual ~IdentifierNode() {
-
     }
 
     virtual bool analyze(Context* context) {

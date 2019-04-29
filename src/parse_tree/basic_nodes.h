@@ -96,10 +96,6 @@ struct ErrorNode : public StatementNode {
         this->loc.pos -= this->loc.len - 1;
     }
 
-    ~ErrorNode() {
-
-    }
-
     virtual bool analyze(Context* context) {
         context->printError(what, loc);
         return false;

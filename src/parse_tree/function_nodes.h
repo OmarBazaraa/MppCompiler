@@ -14,65 +14,37 @@ struct FunctionNode : public StatementNode {
     IdentifierNode* name;
     VarList paramList;
     BlockNode* body;
+    Func func;
 
     FunctionNode(TypeNode* type, IdentifierNode* name, const VarList& paramList, BlockNode* body) : StatementNode(type->loc) {
         this->type = type;
         this->name = name;
         this->paramList = paramList;
         this->body = body;
+
+        this->func.type = type->type;
+        this->func.identifier = name->name;
+
+        for (int i = 0; i < paramList.size(); ++i) {
+            this->func.paramList.push_back(paramList[i]->var);
+        }
     }
 
     virtual ~FunctionNode() {
-        if (type) {
-            delete type;
-        }
-        if (name) {
-            delete name;
-        }
+        if (type) delete type;
+        if (name) delete name;
+        if (body) delete body;
+
         for (int i = 0; i < paramList.size(); ++i) {
             delete paramList[i];
         }
-        if (body) {
-            delete body;
-        }
-    }
-
-    Func* toFunc() {
-        Func* func = new Func();
-
-        func->type = type->type;
-        func->identifier = name->name;
-
-        for (int i = 0; i < paramList.size(); ++i) {
-            Var var;
-            var.type = paramList[i]->type->type;
-            var.identifier = paramList[i]->name->name;
-            var.isConst = paramList[i]->isConst;
-            var.isInitialized = (paramList[i]->value != NULL);
-
-            func->paramList.push_back(var);
-        }
-
-        return func;
-    }
-
-    string header() {
-        string ret = Utils::dtypeToStr(type->type) + " " + name->name + "(";
-        for (int i = 0; i < paramList.size(); ++i) {
-            if (i > 0) {
-                ret += ", ";
-            }
-            ret += Utils::dtypeToStr(paramList[i]->type->type);
-        }
-        ret += ")";
-        return ret;
     }
 
     virtual bool analyze(Context* context) {
         bool ret = true;
 
-        if (!context->declareSymbol(toFunc())) {
-            context->printError("'" + header() + "' redeclared", name->loc);
+        if (!context->declareSymbol(&func)) {
+            context->printError("'" + func.header() + "' redeclared", name->loc);
             ret = false;
         }
 
@@ -90,22 +62,7 @@ struct FunctionNode : public StatementNode {
     }
 
     virtual void print(int ind = 0) {
-        cout << string(ind, ' ');
-        type->print(0);
-        cout << " ";
-        name->print(0);
-        cout << "(";
-
-        if (paramList.size()) {
-            paramList[0]->print(0);
-        }
-
-        for (int i = 1; i < paramList.size(); ++i) {
-            cout << ", ";
-            paramList[i]->print(0);
-        }
-
-        cout << ")" << endl;
+        cout << string(ind, ' ') << func.header();
         body->print(ind);
     }
 };
@@ -123,9 +80,8 @@ struct FunctionCallNode : public ExpressionNode {
     }
 
     virtual ~FunctionCallNode() {
-        if (name) {
-            delete name;
-        }
+        if (name) delete name;
+        
         for (int i = 0; i < argList.size(); ++i) {
             delete argList[i];
         }

@@ -1,9 +1,13 @@
 # Visual Studio Code files
 .vscode/*
 
+# CLion
+.idea/*
+
 # MacOS files
 .DS_Store
 
 # Other files
 out/*
+*.o
 *.exe

@@ -20,15 +20,9 @@ struct IfNode : public StatementNode {
     }
 
     virtual ~IfNode() {
-        if (cond) {
-            delete cond;
-        }
-        if (ifBody) {
-            delete ifBody;
-        }
-        if (elseBody) {
-            delete elseBody;
-        }
+        if (cond) delete cond;
+        if (ifBody) delete ifBody;
+        if (elseBody) delete elseBody;
     }
 
     virtual bool analyze(Context* context) {
@@ -77,9 +71,7 @@ struct SwitchNode : public StatementNode {
     }
 
     virtual ~SwitchNode() {
-        if (cond) {
-            delete cond;
-        }
+        if (cond) delete cond;
         
         for (int i = 0; i < caseList.size(); ++i) {
             delete caseList[i];
