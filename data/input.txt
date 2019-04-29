@@ -3,8 +3,13 @@ void f(int x) {
 }
 
 int main() {
-    f = (8 + 7);
+    int x;
 
-    const int x;
-    x = 1;
+    (x + y) = 7;
+
+    ++(x = 7);
+
+    ++f();
+
+    ++7;
 }

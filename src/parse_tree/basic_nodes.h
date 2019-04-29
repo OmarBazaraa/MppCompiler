@@ -55,13 +55,21 @@ struct StatementNode {
  * The base class of all expression nodes in the parse tree.
  */
 struct ExpressionNode : public StatementNode {
-    DataType type = DTYPE_ERROR;
+    //
+    // NOTE: the following variables will be computed after calling analyze function
+    //
+    DataType type = DTYPE_ERROR;    // data type of the expression
+    Symbol* reference = NULL;       // reference of the expression is exist
 
     ExpressionNode() {}
 
     ExpressionNode(const Location& loc) : StatementNode(loc) {}
 
     virtual DataType getType() {
+        return type;
+    }
+
+    virtual bool isReference() {
         return type;
     }
 };
@@ -87,7 +95,10 @@ struct ExprContainerNode : public ExpressionNode {
         }
 
         bool ret = expr->analyze(context);
+
         type = expr->type;
+        reference = expr->reference;
+
         return ret;
     }
 

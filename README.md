@@ -52,7 +52,7 @@ Run `make run` to run the recently built compiler.
 
 ### Value-related errors
 1. Invalid operand types. (i.e. operands of type `void`)
-2. Increment and decrement operators with `rvalue` operand. _[TODO]_
+2. Increment and decrement operators with `rvalue` operand.
 
 ### Function-related errors
 1. Function parameter with default value.

@@ -61,6 +61,7 @@ struct IdentifierNode : public ExpressionNode {
             return false;
         } else {
             type = ptr->type;
+            reference = ptr;
             return true;
         }
     }

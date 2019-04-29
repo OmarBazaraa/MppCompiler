@@ -210,7 +210,7 @@ var_decl_init:      type ident '=' expression               { $$ = new VarDeclar
 // Expression Rules
 //
 
-expression:         ident '=' expression                    { $$ = new AssignOprNode($2, $1, $3); }
+expression:         expression '=' expression               { $$ = new AssignOprNode($2, $1, $3); }
 
     |               expression '+' expression               { $$ = new BinaryOprNode($2, OPR_ADD, $1, $3); }
     |               expression '-' expression               { $$ = new BinaryOprNode($2, OPR_SUB, $1, $3); }
