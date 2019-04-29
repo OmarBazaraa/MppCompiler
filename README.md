@@ -33,6 +33,28 @@ Run `make run` to run the recently built compiler.
 | `-v` or `--version`                             | Print the installed version number and exit.                     |
 | `-o` or `--output` `<filename>`                 | Specify the output filename.                                     |
 
+# Semantic Errors Deteced by M++
+### Scope-related errors
+1. Code blocks or statements (other than variable, constants, and function declaration/definition) in the global scope.
+2. `continue`-statement outside `for`, `while`, or `do-while` scopes.
+3. `break`-statement outside `for`, `while`, `do-while`, or `switch` scopes.
+4. `return`-statement outside function scope.
+
+### Identifier declaration errors
+1. Variable, constant, or functions redeclaration in the same scope.
+2. Undeclared identifier access.
+
+### Variable-related errors
+1. Variable or constant declared with type `void`
+2. Constant declaration without initialization.
+
+### Function-related errors
+1. Function parameter with default value.
+2. Value returned in `void` function and vice-versa.
+3. Variable or constant call as a function.
+4. Function call with more/less arguments than its parameters.
+5. Function definition ouside the global scope.
+
 # Lex Usage
 
 ### Running Lex
