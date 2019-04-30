@@ -46,12 +46,8 @@ struct AssignOprNode : public ExpressionNode {
         return ret;
     }
 
-    virtual void print(int ind = 0) {
-        cout << string(ind, ' ') << "(";
-        lhs->print(0);
-        cout << " = ";
-        rhs->print(0);
-        cout << ")";
+    virtual string toString(int ind = 0) {
+        return string(ind, ' ') + "(" + lhs->toString() + " = " + rhs->toString() + ")";
     }
 };
 
@@ -89,12 +85,8 @@ struct BinaryOprNode : public ExpressionNode {
         return ret;
     }
 
-    virtual void print(int ind = 0) {
-        cout << string(ind, ' ') << "(";
-        lhs->print(0);
-        cout << ' ' << Utils::oprToStr(opr) << ' ';
-        rhs->print(0);
-        cout << ")";
+    virtual string toString(int ind = 0) {
+        return string(ind, ' ') + "(" + lhs->toString() + " " + Utils::oprToStr(opr) + " " + rhs->toString() + ")";
     }
 };
 
@@ -146,18 +138,16 @@ struct UnaryOprNode : public ExpressionNode {
         return ret;
     }
 
-    virtual void print(int ind = 0) {
-        cout << string(ind, ' ') << "(";
+    virtual string toString(int ind = 0) {
+        string ret = string(ind, ' ') + "(";
 
         if (opr == OPR_SUF_INC || opr == OPR_SUF_DEC) {
-            expr->print(0);
-            cout << Utils::oprToStr(opr);
+            ret += expr->toString() + Utils::oprToStr(opr);
         } else {
-            cout << Utils::oprToStr(opr);
-            expr->print(0);
+            ret += Utils::oprToStr(opr) + expr->toString();
         }
 
-        cout << ")";
+        return ret += ")";
     }
 };
 

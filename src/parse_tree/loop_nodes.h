@@ -40,11 +40,10 @@ struct WhileNode : public StatementNode {
         return ret;
     }
 
-    virtual void print(int ind = 0) {
-        cout << string(ind, ' ') << "while (";
-        cond->print(0);
-        cout << ") " << endl;
-        body->print(ind + (dynamic_cast<BlockNode*>(body) ? 0 : 4));
+    virtual string toString(int ind = 0) {
+        string ret = string(ind, ' ') + "while (" + cond->toString() + ") \n";
+        ret += body->toString(ind + (dynamic_cast<BlockNode*>(body) ? 0 : 4));
+        return ret;
     }
 };
 
@@ -83,13 +82,11 @@ struct DoWhileNode : public StatementNode {
         return ret;
     }
 
-    virtual void print(int ind = 0) {
-        cout << string(ind, ' ') << "do" << endl;
-        body->print(ind + (dynamic_cast<BlockNode*>(body) ? 0 : 4));
-        cout << endl;
-        cout << string(ind, ' ') << "while (";
-        cond->print(0);
-        cout << ");";
+    virtual string toString(int ind = 0) {
+        string ret = string(ind, ' ') + "do\n";
+        ret += body->toString(ind + (dynamic_cast<BlockNode*>(body) ? 0 : 4)) + "\n";
+        ret += string(ind, ' ') + "while (" + cond->toString() + ");";
+        return ret;
     }
 };
 
@@ -124,7 +121,7 @@ struct ForNode : public StatementNode {
 
         bool ret = true;
 
-        context->addScope(SCOPE_IF);
+        context->addScope(SCOPE_LOOP);
 
         if (initStmt) ret &= initStmt->analyze(context);
         if (cond) ret &= cond->analyze(context);
@@ -136,26 +133,14 @@ struct ForNode : public StatementNode {
         return ret;
     }
 
-    virtual void print(int ind = 0) {
-        cout << string(ind, ' ') << "for (";
-
-        if (initStmt) {
-            initStmt->print(0);
-        }
-        cout << "; ";
-
-        if (cond) {
-            cond->print(0);
-        }
-        cout << "; ";
-
-        if (inc) {
-            inc->print(0);
-        }
-
-        cout << ")" << endl;
-
-        body->print(ind + (dynamic_cast<BlockNode*>(body) ? 0 : 4));
+    virtual string toString(int ind = 0) {
+        string ret = string(ind, ' ') + "for (";
+        ret += (initStmt ? initStmt->toString(0) : "") + ";";
+        ret += (cond ? cond->toString(0) : "") + ";";
+        ret += (inc ? inc->toString(0) : "") + ";";
+        ret += ")\n";
+        ret += body->toString(ind + (dynamic_cast<BlockNode*>(body) ? 0 : 4));
+        return ret;
     }
 };
 

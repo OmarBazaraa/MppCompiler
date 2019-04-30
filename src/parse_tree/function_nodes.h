@@ -68,9 +68,14 @@ struct FunctionNode : public StatementNode {
         return ret;
     }
 
-    virtual void print(int ind = 0) {
-        cout << string(ind, ' ') << func.header() << endl;
-        body->print(ind);
+    virtual string toString(int ind = 0) {
+        string ret = string(ind, ' ') + type->toString() + " " + name->toString() + "(";
+        for (int i = 0; i < paramList.size(); ++i) {
+            ret += (i > 0 ? ", " : " ") + paramList[i]->toString();
+        }
+        ret += ")\n";
+        ret += body->toString(ind);
+        return ret;
     }
 };
 
@@ -125,21 +130,12 @@ struct FunctionCallNode : public ExpressionNode {
         return ret;
     }
 
-    virtual void print(int ind = 0) {
-        cout << string(ind, ' ');
-        name->print(0);
-        cout << "(";
-
-        if (argList.size()) {
-            argList[0]->print(0);
+    virtual string toString(int ind = 0) {
+        string ret = string(ind, ' ') + name->toString() + "(";
+        for (int i = 0; i < argList.size(); ++i) {
+            ret += (i > 0 ? ", " : "") + argList[i]->toString(0);
         }
-
-        for (int i = 1; i < argList.size(); ++i) {
-            cout << ", ";
-            argList[i]->print(0);
-        }
-
-        cout << ")";
+        return ret += ")";
     }
 };
 

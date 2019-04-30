@@ -18,8 +18,8 @@ struct TypeNode : public StatementNode {
         return true;
     }
 
-    virtual void print(int ind = 0) {
-        cout << string(ind, ' ') << Utils::dtypeToStr(type);
+    virtual string toString(int ind = 0) {
+        return string(ind, ' ') + Utils::dtypeToStr(type);
     }
 };
 
@@ -38,8 +38,8 @@ struct ValueNode : public ExpressionNode {
         return true;
     }
 
-    virtual void print(int ind = 0) {
-        cout << string(ind, ' ') << value;
+    virtual string toString(int ind = 0) {
+        return string(ind, ' ') + value;
     }
 };
 
@@ -66,8 +66,8 @@ struct IdentifierNode : public ExpressionNode {
         }
     }
 
-    virtual void print(int ind = 0) {
-        cout << string(ind, ' ') << name;
+    virtual string toString(int ind = 0) {
+        return string(ind, ' ') + name;
     }
 };
 

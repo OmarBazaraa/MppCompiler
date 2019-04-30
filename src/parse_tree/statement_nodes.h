@@ -44,13 +44,12 @@ struct BlockNode : public StatementNode {
         return ret;
     }
 
-    virtual void print(int ind = 0) {
-        cout << string(ind, ' ') << "{" << endl;
+    virtual string toString(int ind = 0) {
+        string ret = string(ind, ' ') + "{\n";
         for (int i = 0; i < statements.size(); ++i) {
-            statements[i]->print(ind + 4);
-            cout << endl;
+            ret += statements[i]->toString(ind + 4) + "\n";
         }
-        cout << string(ind, ' ') << "}";
+        return ret += string(ind, ' ') + "}";
     }
 };
 
@@ -110,13 +109,12 @@ struct VarDeclarationNode : public StatementNode {
         return ret;
     }
 
-    virtual void print(int ind = 0) {
-        cout << string(ind, ' ') << var.header();
-
+    virtual string toString(int ind = 0) {
+        string ret = string(ind, ' ') + var.header();
         if (value) {
-            cout << " = ";
-            value->print(0);
+            ret += " = " + value->toString(0);
         }
+        return ret;
     }
 };
 
@@ -136,8 +134,8 @@ struct BreakStmtNode : public StatementNode {
         return true;
     }
 
-    virtual void print(int ind = 0) {
-        cout << string(ind, ' ') << "break;";
+    virtual string toString(int ind = 0) {
+        return string(ind, ' ') + "break";
     }
 };
 
@@ -157,8 +155,8 @@ struct ContinueStmtNode : public StatementNode {
         return true;
     }
 
-    virtual void print(int ind = 0) {
-        cout << string(ind, ' ') << "continue;";
+    virtual string toString(int ind = 0) {
+        return string(ind, ' ') + "continue";
     }
 };
 
@@ -184,7 +182,11 @@ struct ReturnStmtNode : public StatementNode {
             return false;
         }
 
-        bool ret = value->analyze(context);
+        bool ret = true;
+        
+        if (value) {
+            ret = value->analyze(context);
+        }
 
         if (value == NULL && func->type != DTYPE_VOID) {
             context->printError("return-statement with no value, in function returning '" + Utils::dtypeToStr(func->type) + "'", loc);
@@ -198,13 +200,12 @@ struct ReturnStmtNode : public StatementNode {
         return ret;
     }
 
-    virtual void print(int ind = 0) {
-        cout << string(ind, ' ') << "return";
+    virtual string toString(int ind = 0) {
+        string ret = string(ind, ' ') + "return";
         if (value) {
-            cout << " ";
-            value->print(0);
+            ret += " " + value->toString(0);
         }
-        cout << ";";
+        return ret;
     }
 };
 
@@ -237,18 +238,14 @@ struct CaseStmtNode : public StatementNode {
         return true;
     }
 
-    virtual void print(int ind = 0) {
-        if (isDefault) {
-            cout << string(ind, ' ') << "default:" << endl;
-        } else {
-            cout << string(ind, ' ') << "case ";
-            expr->print(0);
-            cout << ":" << endl;
-        }
+    virtual string toString(int ind = 0) {
+        string ret = string(ind, ' ') + (isDefault ? "default:\n" : "case " + expr->toString() + ":\n");
+
         for (int i = 0; i < body.size(); ++i) {
-            body[i]->print(ind + 4);
-            cout << endl;
+            ret += body[i]->toString(ind + 4) + "\n";
         }
+
+        return ret;
     }
 };
 

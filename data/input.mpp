@@ -1,0 +1,43 @@
+// Line comment
+const int MAX = 10;
+
+/**
+ * Block comment
+ */
+int solve(int idx, int prv) {
+    if (idx > MAX)
+        return false;
+
+    int n;
+
+    for (int i = 0; i < n; ++i) {
+        for (int j;;) {
+            break;
+        }
+        continue;
+    }
+
+    return ((idx + prv) * 5) & solve(idx + 1, prv ^ ~23523);
+}
+
+int main() {
+    const int x = 5;
+
+    if (x)
+        solve(true, 'c');
+    else if (0) {
+        return 1;
+    }
+
+    switch (x)
+    {
+        case 5:
+            solve(1,1);
+            break;
+    
+        default:
+            break;
+    }
+
+    9 + 1;
+}

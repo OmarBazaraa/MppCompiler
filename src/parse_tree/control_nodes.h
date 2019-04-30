@@ -47,17 +47,16 @@ struct IfNode : public StatementNode {
         return ret;
     }
 
-    virtual void print(int ind = 0) {
-        cout << string(ind, ' ') << "if (";
-        cond->print(0);
-        cout << ")" << endl;
-        ifBody->print(ind + (dynamic_cast<BlockNode*>(ifBody) ? 0 : 4));
+    virtual string toString(int ind = 0) {
+        string ret = string(ind, ' ') + "if (" + cond->toString() + ")\n";
+        ret += ifBody->toString(ind + (dynamic_cast<BlockNode*>(ifBody) ? 0 : 4));
 
         if (elseBody) {
-            cout << endl;
-            cout << string(ind, ' ') << "else" << endl;
-            elseBody->print(ind + (dynamic_cast<BlockNode*>(elseBody) ? 0 : 4));
+            ret += "\n" + string(ind, ' ') + "else\n";
+            ret += elseBody->toString(ind + (dynamic_cast<BlockNode*>(elseBody) ? 0 : 4));
         }
+
+        return ret;
     }
 };
 
@@ -87,16 +86,13 @@ struct SwitchNode : public StatementNode {
         return true;
     }
 
-    virtual void print(int ind = 0) {
-        cout << string(ind, ' ') << "switch (";
-        cond->print(0);
-        cout << ") {" << endl;
-        
+    virtual string toString(int ind = 0) {
+        string ret = string(ind, ' ') + "switch (" + cond->toString() + ") {\n";
         for (int i = 0; i < caseList.size(); ++i) {
-            caseList[i]->print(ind + 4);
+            ret += caseList[i]->toString(ind + 4);
         }
-
-        cout << string(ind, ' ') << "}";
+        ret += string(ind, ' ') + "}";
+        return ret;
     }
 };
 

@@ -64,7 +64,7 @@ int main(int argc, char* argv[]) {
 
     // Apply semantic check and quadruple generation
     if (programRoot->analyze(&context)) {
-        programRoot->print();
+        cout << programRoot->toString() << endl;
     }
 
     // Finalize and release allocated memory

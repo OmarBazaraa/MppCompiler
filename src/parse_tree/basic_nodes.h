@@ -46,8 +46,8 @@ struct StatementNode {
         return true;
     }
 
-    virtual void print(int ind = 0) {
-        cout << string(ind, ' ') << ";" ;
+    virtual string toString(int ind = 0) {
+        return string(ind, ' ') + ";" ;
     }
 };
 
@@ -102,8 +102,8 @@ struct ExprContainerNode : public ExpressionNode {
         return ret;
     }
 
-    virtual void print(int ind = 0) {
-        expr->print(ind);
+    virtual string toString(int ind = 0) {
+        return expr->toString(ind);
     }
 };
 
@@ -125,8 +125,8 @@ struct ErrorNode : public StatementNode {
         return false;
     }
 
-    virtual void print(int ind) {
-        cout << string(ind, ' ') << ">> ERROR" ;
+    virtual string toString(int ind) {
+        return string(ind, ' ') + ">> ERROR" ;
     }
 };
 

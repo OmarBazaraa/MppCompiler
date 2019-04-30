@@ -22,7 +22,7 @@ build:
 
 run:
 	@make -s clear
-	out\\M++.exe data/input.txt
+	out\\M++.exe data/input.mpp
 
 all:
 	@make -s build
