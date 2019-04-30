@@ -1,15 +1,4 @@
-void f(int x) {
-    
-}
 
 int main() {
-    int x;
-
-    (x + y) = 7;
-
-    ++(x = 7);
-
-    ++f();
-
-    ++7;
+    const int x;
 }

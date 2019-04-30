@@ -33,15 +33,13 @@ Location curLoc = {1,0,0};
 // =====================================================================================================
 // Pattern Definitions (Substitutions)
 // ===================================
-
-// TODO: add (-|+)? to numberic values
 %}
 
 DIGIT               [0-9]
-INTEGER             [0-9]+
-FLOAT               (([0-9]*\.[0-9]+)|([0-9]+\.[0-9]*))
-EXP                 [eE][-+]?{INTEGER}
-REAL                ({INTEGER}{EXP}|{FLOAT}({EXP})?)
+INTEGER             [-+]?[0-9]+
+FLOAT               [-+]?(([0-9]*\.[0-9]+)|([0-9]+\.[0-9]*))
+EXP                 ([eE][-+]?{INTEGER})
+REAL                ({INTEGER}{EXP}|{FLOAT}{EXP}?)
 LETTER              [a-zA-Z_]
 IDENTIFIER          {LETTER}({LETTER}|{DIGIT})*
 LINE_COMMENT        "//"(.)*
