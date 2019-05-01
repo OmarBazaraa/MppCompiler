@@ -20,8 +20,22 @@ int solve(int idx, int prv) {
     return ((idx + prv) * 5) & solve(idx + 1, prv ^ ~23523);
 }
 
+void func() {
+
+}
+
 int main() {
     const int x = 5;
+
+    int a;
+    int b;
+
+    (func * 6) + ((func() - 3) ^ 7);
+
+    (7 = b);
+    a = b = solve = 6;
+    7 = b = solve = 6;
+    (7 = b) = (solve = 6);
 
     if (x)
         solve(true, 'c');

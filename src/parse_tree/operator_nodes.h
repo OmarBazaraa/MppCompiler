@@ -23,7 +23,10 @@ struct AssignOprNode : public ExpressionNode {
     }
 
     virtual bool analyze(ScopeContext* context) {
-        bool ret = rhs->analyze(context) && lhs->analyze(context);
+        if (!(rhs->analyze(context) & lhs->analyze(context))) {
+            // Note that I used a bitwise and to execute both lhs and rhs expressions
+            return false;
+        }
 
         type = lhs->type;
         reference = lhs->reference;
@@ -31,19 +34,19 @@ struct AssignOprNode : public ExpressionNode {
         if (reference) {
             if (dynamic_cast<Var*>(reference) == NULL) {
                 context->printError("assignment of function '" + reference->header() + "'", rhs->loc);
-                ret = false;
+                return false;
             }
             else if (((Var*) reference)->isConst) {
                 context->printError("assignment of read-only variable '" + reference->header() + "'", rhs->loc);
-                ret = false;
+                return false;
             }
         }
         else {
             context->printError("lvalue required as left operand of assignment", lhs->loc);
-            ret = false;
+            return false;
         }
 
-        return ret;
+        return true;
     }
 
     virtual string toString(int ind = 0) {
@@ -71,18 +74,26 @@ struct BinaryOprNode : public ExpressionNode {
     }
 
     virtual bool analyze(ScopeContext* context) {
-        bool ret = lhs->analyze(context) && rhs->analyze(context);
+        if (!(lhs->analyze(context) & rhs->analyze(context))) {
+            // Note that I used a bitwise and to execute both lhs and rhs expressions
+            return false;
+        }
 
-        type = max(lhs->type, rhs->type); // Note that lhs & rhs types are computed after calling analyze function
+        // Note that lhs & rhs types are computed after calling analyze function
+        type = max(lhs->type, rhs->type);
 
+        //
+        // TODO: handle function pointer
+        //
+        
         if (lhs->type == DTYPE_VOID || rhs->type == DTYPE_VOID) {
             context->printError("invalid operands of types '" + 
                 Utils::dtypeToStr(lhs->type) + "' and '" + Utils::dtypeToStr(rhs->type) +
                 "' to binary operator '" + Utils::oprToStr(opr) + "'", loc);
-            ret = false;
+            return false;
         }
 
-        return ret;
+        return true;
     }
 
     virtual string toString(int ind = 0) {
@@ -107,7 +118,9 @@ struct UnaryOprNode : public ExpressionNode {
     }
 
     virtual bool analyze(ScopeContext* context) {
-        bool ret = expr->analyze(context);
+        if (!expr->analyze(context)) {
+            return false;
+        }
 
         type = expr->type;
         reference = expr->reference;
@@ -115,27 +128,27 @@ struct UnaryOprNode : public ExpressionNode {
         if (expr->type == DTYPE_VOID) {
             context->printError("invalid operand of type '" + 
                 Utils::dtypeToStr(expr->type) + "' to unary 'operator" + Utils::oprToStr(opr) + "'", loc);
-            ret = false;
+            return false;
         }
 
         if (opr == OPR_SUF_INC || opr == OPR_PRE_INC || opr == OPR_SUF_DEC || opr == OPR_PRE_DEC) {
             if (reference) {
                 if (dynamic_cast<Var*>(reference) == NULL) {
                     context->printError("increment/decrement of function '" + reference->header() + "'", expr->loc);
-                    ret = false;
+                    return false;
                 }
                 else if (((Var*) reference)->isConst) {
                     context->printError("increment/decrement of read-only variable '" + reference->header() + "'", expr->loc);
-                    ret = false;
+                    return false;
                 }
             }
             else {
                 context->printError("lvalue required as an operand of increment/decrement", expr->loc);
-                ret = false;
+                return false;
             }
         }
 
-        return ret;
+        return true;
     }
 
     virtual string toString(int ind = 0) {
