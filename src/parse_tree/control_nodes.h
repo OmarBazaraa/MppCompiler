@@ -78,20 +78,45 @@ struct CaseLabelNode : public StatementNode {
     }
 
     virtual bool analyze(ScopeContext* context) {
+        Switch* switchStmt = context->switches.empty() ? NULL : context->switches.top();
+
+        if (switchStmt == NULL) {
+            context->printError("case label not within switch statement", loc);
+            return false;
+        }
+
         bool ret = true;
 
-        if (expr) {
+        if (expr) {     // case label
             ret = expr->analyze(context);
 
             if (ret && !expr->isConst) {
                 context->printError("constant expression required in case label", expr->loc);
                 ret = false;
             }
-        }
+            if (ret && !Utils::isIntegerType(expr->type)) {
+                context->printError("case quantity not an integer", expr->loc);
+                ret = false;
+            }
+            if (ret && expr->isConst && Utils::isIntegerType(expr->type)) {
+                // TODO: calculate this value
+                // int val = 0;
 
-        if (!context->hasSwitchScope()) {
-            context->printError("case label not within switch statement", loc);
-            ret = false;
+                // if (switchStmt->labels.count(val)) {
+                //     context->printError("duplicate case value", loc);
+                //     ret = false;
+                // }
+
+                // switchStmt->labels.insert(val);
+            }
+        }
+        else {          // default label
+            if (switchStmt->defaultLabel) {
+                context->printError("multiple default labels in one switch", loc);
+                ret = false;
+            }
+
+            switchStmt->defaultLabel = true;
         }
 
         ret &= stmt->analyze(context);
@@ -112,6 +137,7 @@ struct CaseLabelNode : public StatementNode {
 struct SwitchNode : public StatementNode {
     ExpressionNode* cond;
     StatementNode* body;
+    Switch switchStmt;
 
     SwitchNode(const Location& loc, ExpressionNode* cond, StatementNode* body) : StatementNode(loc) {
         this->cond = cond;
@@ -132,6 +158,7 @@ struct SwitchNode : public StatementNode {
         bool ret = true;
 
         context->addScope(SCOPE_SWITCH);
+        context->switches.push(&switchStmt);
 
         ret &= cond->analyze(context);
 
@@ -142,6 +169,7 @@ struct SwitchNode : public StatementNode {
 
         ret &= body->analyze(context);
 
+        context->switches.pop();
         context->popScope();
 
         return ret;

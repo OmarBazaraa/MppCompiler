@@ -4,8 +4,8 @@
 #include <iostream>
 #include <string>
 #include <vector>
-#include <map>
 #include <unordered_map>
+#include <unordered_set>
 
 #include "../utils/utils.h"
 #include "../utils/consts.h"
@@ -21,7 +21,7 @@ struct Symbol {
     string identifier;
 
     virtual string header() {
-        return Utils::dtypeToStr(type) + " " + identifier;;
+        return Utils::dtypeToStr(type) + " " + identifier;
     }
 
     virtual string getType() {
@@ -71,8 +71,28 @@ struct Func : public Symbol {
 };
 
 /**
+ * Switch statement scope information.
+ */
+struct Switch {
+    bool defaultLabel = false;
+    unordered_set<int> labels;
+};
+
+/**
  * Symbol table type.
  */
 typedef unordered_map<string, Symbol*> SymbolTable;
+
+/**
+ * Struct holding scope information.
+ */
+struct Scope {
+    ScopeType type;
+    SymbolTable table;
+
+    Scope(ScopeType type) {
+        this->type = type;
+    }
+};
 
 #endif

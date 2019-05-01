@@ -175,7 +175,7 @@ struct ReturnStmtNode : public StatementNode {
     }
 
     virtual bool analyze(ScopeContext* context) {
-        Func* func = (Func*) context->getFunctionSymbol();
+        Func* func = context->functions.empty() ? NULL : context->functions.top();
 
         if (func == NULL) {
             context->printError("return-statement not within function", loc);

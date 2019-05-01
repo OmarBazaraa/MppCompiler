@@ -53,7 +53,7 @@ Run `make run` to run the recently built compiler.
 3. Constant assignment after declaration.
 4. Invalid operand types. (i.e. operands of type `void` or pointer to function).
 5. Increment and decrement operators with `rvalue` operand.
-6. `switch`-statement with non integer expression.
+6. `switch`/`case`-statement with non integer expression.
 7. `case`-statement with non-constant expression.
 
 ### Function-related errors
@@ -64,8 +64,8 @@ Run `make run` to run the recently built compiler.
 5. Function parameter with default value.
 
 ### Other errors
-1. Multiple `default`-statement in `switch` scope. _[TODO]_
-2. Multiple `case`-statement with the same constant expression in `switch` scope. _[TODO]_
+1. Multiple `default`-labels in `switch` scope.
+2. Multiple `case`-labels with the same constant expression in `switch` scope. _[TODO]_
 
 # Lex Usage
 

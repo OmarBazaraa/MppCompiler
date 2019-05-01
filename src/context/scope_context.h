@@ -5,7 +5,9 @@
 #include <fstream>
 #include <string>
 #include <vector>
+#include <stack>
 #include <map>
+#include <unordered_map>
 
 #include "../symbol_table/symbol_table.h"
 
@@ -16,20 +18,6 @@ using namespace std;
 
 
 /**
- * Struct holding scope information.
- */
-struct Scope {
-    ScopeType type;
-    SymbolTable table;
-    Symbol* sym;
-
-    Scope(ScopeType type, Symbol* sym = NULL) {
-        this->type = type;
-        this->sym = sym;
-    }
-};
-
-/**
  * Struct holding the current context in the semantic analyzing phase.
  */
 class ScopeContext {
@@ -38,7 +26,6 @@ private:
     // Private member variables
     //
     string sourceFilename;
-    string simTable;
     vector<string> sourceCode;
     vector<Scope*> scopes;
 
@@ -48,6 +35,8 @@ public:
     //
     bool declareFuncParams = false;
     bool initializeVar = false;
+    stack<Func*> functions;
+    stack<Switch*> switches;
 
 public:
 
@@ -64,8 +53,8 @@ public:
      * 
      * @param type the type of the scope to add.
      */
-    void addScope(ScopeType type, Symbol* sym = NULL) {
-        scopes.push_back(new Scope(type, sym));
+    void addScope(ScopeType type) {
+        scopes.push_back(new Scope(type));
     }
 
     /**
@@ -114,21 +103,6 @@ public:
         for (int i = (int) scopes.size() - 1; i >= 0; --i) {
             if (scopes[i]->table.count(identifier)) {
                 return scopes[i]->table[identifier];
-            }
-        }
-
-        return NULL;
-    }
-
-    /**
-     * Searches for the inner most function scope and returns its definition.
-     * 
-     * @return a pointer to the function definition if found, or {@code NULL} if not available.
-     */
-    Symbol* getFunctionSymbol() {
-        for (int i = (int) scopes.size() - 1; i >= 0; --i) {
-            if (scopes[i]->type == SCOPE_FUNCTION) {
-                return scopes[i]->sym;
             }
         }
 

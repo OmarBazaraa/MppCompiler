@@ -2,11 +2,23 @@
 #define __UTILS_H_
 
 #include <string>
+#include <vector>
+#include <unordered_map>
 
 #include "consts.h"
 
 using namespace std;
 
+
+/**
+ * Union of different primitive data types.
+ */
+union ValueTypes {
+    bool boolVal;
+    char charVal;
+    int intVal;
+    float floatVal;
+};
 
 /**
  * Struct holding the location information of the tokens.
@@ -128,6 +140,8 @@ struct Utils {
                 return "float";
             case DTYPE_FUNC_PTR:
                 return "pointer to function";
+            case DTYPE_ERROR:
+                return "type error";
         }
 
         return "unknown";

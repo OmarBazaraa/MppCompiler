@@ -53,7 +53,8 @@ struct FunctionNode : public StatementNode {
             ret = false;
         }
 
-        context->addScope(SCOPE_FUNCTION, &func);
+        context->addScope(SCOPE_FUNCTION);
+        context->functions.push(&func);
 
         context->declareFuncParams = true;
         for (int i = 0; i < paramList.size(); ++i) {
@@ -63,6 +64,7 @@ struct FunctionNode : public StatementNode {
         
         ret &= body->analyze(context);
 
+        context->functions.pop();
         context->popScope();
 
         return ret;
