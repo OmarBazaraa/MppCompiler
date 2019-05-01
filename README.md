@@ -33,31 +33,39 @@ Run `make run` to run the recently built compiler.
 | `-v` or `--version`                             | Print the installed version number and exit.                     |
 | `-o` or `--output` `<filename>`                 | Specify the output filename.                                     |
 
-# Semantic Errors Detected by M++
+# Syntax Errors Detected by M++
 ### Scope-related errors
 1. Code blocks or statements (other than variable, constants, and function declaration/definition) in the global scope.
 2. `continue`-statement outside `for`, `while`, or `do-while` scopes.
 3. `break`-statement outside `for`, `while`, `do-while`, or `switch` scopes.
 4. `return`-statement outside function scope.
-5. `case`-statement outside switch scope. _[TODO]_
+5. `case`/`default`-statement outside switch scope.
 6. Function definition outside the global scope.
 
+### Other errors
+1. Variable or constant declared with type `void`.
+2. Constant declaration without initialization.
+
+# Semantic Errors Detected by M++
+### Identifier/Expression-related errors
+1. Identifier re-declaration in the same scope.
+2. Undeclared identifier access.
+3. Constant assignment after declaration.
+4. Invalid operand types. (i.e. operands of type `void` or pointer to function).
+5. Increment and decrement operators with `rvalue` operand.
+6. `switch`-statement with non integer expression.
+7. `case`-statement with non-constant expression.
+
 ### Function-related errors
-1. Function parameter with default value.
-2. Value returned in `void` function and vice-versa.
-3. Variable or constant call as a function.
-4. Function call with more/less arguments than its parameters.
-5. Function call with invalid argument type (i.e. operands of type `void` or pointer to function).
+1. Value returned in `void` function and vice-versa.
+2. Variable or constant call as a function.
+3. Function call with more/less arguments than its parameters.
+4. Function call with invalid argument type (i.e. argument of type `void` or pointer to function).
+5. Function parameter with default value.
 
 ### Other errors
-1. Variable, constant, or functions re-declaration in the same scope.
-2. Undeclared identifier access.
-3. Variable or constant declared with type `void`.
-4. Constant declaration without initialization.
-5. Constant assignment after declaration.
-6. Invalid operand types. (i.e. operands of type `void` or pointer to function).
-7. Increment and decrement operators with `rvalue` operand.
-8. Case statement with non-constant expression. _[TODO]_
+1. Multiple `default`-statement in `switch` scope. _[TODO]_
+2. Multiple `case`-statement with the same constant expression in `switch` scope. _[TODO]_
 
 # Lex Usage
 

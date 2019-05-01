@@ -144,7 +144,7 @@ struct FunctionCallNode : public ExpressionNode {
     virtual string toString(int ind = 0) {
         string ret = string(ind, ' ') + name->toString() + "(";
         for (int i = 0; i < argList.size(); ++i) {
-            ret += (i > 0 ? ", " : "") + argList[i]->toString(0);
+            ret += (i > 0 ? ", " : "") + argList[i]->toString();
         }
         return ret += ")";
     }

@@ -19,13 +19,11 @@
 struct StatementNode;
 struct ExpressionNode;
 struct VarDeclarationNode;
-struct CaseStmtNode;
 struct FunctionNode;
 
 typedef vector<StatementNode*> StmtList;
 typedef vector<ExpressionNode*> ExprList;
 typedef vector<VarDeclarationNode*> VarList;
-typedef vector<CaseStmtNode*> CaseList;
 
 
 /**

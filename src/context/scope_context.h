@@ -38,6 +38,7 @@ private:
     // Private member variables
     //
     string sourceFilename;
+    string simTable;
     vector<string> sourceCode;
     vector<Scope*> scopes;
 
@@ -143,6 +144,22 @@ public:
     bool hasBreakScope() {
         for (int i = (int) scopes.size() - 1; i >= 0; --i) {
             if (scopes[i]->type == SCOPE_LOOP || scopes[i]->type == SCOPE_SWITCH) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /**
+     * Checks whether this context has a scope that can accept
+     * case statement or not. That is, a switch scope.
+     * 
+     * @return {@code true} if this context has a switch scope, {@code false} otherwise.
+     */
+    bool hasSwitchScope() {
+        for (int i = (int) scopes.size() - 1; i >= 0; --i) {
+            if (scopes[i]->type == SCOPE_SWITCH) {
                 return true;
             }
         }

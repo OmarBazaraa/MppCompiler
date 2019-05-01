@@ -21,9 +21,23 @@ int solve(int idx, int prv) {
 }
 
 void func(const int x) {
-    return func(func);
+    return func(5);
 }
 
 int main() {
     const int x = 5;
+
+    int a;
+
+    switch (x) {
+        case 5:
+            switch (x)
+                case x:
+                    func(0);
+        case x:
+            func(5);
+        default:
+        default:
+            return 0;
+    }
 }

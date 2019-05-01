@@ -29,11 +29,11 @@ StatementNode* programRoot = NULL;
 
 %union {
     BlockNode*          blockNode;
-    StatementNode*      StmtNode;
+    StatementNode*      stmtNode;
     VarDeclarationNode* varDeclNode;
     IfNode*             ifNode;
     SwitchNode*         switchNode;
-    CaseStmtNode*       caseStmtNode;
+    CaseLabelNode*      caseStmtNode;
     WhileNode*          whileNode;
     DoWhileNode*        doWhileNode;
     ForNode*            forNode;
@@ -48,7 +48,6 @@ StatementNode* programRoot = NULL;
     StmtList*           stmtList;
     ExprList*           exprList;
     VarList*            varList;
-    CaseList*           caseList;
 
     Token               token;
     Location            location;
@@ -103,13 +102,12 @@ StatementNode* programRoot = NULL;
 // ==========================
 
 %type <blockNode>           program stmt_block
-%type <StmtNode>            stmt branch_body for_init_stmt
-%type <stmtList>            stmt_list case_body
+%type <stmtNode>            stmt branch_body for_init_stmt
+%type <stmtList>            stmt_list
 %type <varDeclNode>         var_decl var_decl_uninit var_decl_init
 %type <ifNode>              if_stmt unmatched_if_stmt matched_if_stmt
 %type <switchNode>          switch_stmt
 %type <caseStmtNode>        case_stmt
-%type <caseList>            switch_body case_stmt_block case_stmt_list
 %type <whileNode>           while_stmt
 %type <doWhileNode>         do_while_stmt
 %type <forNode>             for_stmt for_header
@@ -155,37 +153,38 @@ StatementNode* programRoot = NULL;
 // Rules Section
 // =============
 
-program:            /* epsilon */           { programRoot = new BlockNode(); }
-    |               stmt_list               { programRoot = new BlockNode((*$1)[0]->loc, *$1); delete $1; }
+program:            /* epsilon */               { programRoot = new BlockNode(); }
+    |               stmt_list                   { programRoot = new BlockNode((*$1)[0]->loc, *$1); delete $1; }
     ;
 
-stmt_list:          stmt                    { $$ = new StmtList(); $$->push_back($1); }
-    |               stmt_block              { $$ = new StmtList(); $$->push_back($1); }
-    |               stmt_list stmt          { $$ = $1; $$->push_back($2); }
-    |               stmt_list stmt_block    { $$ = $1; $$->push_back($2); }
+stmt_list:          stmt                        { $$ = new StmtList(); $$->push_back($1); }
+    |               stmt_list stmt              { $$ = $1; $$->push_back($2); }
+    |               stmt_block                  { $$ = new StmtList(); $$->push_back($1); }
+    |               stmt_list stmt_block        { $$ = $1; $$->push_back($2); }
     ;
 
-stmt_block:         '{' '}'                 { $$ = new BlockNode($<location>1); }
-    |               '{' stmt_list '}'       { $$ = new BlockNode($<location>1, *$2); delete $2; }
+stmt_block:         '{' '}'                     { $$ = new BlockNode($<location>1); }
+    |               '{' stmt_list '}'           { $$ = new BlockNode($<location>1, *$2); delete $2; }
     ;
 
-stmt:               ';'                     { $$ = new StatementNode($<location>1); }
-    |               BREAK ';'               { $$ = new BreakStmtNode($<location>1); }
-    |               CONTINUE ';'            { $$ = new ContinueStmtNode($<location>1); }
-    |               expression ';'          { $$ = new ExprContainerNode($1->loc, $1); }
-    |               var_decl ';'            { $$ = $1; }
-    |               if_stmt                 { $$ = $1; }
-    |               switch_stmt             { $$ = $1; }
-    |               while_stmt              { $$ = $1; }
-    |               do_while_stmt ';'       { $$ = $1; }
-    |               for_stmt                { $$ = $1; }
-    |               function                { $$ = $1; }
-    |               return_stmt ';'         { $$ = $1; }
-    |               error ';'               { $$ = new ErrorNode(curLoc, "invalid syntax"); yyerrok; }
+stmt:               ';'                         { $$ = new StatementNode($<location>1); }
+    |               BREAK ';'                   { $$ = new BreakStmtNode($<location>1); }
+    |               CONTINUE ';'                { $$ = new ContinueStmtNode($<location>1); }
+    |               expression ';'              { $$ = new ExprContainerNode($1->loc, $1); }
+    |               var_decl ';'                { $$ = $1; }
+    |               if_stmt                     { $$ = $1; }
+    |               switch_stmt                 { $$ = $1; }
+    |               case_stmt                   { $$ = $1; }
+    |               while_stmt                  { $$ = $1; }
+    |               do_while_stmt ';'           { $$ = $1; }
+    |               for_stmt                    { $$ = $1; }
+    |               function                    { $$ = $1; }
+    |               return_stmt ';'             { $$ = $1; }
+    |               error ';'                   { $$ = new ErrorNode(curLoc, "invalid syntax"); yyerrok; }
     ;
 
-branch_body:        stmt                    { $$ = $1; }
-    |               stmt_block              { $$ = $1; }
+branch_body:        stmt                        { $$ = $1; }
+    |               stmt_block                  { $$ = $1; }
     ;
 
 // ------------------------------------------------------------
@@ -270,26 +269,11 @@ matched_if_stmt:    IF '(' expression ')' branch_body ELSE branch_body  { $$ = n
 // Switch Rules
 //
 
-switch_stmt:        SWITCH '(' expression ')' switch_body   { $$ = new SwitchNode($1, $3, *$5); delete $5; }
+switch_stmt:        SWITCH '(' expression ')' branch_body   { $$ = new SwitchNode($1, $3, $5); }
     ;
 
-switch_body:        case_stmt_block                         { $$ = $1; }
-    ;
-
-case_stmt_block:    '{' '}'                                 { $$ = new CaseList(); }
-    |               '{' case_stmt_list '}'                  { $$ = $2; }
-    ;
-
-case_stmt_list:     case_stmt                               { $$ = new CaseList(); $$->push_back($1); }
-    |               case_stmt_list case_stmt                { $$ = $1; $$->push_back($2); }
-    ;
-
-case_stmt:          CASE expression ':' case_body           { $$ = new CaseStmtNode($1, $2, *$4); delete $4; }
-    |               DEFAULT ':' case_body                   { $$ = new CaseStmtNode($1, NULL, *$3, true); delete $3; }
-    ;
-
-case_body:          /* epsilon */                           { $$ = new StmtList(); }
-    |               stmt_list                               { $$ = $1; }
+case_stmt:          CASE expression ':' stmt                { $$ = new CaseLabelNode($1, $2, $4); }
+    |               DEFAULT ':' stmt                        { $$ = new CaseLabelNode($1, NULL, $3); }
     ;
 
 // ------------------------------------------------------------

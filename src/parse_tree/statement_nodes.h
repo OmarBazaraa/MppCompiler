@@ -112,7 +112,7 @@ struct VarDeclarationNode : public StatementNode {
     virtual string toString(int ind = 0) {
         string ret = string(ind, ' ') + var.header();
         if (value) {
-            ret += " = " + value->toString(0);
+            ret += " = " + value->toString();
         }
         return ret;
     }
@@ -205,48 +205,8 @@ struct ReturnStmtNode : public StatementNode {
     virtual string toString(int ind = 0) {
         string ret = string(ind, ' ') + "return";
         if (value) {
-            ret += " " + value->toString(0);
+            ret += " " + value->toString();
         }
-        return ret;
-    }
-};
-
-/**
- * The node class holding a case statement in the parse tree.
- * 
- * TODO: redefine switch case grammar.
- */
-struct CaseStmtNode : public StatementNode {
-    ExpressionNode* expr;
-    StmtList body;
-    bool isDefault;
-
-    CaseStmtNode(const Location& loc, ExpressionNode* expr, const StmtList& body, bool isDefault = false) : StatementNode(loc) {
-        this->expr = expr;
-        this->body = body;
-        this->isDefault = isDefault;
-    }
-
-    virtual ~CaseStmtNode() {
-        if (expr) {
-            delete expr;
-        }
-        for (int i = 0; i < body.size(); ++i) {
-            delete body[i];
-        }
-    }
-
-    virtual bool analyze(ScopeContext* context) {
-        return true;
-    }
-
-    virtual string toString(int ind = 0) {
-        string ret = string(ind, ' ') + (isDefault ? "default:\n" : "case " + expr->toString() + ":\n");
-
-        for (int i = 0; i < body.size(); ++i) {
-            ret += body[i]->toString(ind + 4) + "\n";
-        }
-
         return ret;
     }
 };

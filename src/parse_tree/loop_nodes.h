@@ -135,9 +135,9 @@ struct ForNode : public StatementNode {
 
     virtual string toString(int ind = 0) {
         string ret = string(ind, ' ') + "for (";
-        ret += (initStmt ? initStmt->toString(0) : "") + ";";
-        ret += (cond ? cond->toString(0) : "") + ";";
-        ret += (inc ? inc->toString(0) : "") + ";";
+        ret += (initStmt ? initStmt->toString() : "") + ";";
+        ret += (cond ? cond->toString() : "") + ";";
+        ret += (inc ? inc->toString() : "") + ";";
         ret += ")\n";
         ret += body->toString(ind + (dynamic_cast<BlockNode*>(body) ? 0 : 4));
         return ret;
