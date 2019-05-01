@@ -24,7 +24,7 @@ struct AssignOprNode : public ExpressionNode {
 
     virtual bool analyze(ScopeContext* context) {
         if (!(rhs->analyze(context) & lhs->analyze(context))) {
-            // Note that I used a bitwise and to execute both lhs and rhs expressions
+            // Note that I used a bitwise AND to execute both lhs and rhs expressions
             return false;
         }
 
@@ -78,7 +78,7 @@ struct BinaryOprNode : public ExpressionNode {
 
     virtual bool analyze(ScopeContext* context) {
         if (!(lhs->analyze(context) & rhs->analyze(context))) {
-            // Note that I used a bitwise and to execute both lhs and rhs expressions
+            // Note that I used a bitwise AND to execute both lhs and rhs expressions
             return false;
         }
 
@@ -86,7 +86,8 @@ struct BinaryOprNode : public ExpressionNode {
         isConst = (lhs->isConst && rhs->isConst);
 
         if (lhs->type == DTYPE_VOID || lhs->type == DTYPE_FUNC_PTR ||
-            rhs->type == DTYPE_VOID || rhs->type == DTYPE_FUNC_PTR) {
+            rhs->type == DTYPE_VOID || rhs->type == DTYPE_FUNC_PTR ||
+            Utils::isBitwiseOpr(opr) && (lhs->type == DTYPE_FLOAT || rhs->type == DTYPE_FLOAT)) {
             context->printError("invalid operands of types '" + lhs->getType() + "' and '" + rhs->getType() + "' to " + getOpr(), loc);
             return false;
         }
@@ -128,12 +129,13 @@ struct UnaryOprNode : public ExpressionNode {
         reference = expr->reference;
         isConst = expr->isConst;
 
-        if (expr->type == DTYPE_VOID || expr ->type == DTYPE_FUNC_PTR) {
+        if (expr->type == DTYPE_VOID || expr ->type == DTYPE_FUNC_PTR ||
+            expr->type == DTYPE_FLOAT && Utils::isBitwiseOpr(opr)) {
             context->printError("invalid operand of type '" + expr->getType() + "' to " + getOpr(), loc);
             return false;
         }
 
-        if (opr == OPR_SUF_INC || opr == OPR_PRE_INC || opr == OPR_SUF_DEC || opr == OPR_PRE_DEC) {
+        if (Utils::isLvalueOpr(opr)) {
             if (reference == NULL) {
                 context->printError("lvalue required as an operand of increment/decrement operator", expr->loc);
                 return false;

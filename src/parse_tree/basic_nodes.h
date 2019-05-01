@@ -63,7 +63,7 @@ struct ExpressionNode : public StatementNode {
     ExpressionNode() {}
 
     ExpressionNode(const Location& loc) : StatementNode(loc) {}
-
+    
     virtual string getType() {
         if (reference) {
             return reference->getType();

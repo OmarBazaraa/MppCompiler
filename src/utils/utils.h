@@ -13,7 +13,7 @@ using namespace std;
 /**
  * Union of different primitive data types.
  */
-union ValueTypes {
+union Value {
     bool boolVal;
     char charVal;
     int intVal;
@@ -43,6 +43,89 @@ struct Token {
  * Note that all methods in this class must be static methods.
  */
 struct Utils {
+
+    /**
+     * Checks whether the given operator is an arithmetic operator or not.
+     * 
+     * @param opr the operator to check.
+     * 
+     * @return {@code true} if the given operator is arithmetic; {@code false} otherwise.
+     */
+    static bool isArithmeticOpr(Operator opr) {
+        switch (opr) {
+            case OPR_ADD:
+            case OPR_U_PLUS:
+            case OPR_SUB:
+            case OPR_U_MINUS:
+            case OPR_MUL:
+            case OPR_DIV:
+            case OPR_MOD:
+                return true;
+        }
+        return false;
+    }
+
+    /**
+     * Checks whether the given operator is a logical operator or not.
+     * 
+     * @param opr the operator to check.
+     * 
+     * @return {@code true} if the given operator is logical; {@code false} otherwise.
+     */
+    static bool isLogicalOpr(Operator opr) {
+        switch (opr) {
+            case OPR_LOGICAL_AND:
+            case OPR_LOGICAL_OR:
+            case OPR_LOGICAL_NOT:
+            case OPR_GREATER:
+            case OPR_GREATER_EQUAL:
+            case OPR_LESS:
+            case OPR_LESS_EQUAL:
+            case OPR_EQUAL:
+            case OPR_NOT_EQUAL:
+                return true;
+        }
+        return false;
+    }
+
+    /**
+     * Checks whether the given operator is a bitwise operator or not.
+     * 
+     * @param opr the operator to check.
+     * 
+     * @return {@code true} if the given operator is bitwise; {@code false} otherwise.
+     */
+    static bool isBitwiseOpr(Operator opr) {
+        switch (opr) {
+            case OPR_AND:
+            case OPR_OR:
+            case OPR_XOR:
+            case OPR_NOT:
+            case OPR_SHL:
+            case OPR_SHR:
+                return true;
+        }
+        return false;
+    }
+
+    /**
+     * Checks whether the given operator requires l-value operand or not.
+     * 
+     * @param opr the operator to check.
+     * 
+     * @return {@code true} if the given operator requires l-value operand; {@code false} otherwise.
+     */
+    static bool isLvalueOpr(Operator opr) {
+        switch (opr) {
+            case OPR_ASSIGN:
+            case OPR_PRE_INC:
+            case OPR_SUF_INC:
+            case OPR_PRE_DEC:
+            case OPR_SUF_DEC:
+                return true;
+        }
+        return false;
+    }
 
     /**
      * Converts the given operator into its corresponding token string.
