@@ -21,22 +21,9 @@ int solve(int idx, int prv) {
 }
 
 void func(const int x) {
-
+    return func(func);
 }
 
 int main() {
     const int x = 5;
-
-    int a = func;
-    int b;
-	
-    a = func;
-
-    (7 = b);
-    a = b = solve = 6;
-    7 = b = solve = 6;
-    (7 = b) = (solve = 6);
-
-    ++7;
-	
 }

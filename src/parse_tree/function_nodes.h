@@ -71,7 +71,7 @@ struct FunctionNode : public StatementNode {
     virtual string toString(int ind = 0) {
         string ret = string(ind, ' ') + type->toString() + " " + name->toString() + "(";
         for (int i = 0; i < paramList.size(); ++i) {
-            ret += (i > 0 ? ", " : " ") + paramList[i]->toString();
+            ret += (i > 0 ? ", " : "") + paramList[i]->toString();
         }
         ret += ")\n";
         ret += body->toString(ind);
@@ -103,28 +103,39 @@ struct FunctionCallNode : public ExpressionNode {
         bool ret = true;
 
         Symbol* ptr = context->getSymbol(name->name);
+        Func* func = dynamic_cast<Func*>(ptr);
 
         if (ptr == NULL) {
             context->printError("'" + name->name + "' was not declared in this scope", loc);
             ret = false;
         }
-        else if (dynamic_cast<Func*>(ptr) == NULL) {
+        else if (func == NULL) {
             context->printError("'" + name->name + "' cannot be used as a function", loc);
             ret = false;
         }
-        else if (argList.size() > ((Func*) ptr)->paramList.size()) {
-            context->printError("too many arguments to function '" + ((Func*) ptr)->header() + "'", loc);
+        else if (argList.size() > func->paramList.size()) {
+            context->printError("too many arguments to function '" + func->header() + "'", loc);
             ret = false;
         }
-        else if (argList.size() < ((Func*) ptr)->paramList.size()) {
-            context->printError("too few arguments to function '" + ((Func*) ptr)->header() + "'", loc);
+        else if (argList.size() < func->paramList.size()) {
+            context->printError("too few arguments to function '" + func->header() + "'", loc);
             ret = false;
         } else {
             type = ptr->type;
         }
 
         for (int i = 0; i < argList.size(); ++i) {
-            ret &= argList[i]->analyze(context);
+            if (!argList[i]->analyze(context)) {
+                ret = false;
+                continue;
+            }
+
+            if (func && argList[i]->type == DTYPE_VOID || argList[i]->type == DTYPE_FUNC_PTR) {
+                context->printError("invalid conversion from '" + argList[i]->getType() + "' to '" +
+                    func->paramList[i].getType() + "' in function '" + 
+                    func->header() + "' call", argList[i]->loc);
+                return false;
+            }
         }
 
         return ret;

@@ -41,7 +41,7 @@ struct Var : public Symbol {
     }
 
     virtual string getType() {
-        return (isConst ? "const " : "") + Utils::dtypeToStr(type);
+        return Utils::dtypeToStr(type);
     }
 };
 

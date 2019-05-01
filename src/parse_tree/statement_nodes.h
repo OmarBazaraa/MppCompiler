@@ -182,22 +182,24 @@ struct ReturnStmtNode : public StatementNode {
             return false;
         }
 
-        bool ret = true;
-        
-        if (value) {
-            ret = value->analyze(context);
-        }
+        if (value) {    // return expression exists
+            if (!value->analyze(context)) {
+                return false;
+            }
 
-        if (value == NULL && func->type != DTYPE_VOID) {
-            context->printError("return-statement with no value, in function returning '" + Utils::dtypeToStr(func->type) + "'", loc);
-            ret = false;
+            if (func->type == DTYPE_VOID && value->type != DTYPE_VOID) {
+                context->printError("return-statement with '" + value->getType() + "' value, in function returning 'void'", value->loc);
+                return false;
+            }
         }
-        else if (value != NULL && func->type == DTYPE_VOID) {
-            context->printError("return-statement with a value, in function returning 'void'", value->loc);
-            ret = false;
+        else {          // No return expression
+            if (func->type != DTYPE_VOID) {
+                context->printError("return-statement with no value, in function returning '" + Utils::dtypeToStr(func->type) + "'", loc);
+                return false;
+            }
         }
         
-        return ret;
+        return true;
     }
 
     virtual string toString(int ind = 0) {

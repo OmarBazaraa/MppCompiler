@@ -47,6 +47,7 @@ Run `make run` to run the recently built compiler.
 2. Value returned in `void` function and vice-versa.
 3. Variable or constant call as a function.
 4. Function call with more/less arguments than its parameters.
+5. Function call with invalid argument type (i.e. operands of type `void` or pointer to function).
 
 ### Other errors
 1. Variable, constant, or functions re-declaration in the same scope.

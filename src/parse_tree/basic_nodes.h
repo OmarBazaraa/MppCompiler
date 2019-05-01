@@ -99,6 +99,7 @@ struct ExprContainerNode : public ExpressionNode {
 
         type = expr->type;
         reference = expr->reference;
+        isConst = expr->isConst;
 
         return ret;
     }
