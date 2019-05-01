@@ -40,27 +40,23 @@ Run `make run` to run the recently built compiler.
 3. `break`-statement outside `for`, `while`, `do-while`, or `switch` scopes.
 4. `return`-statement outside function scope.
 5. `case`-statement outside switch scope. _[TODO]_
-
-### Identifier-related errors
-1. Variable, constant, or functions re-declaration in the same scope.
-2. Undeclared identifier access.
-
-### Variable-related errors
-1. Variable or constant declared with type `void`.
-2. Constant declaration without initialization.
-3. Constant value assignment after declaration.
-
-### Value-related errors
-1. Invalid operand types. (i.e. operands of type `void`).
-2. Increment and decrement operators with `rvalue` operand.
-3. Case statement with non-constant expression.
+6. Function definition outside the global scope.
 
 ### Function-related errors
 1. Function parameter with default value.
 2. Value returned in `void` function and vice-versa.
 3. Variable or constant call as a function.
 4. Function call with more/less arguments than its parameters.
-5. Function definition outside the global scope.
+
+### Other errors
+1. Variable, constant, or functions re-declaration in the same scope.
+2. Undeclared identifier access.
+3. Variable or constant declared with type `void`.
+4. Constant declaration without initialization.
+5. Constant assignment after declaration.
+6. Invalid operand types. (i.e. operands of type `void` or pointer to function).
+7. Increment and decrement operators with `rvalue` operand.
+8. Case statement with non-constant expression. _[TODO]_
 
 # Lex Usage
 
