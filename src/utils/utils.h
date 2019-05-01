@@ -115,6 +115,8 @@ struct Utils {
                 return "bool";
             case DTYPE_VOID:
                 return "void";
+            case DTYPE_FUNC_PTR:
+                return "pointer to function";
         }
 
         return "unknown";

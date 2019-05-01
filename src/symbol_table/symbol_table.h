@@ -23,6 +23,10 @@ struct Symbol {
     virtual string header() {
         return Utils::dtypeToStr(type) + " " + identifier;;
     }
+
+    virtual string getType() {
+        return Utils::dtypeToStr(type);
+    }
 };
 
 /**
@@ -35,6 +39,10 @@ struct Var : public Symbol {
     virtual string header() {
         return (isConst ? "const " : "") + Utils::dtypeToStr(type) + " " + identifier;
     }
+
+    virtual string getType() {
+        return (isConst ? "const " : "") + Utils::dtypeToStr(type);
+    }
 };
 
 /**
@@ -46,10 +54,16 @@ struct Func : public Symbol {
     virtual string header() {
         string ret = Utils::dtypeToStr(type) + " " + identifier + "(";
         for (int i = 0; i < paramList.size(); ++i) {
-            if (i > 0) {
-                ret += ", ";
-            }
-            ret += Utils::dtypeToStr(paramList[i].type);
+            ret += (i > 0 ? ", " : "") + Utils::dtypeToStr(paramList[i].type);
+        }
+        ret += ")";
+        return ret;
+    }
+
+    virtual string getType() {
+        string ret = Utils::dtypeToStr(type) + "(*)(";
+        for (int i = 0; i < paramList.size(); ++i) {
+            ret += (i > 0 ? ", " : "") + Utils::dtypeToStr(paramList[i].type);
         }
         ret += ")";
         return ret;

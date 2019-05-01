@@ -32,6 +32,7 @@ struct ValueNode : public ExpressionNode {
     ValueNode(const Location& loc, DataType type, const char* value) : ExpressionNode(loc) {
         this->type = type;
         this->value = value;
+        this->isConst = true;
     }
 
     virtual bool analyze(ScopeContext* context) {
@@ -59,11 +60,18 @@ struct IdentifierNode : public ExpressionNode {
         if (ptr == NULL) {
             context->printError("'" + name + "' was not declared in this scope", loc);
             return false;
+        }
+
+        reference = ptr;
+
+        if (dynamic_cast<Func*>(ptr)) {
+            type = DTYPE_FUNC_PTR;
         } else {
             type = ptr->type;
-            reference = ptr;
-            return true;
+            isConst = ((Var*) ptr)->isConst;
         }
+        
+        return true;
     }
 
     virtual string toString(int ind = 0) {

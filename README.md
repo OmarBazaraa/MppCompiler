@@ -46,13 +46,14 @@ Run `make run` to run the recently built compiler.
 2. Undeclared identifier access.
 
 ### Variable-related errors
-1. Variable or constant declared with type `void`
+1. Variable or constant declared with type `void`.
 2. Constant declaration without initialization.
 3. Constant value assignment after declaration.
 
 ### Value-related errors
-1. Invalid operand types. (i.e. operands of type `void`)
+1. Invalid operand types. (i.e. operands of type `void`).
 2. Increment and decrement operators with `rvalue` operand.
+3. Case statement with non-constant expression.
 
 ### Function-related errors
 1. Function parameter with default value.
@@ -81,4 +82,4 @@ gcc <output>.c -o <lexer_name>.exe
 Where `<output>.c` is the name of the generated lexer C file, and `<lexer_name>.exe` is the name of the compiled lexer program.
 
 ### More About Lex
-For more information about lex, please refer to this [link](https://github.com/OmarBazaraa/Compiler/blob/master/README_LEX.md)
+For more information about lex, please refer to this [link](https://github.com/OmarBazaraa/Compiler/blob/master/README_LEX.md).

@@ -60,17 +60,18 @@ struct ExpressionNode : public StatementNode {
     //
     DataType type = DTYPE_ERROR;    // data type of the expression
     Symbol* reference = NULL;       // reference of the expression is exist
+    bool isConst = false;           // whether the expression is of constant value or not
 
     ExpressionNode() {}
 
     ExpressionNode(const Location& loc) : StatementNode(loc) {}
 
-    virtual DataType getType() {
-        return type;
-    }
-
-    virtual bool isReference() {
-        return type;
+    virtual string getType() {
+        if (reference) {
+            return reference->getType();
+        } else {
+            return Utils::dtypeToStr(type);
+        }
     }
 };
 

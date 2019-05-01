@@ -46,6 +46,7 @@ enum DataType {
     DTYPE_CHAR,
     DTYPE_INT,
     DTYPE_FLOAT,
+    DTYPE_FUNC_PTR,
     DTYPE_ERROR
 };
 

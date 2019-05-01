@@ -20,38 +20,23 @@ int solve(int idx, int prv) {
     return ((idx + prv) * 5) & solve(idx + 1, prv ^ ~23523);
 }
 
-void func() {
+void func(const int x) {
 
 }
 
 int main() {
     const int x = 5;
 
-    int a;
+    int a = func;
     int b;
-
-    (func * 6) + ((func() - 3) ^ 7);
+	
+    a = func;
 
     (7 = b);
     a = b = solve = 6;
     7 = b = solve = 6;
     (7 = b) = (solve = 6);
 
-    if (x)
-        solve(true, 'c');
-    else if (0) {
-        return 1;
-    }
-
-    switch (x)
-    {
-        case 5:
-            solve(1,1);
-            break;
-    
-        default:
-            break;
-    }
-
-    9 + 1;
+    ++7;
+	
 }

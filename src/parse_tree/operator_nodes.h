@@ -30,19 +30,22 @@ struct AssignOprNode : public ExpressionNode {
 
         type = lhs->type;
         reference = lhs->reference;
+        isConst = lhs->isConst;
 
-        if (reference) {
-            if (dynamic_cast<Var*>(reference) == NULL) {
-                context->printError("assignment of function '" + reference->header() + "'", rhs->loc);
-                return false;
-            }
-            else if (((Var*) reference)->isConst) {
-                context->printError("assignment of read-only variable '" + reference->header() + "'", rhs->loc);
-                return false;
-            }
+        if (type == DTYPE_FUNC_PTR) {
+            context->printError("assignment of function '" + reference->header() + "'", lhs->loc);
+            return false;
         }
-        else {
+        if (reference == NULL) {
             context->printError("lvalue required as left operand of assignment", lhs->loc);
+            return false;
+        }
+        if (reference && isConst) {
+            context->printError("assignment of read-only variable '" + reference->header() + "'", lhs->loc);
+            return false;
+        }
+        if (rhs->type == DTYPE_VOID || rhs->type == DTYPE_FUNC_PTR) {
+            context->printError("invalid conversion from '" + rhs->getType() + "' to '" + lhs->getType() + "'", rhs->loc);
             return false;
         }
 
@@ -79,21 +82,20 @@ struct BinaryOprNode : public ExpressionNode {
             return false;
         }
 
-        // Note that lhs & rhs types are computed after calling analyze function
         type = max(lhs->type, rhs->type);
+        isConst = (lhs->isConst && rhs->isConst);
 
-        //
-        // TODO: handle function pointer
-        //
-        
-        if (lhs->type == DTYPE_VOID || rhs->type == DTYPE_VOID) {
-            context->printError("invalid operands of types '" + 
-                Utils::dtypeToStr(lhs->type) + "' and '" + Utils::dtypeToStr(rhs->type) +
-                "' to binary operator '" + Utils::oprToStr(opr) + "'", loc);
+        if (lhs->type == DTYPE_VOID || lhs->type == DTYPE_FUNC_PTR ||
+            rhs->type == DTYPE_VOID || rhs->type == DTYPE_FUNC_PTR) {
+            context->printError("invalid operands of types '" + lhs->getType() + "' and '" + rhs->getType() + "' to " + getOpr(), loc);
             return false;
         }
 
         return true;
+    }
+
+    virtual string getOpr() {
+        return "binary operator '" + Utils::oprToStr(opr) + "'";
     }
 
     virtual string toString(int ind = 0) {
@@ -124,31 +126,29 @@ struct UnaryOprNode : public ExpressionNode {
 
         type = expr->type;
         reference = expr->reference;
+        isConst = expr->isConst;
 
-        if (expr->type == DTYPE_VOID) {
-            context->printError("invalid operand of type '" + 
-                Utils::dtypeToStr(expr->type) + "' to unary 'operator" + Utils::oprToStr(opr) + "'", loc);
+        if (expr->type == DTYPE_VOID || expr ->type == DTYPE_FUNC_PTR) {
+            context->printError("invalid operand of type '" + expr->getType() + "' to " + getOpr(), loc);
             return false;
         }
 
         if (opr == OPR_SUF_INC || opr == OPR_PRE_INC || opr == OPR_SUF_DEC || opr == OPR_PRE_DEC) {
-            if (reference) {
-                if (dynamic_cast<Var*>(reference) == NULL) {
-                    context->printError("increment/decrement of function '" + reference->header() + "'", expr->loc);
-                    return false;
-                }
-                else if (((Var*) reference)->isConst) {
-                    context->printError("increment/decrement of read-only variable '" + reference->header() + "'", expr->loc);
-                    return false;
-                }
+            if (reference == NULL) {
+                context->printError("lvalue required as an operand of increment/decrement operator", expr->loc);
+                return false;
             }
-            else {
-                context->printError("lvalue required as an operand of increment/decrement", expr->loc);
+            if (reference && isConst) {
+                context->printError("increment/decrement of read-only variable '" + reference->header() + "'", expr->loc);
                 return false;
             }
         }
 
         return true;
+    }
+
+    virtual string getOpr() {
+        return "unary operator '" + Utils::oprToStr(opr) + "'";
     }
 
     virtual string toString(int ind = 0) {
