@@ -63,7 +63,7 @@ struct AssignOprNode : public ExpressionNode {
 		
 		ret += rhs->generateQuad(generationContext);
 		
-		ret += Utils::dtypeConvQuad(rhs->type, lhs->type);
+		ret += Utils::dtypeConvQuad(rhs->type, type);
         ret += "POP " + lhs->reference->identifier + "\n";
 		
 		return ret;
@@ -123,13 +123,12 @@ struct BinaryOprNode : public ExpressionNode {
     
     virtual string generateQuad(GenerationContext* generationContext) {
 		string ret = "";
-		DataType t = max(lhs->type, rhs->type);
 		
         ret += lhs->generateQuad(generationContext);
-		ret += Utils::dtypeConvQuad(lhs->type, t);
+		ret += Utils::dtypeConvQuad(lhs->type, type);
 		
         ret += rhs->generateQuad(generationContext);
-		ret += Utils::dtypeConvQuad(rhs->type, t);
+		ret += Utils::dtypeConvQuad(rhs->type, type);
         ret += Utils::binOprToQuad(opr) + "\n";
 		
 		return ret;
