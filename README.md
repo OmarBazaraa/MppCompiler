@@ -39,7 +39,7 @@ Run `make run` to run the recently built compiler.
 2. `continue`-statement outside `for`, `while`, or `do-while` scopes.
 3. `break`-statement outside `for`, `while`, `do-while`, or `switch` scopes.
 4. `return`-statement outside function scope.
-5. `case`/`default`-statement outside switch scope.
+5. `case` and `default` labels outside switch scope.
 6. Function definition outside the global scope.
 
 ### Other errors
@@ -52,9 +52,9 @@ Run `make run` to run the recently built compiler.
 2. Undeclared identifier access.
 3. Constant assignment after declaration.
 4. Invalid operand types. (i.e. operands of type `void` or pointer to function).
-5. Float operand to logical operators. _[TODO]_
+5. Float operand to logical operators.
 6. Increment and decrement operators with `rvalue` operand.
-7. `switch`/`case`-statement with non integer expression.
+7. `switch` and `case` statements with non integer expression.
 8. `case`-statement with non-constant expression.
 
 ### Function-related errors

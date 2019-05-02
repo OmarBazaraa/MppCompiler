@@ -27,7 +27,7 @@ void func(const int x) {
 int main() {
     const int x = 5;
 
-    int a = 5.5 & 1;
+    int a = !6.6;
 
     case 5:;
 

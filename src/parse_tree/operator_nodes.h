@@ -28,26 +28,26 @@ struct AssignOprNode : public ExpressionNode {
             return false;
         }
 
-        type = lhs->type;
-        reference = lhs->reference;
-        isConst = lhs->isConst;
-
-        if (type == DTYPE_FUNC_PTR) {
-            context->printError("assignment of function '" + reference->header() + "'", lhs->loc);
+        if (lhs->type == DTYPE_FUNC_PTR) {
+            context->printError("assignment of function '" + lhs->reference->header() + "'", lhs->loc);
             return false;
         }
-        if (reference == NULL) {
+        if (lhs->reference == NULL) {
             context->printError("lvalue required as left operand of assignment", lhs->loc);
             return false;
         }
-        if (reference && isConst) {
-            context->printError("assignment of read-only variable '" + reference->header() + "'", lhs->loc);
+        if (lhs->reference && lhs->isConst) {
+            context->printError("assignment of read-only variable '" + lhs->reference->header() + "'", lhs->loc);
             return false;
         }
         if (rhs->type == DTYPE_VOID || rhs->type == DTYPE_FUNC_PTR) {
             context->printError("invalid conversion from '" + rhs->getType() + "' to '" + lhs->getType() + "'", rhs->loc);
             return false;
         }
+
+        type = lhs->type;
+        reference = lhs->reference;
+        isConst = lhs->isConst;
 
         return true;
     }
@@ -82,15 +82,20 @@ struct BinaryOprNode : public ExpressionNode {
             return false;
         }
 
-        type = max(lhs->type, rhs->type);
-        isConst = (lhs->isConst && rhs->isConst);
-
         if (lhs->type == DTYPE_VOID || lhs->type == DTYPE_FUNC_PTR ||
             rhs->type == DTYPE_VOID || rhs->type == DTYPE_FUNC_PTR ||
             Utils::isBitwiseOpr(opr) && (lhs->type == DTYPE_FLOAT || rhs->type == DTYPE_FLOAT)) {
             context->printError("invalid operands of types '" + lhs->getType() + "' and '" + rhs->getType() + "' to " + getOpr(), loc);
             return false;
         }
+
+        if (Utils::isLogicalOpr(opr)) {
+            type == DTYPE_BOOL;
+        } else {
+            type = max(lhs->type, rhs->type);
+        }
+
+        isConst = (lhs->isConst && rhs->isConst);
 
         return true;
     }
@@ -125,10 +130,6 @@ struct UnaryOprNode : public ExpressionNode {
             return false;
         }
 
-        type = expr->type;
-        reference = expr->reference;
-        isConst = expr->isConst;
-
         if (expr->type == DTYPE_VOID || expr ->type == DTYPE_FUNC_PTR ||
             expr->type == DTYPE_FLOAT && Utils::isBitwiseOpr(opr)) {
             context->printError("invalid operand of type '" + expr->getType() + "' to " + getOpr(), loc);
@@ -136,15 +137,24 @@ struct UnaryOprNode : public ExpressionNode {
         }
 
         if (Utils::isLvalueOpr(opr)) {
-            if (reference == NULL) {
+            if (expr->reference == NULL) {
                 context->printError("lvalue required as an operand of increment/decrement operator", expr->loc);
                 return false;
             }
-            if (reference && isConst) {
-                context->printError("increment/decrement of read-only variable '" + reference->header() + "'", expr->loc);
+            if (expr->reference && expr->isConst) {
+                context->printError("increment/decrement of read-only variable '" + expr->reference->header() + "'", expr->loc);
                 return false;
             }
         }
+
+        if (Utils::isLogicalOpr(opr)) {
+            type == DTYPE_BOOL;
+        } else {
+            type = expr->type;
+        }
+        
+        reference = expr->reference;
+        isConst = expr->isConst;
 
         return true;
     }
