@@ -60,28 +60,33 @@ struct IfNode : public StatementNode {
         return ret;
     }
     
-    virtual void generateQuad(GenerationContext* generationContext) {
+    virtual string generateQuad(GenerationContext* generationContext) {
+		string ret = "";
         int label1 = generationContext->labelCounter++;
-        cond->generateQuad(generationContext);
+        ret += cond->generateQuad(generationContext);
+		
         if (elseBody) {
             int label2 = generationContext->labelCounter++;
-            cout << "JZ L" << label1 << endl;
+            ret += "JZ L" + to_string(label1) + "\n";
             
-            ifBody->generateQuad(generationContext);
+            ret += ifBody->generateQuad(generationContext);
             
-            cout << "JMP L" << label2 << endl;
-            cout << "L" << label1 << ":" << endl;
+            ret += "JMP L" + to_string(label2) + "\n";
+            ret += "L" + to_string(label1) + ":\n";
             
-            elseBody->generateQuad(generationContext);
+            ret += elseBody->generateQuad(generationContext);
             
-            cout << "L" << label2 << ":" << endl;
-        } else {
-            cout << "JZ L" << label1 << endl;
+            ret += "L" + to_string(label2) + ":\n";
+        } 
+		else {
+            ret += "JZ L" + to_string(label1) + "\n";
             
-            ifBody->generateQuad(generationContext);
+            ret += ifBody->generateQuad(generationContext);
             
-            cout << "L" << label1 << ":" << endl;
+            ret += "L" + to_string(label1) + ":\n";
         }
+		
+		return ret;
     }
     
 };
@@ -156,8 +161,24 @@ struct CaseLabelNode : public StatementNode {
         return ret;
     }
 	
-	virtual void generateQuad(GenerationContext* generationContext) {
-        
+	virtual string generateQuad(GenerationContext* generationContext) {
+        if (expr == NULL) {
+            return stmt->generateQuad(generationContext);
+        }
+		
+		string ret = "";
+        int label1 = generationContext->labelCounter++;
+			
+		ret += "POP T" + to_string(generationContext->breakLabels.top()) + "\n";
+		ret += "PUSH T" + to_string(generationContext->breakLabels.top()) + "\n";
+		ret += "PUSH T" + to_string(generationContext->breakLabels.top()) + "\n";
+        ret += expr->generateQuad(generationContext);
+		ret += "EQU\n";
+        ret += "JZ L" + to_string(label1) + "\n";
+        ret += stmt->generateQuad(generationContext);
+        ret += "L" + to_string(label1) + ":\n";
+		
+		return ret;
     }
 };
 
@@ -211,8 +232,19 @@ struct SwitchNode : public StatementNode {
         return ret;
     }
     
-    virtual void generateQuad(GenerationContext* generationContext) {
+    virtual string generateQuad(GenerationContext* generationContext) {
+        string ret = "";
+		int label1 = generationContext->labelCounter++;
 		
+		ret += cond->generateQuad(generationContext);
+        generationContext->breakLabels.push(label1);
+        
+        ret += body->generateQuad(generationContext);
+        
+        generationContext->breakLabels.pop();
+        ret += "L" + to_string(label1) + ":\n";
+		
+		return ret;
     }
     
 };

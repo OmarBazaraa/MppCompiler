@@ -257,7 +257,7 @@ struct Utils {
     }
 
     /**
-     * Converts the given operator into its corresponding token string.
+     * Converts the given data type into its corresponding token string.
      * 
      * @param type the type to convert.
      * 
@@ -282,6 +282,48 @@ struct Utils {
         }
 
         return "unknown";
+    }
+	
+	/**
+     * Converts the given data type into its corresponding quadruple string.
+     * 
+     * @param type the type to convert.
+     * 
+     * @return the corresponding quadruple string.
+     */
+    static string dtypeToQuad(DataType type) {
+        switch (type) {
+            case DTYPE_VOID:
+                return "VOID";
+            case DTYPE_BOOL:
+                return "BOOL";
+            case DTYPE_CHAR:
+                return "CHR";
+            case DTYPE_INT:
+                return "INT";
+            case DTYPE_FLOAT:
+                return "FLOAT";
+            case DTYPE_FUNC_PTR:
+                return "FNCPTR";
+            case DTYPE_ERROR:
+                return "TYPERR";
+        }
+
+        return "unknown";
+    }
+	
+	/**
+     * Convert data type from t1 into t2.
+     * 
+     * @param t1 the type to convert from.
+	 * @param t2 the type to convert to.
+     * 
+     * @return the corresponding quadruple string.
+     */
+    static string dtypeConvQuad(DataType t1, DataType t2) {
+        if (t1 != t2)
+			return dtypeToQuad(t1) + "_TO_" + dtypeToQuad(t2) + "\n";
+		return "";
     }
 };
 

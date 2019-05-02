@@ -53,10 +53,14 @@ struct BlockNode : public StatementNode {
         return ret += string(ind, ' ') + "}";
     }
     
-    virtual void generateQuad(GenerationContext* generationContext) {
+    virtual string generateQuad(GenerationContext* generationContext) {
+		string ret = "";
+		
         for (int i = 0; i < statements.size(); ++i) {
-            statements[i]->generateQuad(generationContext);
+            ret += statements[i]->generateQuad(generationContext);
         }
+		
+		return ret;
     }
 };
 
@@ -124,12 +128,16 @@ struct VarDeclarationNode : public StatementNode {
         return ret;
     }
     
-    virtual void generateQuad(GenerationContext* generationContext) {
+    virtual string generateQuad(GenerationContext* generationContext) {
+		string ret = "";
+		
         if (value) {
-            value->generateQuad(generationContext);
+            ret += value->generateQuad(generationContext);
         }
 		
-		cout << "POP " << name->name << endl; 
+		ret += "POP " + name->name + "\n"; 
+		
+		return ret;
     }
 };
 
@@ -153,8 +161,8 @@ struct BreakStmtNode : public StatementNode {
         return string(ind, ' ') + "break";
     }
     
-    virtual void generateQuad(GenerationContext* generationContext) {
-        cout << "JMP L" << generationContext->breakLabels.top() << endl; 
+    virtual string generateQuad(GenerationContext* generationContext) {
+        return "JMP L" + to_string(generationContext->breakLabels.top()) + "\n"; 
     }
 };
 
@@ -178,8 +186,8 @@ struct ContinueStmtNode : public StatementNode {
         return string(ind, ' ') + "continue";
     }
     
-    virtual void generateQuad(GenerationContext* generationContext) {
-        cout << "JMP L" << generationContext->continueLabels.top() << endl; 
+    virtual string generateQuad(GenerationContext* generationContext) {
+        return "JMP L" + to_string(generationContext->continueLabels.top()) + "\n"; 
     }
 };
 
@@ -233,11 +241,15 @@ struct ReturnStmtNode : public StatementNode {
         return ret;
     }
     
-    virtual void generateQuad(GenerationContext* generationContext) {
+    virtual string generateQuad(GenerationContext* generationContext) {
+		string ret = "";
+		
         if (value)
-            value->generateQuad(generationContext);
+            ret += value->generateQuad(generationContext);
         
-        cout << "RET" << endl;
+        ret += "RET\n";
+		
+		return ret;
     }
 	
 };

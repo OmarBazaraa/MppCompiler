@@ -26,9 +26,11 @@ void func(const int x) {
 
 int main() {
     const int x = 5;
+	const float y = 6.5;
 
-    int a = 'C';
-
+    char a = 15;
+	
+	int c = a + y;
 
     switch (x) {
         case 5:

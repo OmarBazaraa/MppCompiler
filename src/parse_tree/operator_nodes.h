@@ -57,10 +57,16 @@ struct AssignOprNode : public ExpressionNode {
         return string(ind, ' ') + "(" + lhs->toString() + " = " + rhs->toString() + ")";
     }
     
-    virtual void generateQuad(GenerationContext* generationContext) {
+    virtual string generateQuad(GenerationContext* generationContext) {
 		// TODO: What about the quad of the lhs ?
-        rhs->generateQuad(generationContext);
-        cout << "POP " << lhs->reference << endl;
+        string ret = "";
+		
+		ret += rhs->generateQuad(generationContext);
+		
+		ret += Utils::dtypeConvQuad(rhs->type, lhs->type);
+        ret += "POP " + lhs->reference->identifier + "\n";
+		
+		return ret;
     }
 };
 
@@ -115,10 +121,18 @@ struct BinaryOprNode : public ExpressionNode {
         return string(ind, ' ') + "(" + lhs->toString() + " " + Utils::oprToStr(opr) + " " + rhs->toString() + ")";
     }
     
-    virtual void generateQuad(GenerationContext* generationContext) {
-        lhs->generateQuad(generationContext);
-        rhs->generateQuad(generationContext);
-        cout << Utils::binOprToQuad(opr) << endl;
+    virtual string generateQuad(GenerationContext* generationContext) {
+		string ret = "";
+		DataType t = max(lhs->type, rhs->type);
+		
+        ret += lhs->generateQuad(generationContext);
+		ret += Utils::dtypeConvQuad(lhs->type, t);
+		
+        ret += rhs->generateQuad(generationContext);
+		ret += Utils::dtypeConvQuad(rhs->type, t);
+        ret += Utils::binOprToQuad(opr) + "\n";
+		
+		return ret;
     }
 };
 
@@ -183,33 +197,49 @@ struct UnaryOprNode : public ExpressionNode {
         return ret += ")";
     }
     
-    virtual void generateQuad(GenerationContext* generationContext) {
+    virtual string generateQuad(GenerationContext* generationContext) {
+		string ret = "";
+		
         switch (opr) {
             case OPR_U_MINUS:
-                expr->generateQuad(generationContext);
-                cout << "NEG" << endl;
+                ret += expr->generateQuad(generationContext);
+                ret += "NEG\n";
                 break;
             case OPR_PRE_INC:
-                expr->generateQuad(generationContext);
-                cout << "PUSH 1" << endl;
-                cout << "ADD" << endl;
+                ret += expr->generateQuad(generationContext);
+                ret += "PUSH 1\n";
+                ret += "ADD\n";
+				ret += "POP " + expr->reference->identifier + "\n";
+				ret += "PUSH " + expr->reference->identifier + "\n";
                 break;
             case OPR_SUF_INC:
-                expr->generateQuad(generationContext);
-                cout << "PUSH 1" << endl;
-                cout << "ADD" << endl;
+                ret += expr->generateQuad(generationContext);
+				ret += "POP " + expr->reference->identifier + "\n";
+				ret += "PUSH " + expr->reference->identifier + "\n";
+				ret += "PUSH " + expr->reference->identifier + "\n";
+                ret += "PUSH 1\n";
+                ret += "ADD\n";
+				ret += "POP " + expr->reference->identifier + "\n";
                 break;
             case OPR_PRE_DEC:
                 expr->generateQuad(generationContext);
-                cout << "PUSH 1" << endl;
-                cout << "SUB" << endl;
+                ret += "PUSH 1\n";
+                ret += "SUB\n";
+				ret += "POP " + expr->reference->identifier + "\n";
+				ret += "PUSH " + expr->reference->identifier + "\n";
                 break;
             case OPR_SUF_DEC:
                 expr->generateQuad(generationContext);
-                cout << "PUSH 1" << endl;
-                cout << "SUB" << endl;
+				ret += "POP " + expr->reference->identifier + "\n";
+				ret += "PUSH " + expr->reference->identifier + "\n";
+				ret += "PUSH " + expr->reference->identifier + "\n";
+                ret += "PUSH 1\n";
+                ret += "SUB\n";
+				ret += "POP " + expr->reference->identifier + "\n";
                 break;
         }
+		
+		return ret;
     }
 };
 
