@@ -147,13 +147,8 @@ struct UnaryOprNode : public ExpressionNode {
             }
         }
 
-        if (Utils::isLogicalOpr(opr)) {
-            type == DTYPE_BOOL;
-        } else {
-            type = expr->type;
-        }
-        
-        reference = expr->reference;
+        type = (Utils::isLogicalOpr(opr) ? DTYPE_BOOL : expr->type);
+        reference = (Utils::isLvalueOpr(opr) ? expr->reference : NULL);
         isConst = expr->isConst;
 
         return true;

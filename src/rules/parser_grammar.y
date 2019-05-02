@@ -116,7 +116,7 @@ StatementNode* programRoot = NULL;
 %type <returnStmtNode>      return_stmt
 %type <varList>             param_list param_list_ext
 %type <exprList>            arg_list arg_list_ext
-%type <exprNode>            expression for_expr
+%type <exprNode>            expression expr_1 expr_2 expr_3 for_expr
 %type <typeNode>            type
 %type <valueNode>           value
 %type <identifierNode>      ident
@@ -209,7 +209,12 @@ var_decl_init:      type ident '=' expression               { $$ = new VarDeclar
 // Expression Rules
 //
 
-expression:         expression '=' expression               { $$ = new AssignOprNode($2, $1, $3); }
+expression:         expr_1
+    |               expr_2
+    |               expr_3
+    ;
+
+expr_1:             expression '=' expression               { $$ = new AssignOprNode($2, $1, $3); }
 
     |               expression '+' expression               { $$ = new BinaryOprNode($2, OPR_ADD, $1, $3); }
     |               expression '-' expression               { $$ = new BinaryOprNode($2, OPR_SUB, $1, $3); }
@@ -230,19 +235,20 @@ expression:         expression '=' expression               { $$ = new AssignOpr
     |               expression EQUAL expression             { $$ = new BinaryOprNode($2, OPR_EQUAL, $1, $3); }
     |               expression NOT_EQUAL expression         { $$ = new BinaryOprNode($2, OPR_NOT_EQUAL, $1, $3); }
 
-    |               INC expression %prec PRE_INC            { $$ = new UnaryOprNode($1, OPR_PRE_INC, $2); }
-    |               DEC expression %prec PRE_DEC            { $$ = new UnaryOprNode($1, OPR_PRE_DEC, $2); }
-    
-//  TODO - fix postfix inc/dec
-//  |               expression INC %prec SUF_INC            { $$ = new UnaryOprNode($2, OPR_SUF_INC, $1); }
-//  |               expression DEC %prec SUF_DEC            { $$ = new UnaryOprNode($2, OPR_SUF_DEC, $1); }
-
     |               '+' expression %prec U_PLUS             { $$ = new UnaryOprNode($1, OPR_U_PLUS, $2); }
     |               '-' expression %prec U_MINUM            { $$ = new UnaryOprNode($1, OPR_U_MINUS, $2); }
     |               '~' expression                          { $$ = new UnaryOprNode($1, OPR_NOT, $2); }
     |               '!' expression                          { $$ = new UnaryOprNode($1, OPR_LOGICAL_NOT, $2); }
+    ;
 
-    |               '(' expression ')'                      { $$ = new ExprContainerNode($1, $2); }
+expr_2:             INC expr_3 %prec PRE_INC                { $$ = new UnaryOprNode($1, OPR_PRE_INC, $2); }
+    |               DEC expr_3 %prec PRE_DEC                { $$ = new UnaryOprNode($1, OPR_PRE_DEC, $2); }
+    
+    |               expr_3 INC %prec SUF_INC                { $$ = new UnaryOprNode($2, OPR_SUF_INC, $1); }
+    |               expr_3 DEC %prec SUF_DEC                { $$ = new UnaryOprNode($2, OPR_SUF_DEC, $1); }
+    ;
+
+expr_3:             '(' expression ')'                      { $$ = new ExprContainerNode($1, $2); }
 
     |               value                                   { $$ = $1; }
     |               ident                                   { $$ = $1; }
