@@ -58,8 +58,9 @@ struct AssignOprNode : public ExpressionNode {
     }
     
     virtual void generateQuad(GenerationContext* generationContext) {
-        value->generateQuad(generationContext);
-        cout << "POP " << name->name << endl;
+		// TODO: What about the quad of the lhs ?
+        rhs->generateQuad(generationContext);
+        cout << "POP " << lhs->reference << endl;
     }
 };
 
