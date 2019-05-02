@@ -81,13 +81,19 @@ struct FunctionNode : public StatementNode {
         return ret;
     }
     
-    virtual void generateQuad(GenerationContext* generationContext) {
-        cout << "PROC " << name->name << endl;
-        for (int i = 0; i < paramList.size(); ++i) {
-            paramList[i]->generateQuad(generationContext);
+    virtual string generateQuad(GenerationContext* generationContext) {
+        string ret = "";
+		
+		ret += "PROC " + name->name + "\n";
+        
+		for (int i = 0; i < paramList.size(); ++i) {
+            ret += paramList[i]->generateQuad(generationContext);
         }
-        body->generateQuad(generationContext);
-        cout << "ENDP " << name->name << endl;
+		
+        ret += body->generateQuad(generationContext);
+        ret += "ENDP " + name->name + "\n";
+		
+		return ret;
     } 
 };
 
@@ -161,11 +167,16 @@ struct FunctionCallNode : public ExpressionNode {
         return ret += ")";
     }
     
-    virtual void generateQuad(GenerationContext* generationContext) {
+    virtual string generateQuad(GenerationContext* generationContext) {
+		string ret = "";
+		
         for (int i = argList.size() - 1; i >= 0; --i) {
-            argList[i]->generateQuad(generationContext);
+            ret += argList[i]->generateQuad(generationContext);
         }
-        cout << "CALL " << name->name << endl;
+		
+        ret += "CALL " + name->name + "\n";
+		
+		return ret;
     }
     
 };

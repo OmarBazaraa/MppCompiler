@@ -47,22 +47,27 @@ struct WhileNode : public StatementNode {
         return ret;
     }
     
-    virtual void generateQuad(GenerationContext* generationContext) {
-        int label1 = generationContext->labelCounter++, label2 = generationContext->labelCounter++;
-        cout << "L" << label1 << ":" << endl;
-        cond->generateQuad(generationContext);
-        cout << "JZ L" << label2 << endl;
+    virtual string generateQuad(GenerationContext* generationContext) {
+		string ret = "";
+        int label1 = generationContext->labelCounter++;
+		int label2 = generationContext->labelCounter++;
+		
+        ret += "L" + to_string(label1) + ":\n";
+        ret += cond->generateQuad(generationContext);
+        ret += "JZ L" + to_string(label2) + "\n";
         
         generationContext->breakLabels.push(label2);
         generationContext->continueLabels.push(label1);
         
-        body->generateQuad(generationContext);
+        ret += body->generateQuad(generationContext);
         
         generationContext->breakLabels.pop();
         generationContext->continueLabels.pop();
         
-        cout << "JMP L" << label1 << endl;
-        cout << "L" << label2 << ":" << endl;
+        ret += "JMP L" + to_string(label1) + "\n";
+        ret += "L" + to_string(label2) + ":\n";
+		
+		return ret;
     }
   
 };
@@ -109,22 +114,28 @@ struct DoWhileNode : public StatementNode {
         return ret;
     }
     
-    virtual void generateQuad(GenerationContext* generationContext) {
-        int label1 = generationContext->labelCounter++, label2 = generationContext->labelCounter++, label3 = generationContext->labelCounter++;
-        cout << "L" << label1 << ":" << endl;
+    virtual string generateQuad(GenerationContext* generationContext) {
+		string ret = "";
+        int label1 = generationContext->labelCounter++;
+		int label2 = generationContext->labelCounter++;
+		int label3 = generationContext->labelCounter++;
+
+        ret += "L" + to_string(label1) + ":\n";
         
         generationContext->breakLabels.push(label3);
         generationContext->continueLabels.push(label2);
         
-        body->generateQuad(generationContext);
+        ret += body->generateQuad(generationContext);
         
         generationContext->breakLabels.pop();
         generationContext->continueLabels.pop();
         
-        cout << "L" << label2 << ":" << endl;
-        cond->generateQuad(generationContext);
-        cout << "JNZ L" << label1 << endl;
-        cout << "L" << label3 << ":" << endl;
+        ret += "L" + to_string(label2) + ":\n";
+        ret += cond->generateQuad(generationContext);
+        ret += "JNZ L" + to_string(label1) + "\n";
+        ret += "L" + to_string(label3) + ":\n";
+		
+		return ret;
     }
    
 };
@@ -197,35 +208,46 @@ struct ForNode : public StatementNode {
      * 
      * L5 (exit)
      **/
-    virtual void generateQuad(GenerationContext* generationContext) {
+    virtual string generateQuad(GenerationContext* generationContext) {
+		string ret = "";
         int label1 = generationContext->labelCounter++;
         int label2 = generationContext->labelCounter++;
         int label3 = generationContext->labelCounter++;
         int label4 = generationContext->labelCounter++;
         int label5 = generationContext->labelCounter++;           
                                                                                 
-        if (initStmt) initStmt->generateQuad(generationContext);                                    
-        cout << "L" << label1 << ":" << endl;                                   
-        if (cond) cond->generateQuad(generationContext);                                        
-        cout << "JMP L" << label4 << endl;                                      
-        cout << "L" << label2 << ":" << endl;                                   
-        if (inc) inc->generateQuad(generationContext);                                         
-        cout << "JMP L" << label1 << endl;                                      
-        cout << "L" << label3 << ":" << endl;   
+        if (initStmt) 
+			ret += initStmt->generateQuad(generationContext);                                    
+        
+		ret += "L" + to_string(label1) + ":\n";                                   
+        
+		if (cond) 
+			ret += cond->generateQuad(generationContext);                                        
+        
+		ret += "JMP L" + to_string(label4) + "\n";                                      
+        ret += "L" + to_string(label2) + ":\n";                                   
+        
+		if (inc) 
+			ret += inc->generateQuad(generationContext);                                         
+		
+        ret += "JMP L" + to_string(label1) + "\n";                                      
+        ret += "L" + to_string(label3) + ":\n";   
         
         generationContext->breakLabels.push(label5);
         generationContext->continueLabels.push(label2);
         
-        body->generateQuad(generationContext);
+        ret += body->generateQuad(generationContext);
         
         generationContext->breakLabels.pop();
         generationContext->continueLabels.pop();
         
-        cout << "JMP L" << label2 << endl;                                      
-        cout << "L" << label4 << ":" << endl;                                   
-        cout << "JZ L" << label5 << endl;                                       
-        cout << "JMP L" << label3 << endl;                                      
-        cout << "L" << label5 << ":" << endl;
+        ret += "JMP L" + to_string(label2) + "\n";                                      
+        ret += "L" + to_string(label4) + ":\n";                                   
+        ret += "JZ L" + to_string(label5) + "\n";                                       
+        ret += "JMP L" + to_string(label3) + "\n";                                      
+        ret += "L" + to_string(label5) + ":\n";
+		
+		return ret;
     }
     
 };

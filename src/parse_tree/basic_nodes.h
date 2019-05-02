@@ -50,8 +50,8 @@ struct StatementNode {
         return string(ind, ' ') + ";" ;
     }
     
-    virtual void generateQuad(GenerationContext* generationContext) {
-        
+    virtual string generateQuad(GenerationContext* generationContext) {
+        return "";
     }
     
 };
@@ -79,8 +79,8 @@ struct ExpressionNode : public StatementNode {
         }
     }
     
-    virtual void generateQuad(GenerationContext* generationContext) {
-        
+    virtual string generateQuad(GenerationContext* generationContext) {
+        return "";
     }
 };
 
@@ -117,8 +117,8 @@ struct ExprContainerNode : public ExpressionNode {
         return expr->toString(ind);
     }
 	
-	virtual void generateQuad(GenerationContext* generationContext) {
-        expr->generateQuad(generationContext);
+	virtual string generateQuad(GenerationContext* generationContext) {
+        return expr->generateQuad(generationContext);
     }
 };
 

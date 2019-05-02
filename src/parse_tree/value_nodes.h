@@ -23,8 +23,9 @@ struct TypeNode : public StatementNode {
         return string(ind, ' ') + Utils::dtypeToStr(type);
     }
     
-    virtual void generateQuad(GenerationContext* generationContext) {
+    virtual string generateQuad(GenerationContext* generationContext) {
         // TODO: Should it be empty ?
+		return "";
     }
     
 };
@@ -49,9 +50,9 @@ struct ValueNode : public ExpressionNode {
         return string(ind, ' ') + value;
     }
     
-    virtual void generateQuad(GenerationContext* generationContext) {
+    virtual string generateQuad(GenerationContext* generationContext) {
         // is this correct ?
-        cout << "PUSH " << value << endl;
+        return "PUSH " + value + "\n";
     }
     
 };
@@ -90,8 +91,8 @@ struct IdentifierNode : public ExpressionNode {
         return string(ind, ' ') + name;
     }
     
-    virtual void generateQuad(GenerationContext* generationContext) {
-        cout << "PUSH " << name << endl;
+    virtual string generateQuad(GenerationContext* generationContext) {
+        return "PUSH " + name + "\n";
     }
     
 };
