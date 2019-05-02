@@ -54,9 +54,6 @@ struct StatementNode {
         
     }
     
-    virtual void generateQuad(GenerationContext* generationContext) {
-        
-    }
 };
 
 /**
@@ -121,7 +118,7 @@ struct ExprContainerNode : public ExpressionNode {
     }
 	
 	virtual void generateQuad(GenerationContext* generationContext) {
-        
+        expr->generateQuad(generationContext);
     }
 };
 
