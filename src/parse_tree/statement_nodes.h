@@ -128,8 +128,8 @@ struct VarDeclarationNode : public StatementNode {
         if (value) {
             value->generateQuad(generationContext);
         }
-        
-        cout << "POP " << name->name << endl; 
+		
+		cout << "POP " << name->name << endl; 
     }
 };
 

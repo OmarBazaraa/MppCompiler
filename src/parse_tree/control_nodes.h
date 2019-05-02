@@ -156,22 +156,7 @@ struct CaseLabelNode : public StatementNode {
     }
 	
 	virtual void generateQuad(GenerationContext* generationContext) {
-        if (isDefault) {
-            for (int i = 0; i < body.size(); ++i) {
-                body[i]->generateQuad(generationContext);
-            }
-        }
-        else {
-            int label1 = generationContext->labelCounter++;
-            expr->generateQuad(generationContext);
-            cout << "JZ L" << label1 << endl;
-            
-            for (int i = 0; i < body.size(); ++i) {
-                body[i]->generateQuad(generationContext);
-            }
-            
-            cout << "L" << label1 << endl;
-        }
+        
     }
 };
 
@@ -226,16 +211,7 @@ struct SwitchNode : public StatementNode {
     }
     
     virtual void generateQuad(GenerationContext* generationContext) {
-        int label1 = generationContext->labelCounter++;
-        generationContext->breakLabels.push(label1);
-        
-        for (int i = 0; i < caseList.size(); ++i) {
-            cond->generateQuad(generationContext);
-            caseList[i]->generateQuad(generationContext);
-        }
-        
-        generationContext->breakLabels.pop();
-        cout << "L" << label1 << ":" << endl;
+		
     }
 };
 

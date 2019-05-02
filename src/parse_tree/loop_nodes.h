@@ -202,12 +202,12 @@ struct ForNode : public StatementNode {
         int label4 = generationContext->labelCounter++;
         int label5 = generationContext->labelCounter++;           
                                                                                 
-        initStmt->generateQuad(generationContext);                                    
+        if (initStmt) initStmt->generateQuad(generationContext);                                    
         cout << "L" << label1 << ":" << endl;                                   
-        cond->generateQuad(generationContext);                                        
+        if (cond) cond->generateQuad(generationContext);                                        
         cout << "JMP L" << label4 << endl;                                      
         cout << "L" << label2 << ":" << endl;                                   
-        inc->generateQuad(generationContext);                                         
+        if (inc) inc->generateQuad(generationContext);                                         
         cout << "JMP L" << label1 << endl;                                      
         cout << "L" << label3 << ":" << endl;   
         

@@ -116,7 +116,7 @@ struct ExprContainerNode : public ExpressionNode {
         return expr->toString(ind);
     }
 	
-	virtual void generateQuad(QuadrupleContext* quadContext) {
+	virtual void generateQuad(GenerationContext* generationContext) {
         
     }
 };
