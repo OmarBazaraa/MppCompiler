@@ -84,29 +84,6 @@ struct IfNode : public StatementNode {
         }
     }
     
-    virtual void generateQuad(GenerationContext* generationContext) {
-        int label1 = generationContext->labelCounter++;
-        cond->generateQuad(generationContext);
-        if (elseBody) {
-            int label2 = generationContext->labelCounter++;
-            cout << "JZ L" << label1 << endl;
-            
-            ifBody->generateQuad(generationContext);
-            
-            cout << "JMP L" << label2 << endl;
-            cout << "L" << label1 << ":" << endl;
-            
-            elseBody->generateQuad(generationContext);
-            
-            cout << "L" << label2 << ":" << endl;
-        } else {
-            cout << "JZ L" << label1 << endl;
-            
-            ifBody->generateQuad(generationContext);
-            
-            cout << "L" << label1 << ":" << endl;
-        }
-    }
 };
 
 /**
@@ -238,18 +215,6 @@ struct SwitchNode : public StatementNode {
 		
     }
     
-    virtual void generateQuad(GenerationContext* generationContext) {
-        int label1 = generationContext->labelCounter++;
-        generationContext->breakLabels.push(label1);
-        
-        for (int i = 0; i < caseList.size(); ++i) {
-            cond->generateQuad(generationContext);
-            caseList[i]->generateQuad(generationContext);
-        }
-        
-        generationContext->breakLabels.pop();
-        cout << "L" << label1 << ":" << endl;
-    }
 };
 
 #endif

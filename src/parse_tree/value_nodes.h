@@ -27,9 +27,6 @@ struct TypeNode : public StatementNode {
         // TODO: Should it be empty ?
     }
     
-    virtual void generateQuad(GenerationContext* generationContext) {
-        // TODO: Should it be empty ?
-    }
 };
 
 /**
@@ -57,10 +54,6 @@ struct ValueNode : public ExpressionNode {
         cout << "PUSH " << value << endl;
     }
     
-    virtual void generateQuad(GenerationContext* generationContext) {
-        // is this correct ?
-        cout << "PUSH " << value << endl;
-    }
 };
 
 /**
@@ -101,9 +94,6 @@ struct IdentifierNode : public ExpressionNode {
         cout << "PUSH " << name << endl;
     }
     
-    virtual void generateQuad(GenerationContext* generationContext) {
-        cout << "PUSH " << name << endl;
-    }
 };
 
 #endif

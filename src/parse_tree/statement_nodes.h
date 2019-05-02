@@ -59,11 +59,6 @@ struct BlockNode : public StatementNode {
         }
     }
     
-    virtual void generateQuad(GenerationContext* generationContext) {
-        for (int i = 0; i < statements.size(); ++i) {
-            statements[i]->generateQuad(generationContext);
-        }
-    }
 };
 
 /**
@@ -138,13 +133,6 @@ struct VarDeclarationNode : public StatementNode {
 		cout << "POP " << name->name << endl; 
     }
     
-    virtual void generateQuad(GenerationContext* generationContext) {
-        if (value) {
-            value->generateQuad(generationContext);
-        }
-        
-        cout << "POP " << name->name << endl; 
-    }
 };
 
 /**
@@ -171,9 +159,6 @@ struct BreakStmtNode : public StatementNode {
         cout << "JMP L" << generationContext->breakLabels.top() << endl; 
     }
     
-    virtual void generateQuad(GenerationContext* generationContext) {
-        cout << "JMP L" << generationContext->breakLabels.top() << endl; 
-    }
 };
 
 /**
@@ -200,9 +185,6 @@ struct ContinueStmtNode : public StatementNode {
         cout << "JMP L" << generationContext->continueLabels.top() << endl; 
     }
     
-    virtual void generateQuad(GenerationContext* generationContext) {
-        cout << "JMP L" << generationContext->continueLabels.top() << endl; 
-    }
 };
 
 /**

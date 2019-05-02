@@ -17,7 +17,7 @@ int solve(int idx, int prv) {
         continue;
     }
 
-    return ((idx + prv) * 5) & solve(idx + 1, prv ^ ~23523);
+    return ((idx + prv) * 5) & solve(idx + 1, prv ^ 23523);
 }
 
 void func(const int x) {
@@ -27,9 +27,8 @@ void func(const int x) {
 int main() {
     const int x = 5;
 
-    int a = !6.6;
+    int a = 'C';
 
-    case 5:;
 
     switch (x) {
         case 5:
@@ -38,7 +37,6 @@ int main() {
                     func(0);
         case x:
             func(5);
-        default:
         default:
             return 0;
     }

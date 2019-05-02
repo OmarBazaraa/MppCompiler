@@ -29,27 +29,6 @@ typedef vector<VarDeclarationNode*> VarList;
 
 
 /**
-<<<<<<< HEAD
-=======
- * The base class of all parse tree nodes.
- */
-struct Node {
-
-    virtual ~Node() {
-
-    }
-
-    virtual void print(int ind = 0) {
-        
-    }
-    
-    virtual void generateQuad(GenerationContext* generationContext) {
-        
-    }
-};
-
-/**
->>>>>>> e71b204ae7ac0d53a7d71586167117e2ddab5887
  * The base class of all statement nodes in the parse tree.
  */
 struct StatementNode {
@@ -75,9 +54,6 @@ struct StatementNode {
         
     }
     
-    virtual void generateQuad(GenerationContext* generationContext) {
-        
-    }
 };
 
 /**
@@ -142,7 +118,7 @@ struct ExprContainerNode : public ExpressionNode {
     }
 	
 	virtual void generateQuad(GenerationContext* generationContext) {
-        
+        expr->generateQuad(generationContext);
     }
 };
 

@@ -63,10 +63,6 @@ struct AssignOprNode : public ExpressionNode {
         cout << "POP " << lhs->reference << endl;
     }
     
-    virtual void generateQuad(GenerationContext* generationContext) {
-        value->generateQuad(generationContext);
-        cout << "POP " << name->name << endl;
-    }
 };
 
 /**
@@ -126,11 +122,6 @@ struct BinaryOprNode : public ExpressionNode {
         cout << Utils::binOprToQuad(opr) << endl;
     }
     
-    virtual void generateQuad(GenerationContext* generationContext) {
-        lhs->generateQuad(generationContext);
-        rhs->generateQuad(generationContext);
-        cout << Utils::binOprToQuad(opr) << endl;
-    }
 };
 
 /**
@@ -228,34 +219,6 @@ struct UnaryOprNode : public ExpressionNode {
         }
     }
     
-    virtual void generateQuad(GenerationContext* generationContext) {
-        switch (opr) {
-            case OPR_U_MINUS:
-                expr->generateQuad(generationContext);
-                cout << "NEG" << endl;
-                break;
-            case OPR_PRE_INC:
-                expr->generateQuad(generationContext);
-                cout << "PUSH 1" << endl;
-                cout << "ADD" << endl;
-                break;
-            case OPR_SUF_INC:
-                expr->generateQuad(generationContext);
-                cout << "PUSH 1" << endl;
-                cout << "ADD" << endl;
-                break;
-            case OPR_PRE_DEC:
-                expr->generateQuad(generationContext);
-                cout << "PUSH 1" << endl;
-                cout << "SUB" << endl;
-                break;
-            case OPR_SUF_DEC:
-                expr->generateQuad(generationContext);
-                cout << "PUSH 1" << endl;
-                cout << "SUB" << endl;
-                break;
-        }
-    }
 };
 
 #endif
