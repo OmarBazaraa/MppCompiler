@@ -62,6 +62,11 @@ struct AssignOprNode : public ExpressionNode {
         rhs->generateQuad(generationContext);
         cout << "POP " << lhs->reference << endl;
     }
+    
+    virtual void generateQuad(GenerationContext* generationContext) {
+        value->generateQuad(generationContext);
+        cout << "POP " << name->name << endl;
+    }
 };
 
 /**
@@ -113,6 +118,12 @@ struct BinaryOprNode : public ExpressionNode {
 
     virtual string toString(int ind = 0) {
         return string(ind, ' ') + "(" + lhs->toString() + " " + Utils::oprToStr(opr) + " " + rhs->toString() + ")";
+    }
+    
+    virtual void generateQuad(GenerationContext* generationContext) {
+        lhs->generateQuad(generationContext);
+        rhs->generateQuad(generationContext);
+        cout << Utils::binOprToQuad(opr) << endl;
     }
     
     virtual void generateQuad(GenerationContext* generationContext) {
@@ -186,6 +197,35 @@ struct UnaryOprNode : public ExpressionNode {
         }
 
         return ret += ")";
+    }
+    
+    virtual void generateQuad(GenerationContext* generationContext) {
+        switch (opr) {
+            case OPR_U_MINUS:
+                expr->generateQuad(generationContext);
+                cout << "NEG" << endl;
+                break;
+            case OPR_PRE_INC:
+                expr->generateQuad(generationContext);
+                cout << "PUSH 1" << endl;
+                cout << "ADD" << endl;
+                break;
+            case OPR_SUF_INC:
+                expr->generateQuad(generationContext);
+                cout << "PUSH 1" << endl;
+                cout << "ADD" << endl;
+                break;
+            case OPR_PRE_DEC:
+                expr->generateQuad(generationContext);
+                cout << "PUSH 1" << endl;
+                cout << "SUB" << endl;
+                break;
+            case OPR_SUF_DEC:
+                expr->generateQuad(generationContext);
+                cout << "PUSH 1" << endl;
+                cout << "SUB" << endl;
+                break;
+        }
     }
     
     virtual void generateQuad(GenerationContext* generationContext) {
