@@ -52,10 +52,11 @@ Run `make run` to run the recently built compiler.
 2. Undeclared identifier access.
 3. Constant assignment after declaration.
 4. Invalid operand types. (i.e. operands of type `void` or pointer to function).
-5. Float operand to logical operators.
-6. Increment and decrement operators with `rvalue` operand.
-7. `switch` and `case` statements with non integer expression.
-8. `case`-statement with non-constant expression.
+5. Float operand to modulus operator.
+6. Float operand to bitwise operators.
+7. Increment and decrement operators with `rvalue` operand.
+8. `switch` and `case` statements with non integer expression.
+9. `case`-statement with non-constant expression.
 
 ### Function-related errors
 1. Value returned in `void` function and vice-versa.
