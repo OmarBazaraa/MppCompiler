@@ -66,10 +66,20 @@ struct ExpressionNode : public StatementNode {
     DataType type = DTYPE_ERROR;    // data type of the expression
     Symbol* reference = NULL;       // reference of the expression is exist
     bool isConst = false;           // whether the expression is of constant value or not
+    bool used = false;              // whether the value of the expression is used or not
 
     ExpressionNode() {}
 
     ExpressionNode(const Location& loc) : StatementNode(loc) {}
+    
+    virtual bool analyze(ScopeContext* context) {
+        return analyze(context, false);
+    }
+
+    virtual bool analyze(ScopeContext* context, bool valueUsed) {
+        used = valueUsed;
+        return true;
+    }
 
     virtual string getType() {
         if (reference) {
@@ -98,7 +108,7 @@ struct ExprContainerNode : public ExpressionNode {
         if (expr) delete expr;
     }
 
-    virtual bool analyze(ScopeContext* context) {
+    virtual bool analyze(ScopeContext* context, bool valueUsed) {
         if (!context->initializeVar && context->isGlobalScope()) {
             context->printError("expression is not allowed in global scope", loc);
             return false;
@@ -109,6 +119,7 @@ struct ExprContainerNode : public ExpressionNode {
         type = expr->type;
         reference = expr->reference;
         isConst = expr->isConst;
+        used = valueUsed;
 
         return ret;
     }

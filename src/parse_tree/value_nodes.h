@@ -40,7 +40,8 @@ struct ValueNode : public ExpressionNode {
         this->isConst = true;
     }
 
-    virtual bool analyze(ScopeContext* context) {
+    virtual bool analyze(ScopeContext* context, bool valueUsed) {
+        used = valueUsed;
         return true;
     }
 
@@ -63,7 +64,7 @@ struct IdentifierNode : public ExpressionNode {
         this->name = name;
     }
 
-    virtual bool analyze(ScopeContext* context) {
+    virtual bool analyze(ScopeContext* context, bool valueUsed) {
         Symbol* ptr = context->getSymbol(name);
 
         if (ptr == NULL) {
@@ -80,6 +81,12 @@ struct IdentifierNode : public ExpressionNode {
             isConst = ((Var*) ptr)->isConst;
         }
 
+        used = valueUsed;
+
+        if (used) {
+            ptr->used = true;
+        }
+        
         return true;
     }
 

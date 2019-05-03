@@ -67,7 +67,18 @@ public:
         scopes.pop_back();
 
         for (auto& it : scope->table) {
-            aliases[it.first]--;
+            Symbol* sym = it.second;
+
+            if (!sym->used) {
+                if (dynamic_cast<Var*>(sym)) {
+                    printWarning("the value of variable '" + sym->header() + "' is never used");
+                }
+                else if (sym->identifier != "main") {
+                    printWarning("function '" + sym->header() + "' is never called");
+                }
+            }
+            
+            aliases[sym->identifier]--;
         }
 
         delete scope;
@@ -188,6 +199,13 @@ public:
         }
 
         return false;
+    }
+
+    /**
+     * Prints warning message.
+     */
+    void printWarning(const string& what) {
+        fprintf(stdout, "warning: %s\n", what.c_str());
     }
 
     /**

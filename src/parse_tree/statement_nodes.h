@@ -104,7 +104,7 @@ struct VarDeclarationNode : public StatementNode {
 
         if (value) {
             context->initializeVar = true;
-            ret &= value->analyze(context);
+            ret &= value->analyze(context, true);
             context->initializeVar = false;
         }
 
@@ -218,7 +218,7 @@ struct ReturnStmtNode : public StatementNode {
         }
 
         if (value) {    // return expression exists
-            if (!value->analyze(context)) {
+            if (!value->analyze(context, true)) {
                 return false;
             }
 

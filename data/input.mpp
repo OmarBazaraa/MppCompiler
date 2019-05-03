@@ -1,17 +1,12 @@
 
-char fun(int y) {
-	return 5;
+void func() {
+
 }
 
 int main() {
-    int x = fun(true);
-	if (x > 3 && fun(15) > 50) {
-		int y = x + 5;
-		int x = y + 5;
-		x = x + 16;
-	}
-	
-	while (x) {
-		int z = x--;
-	}
+	int x = 1;
+	int y = 2;
+	int z = 3;
+
+    ((((++x) = y++) = 7) = (z = 8));
 }

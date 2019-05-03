@@ -23,8 +23,8 @@ struct AssignOprNode : public ExpressionNode {
         if (rhs) delete rhs;
     }
 
-    virtual bool analyze(ScopeContext* context) {
-        if (!(rhs->analyze(context) & lhs->analyze(context))) {
+    virtual bool analyze(ScopeContext* context, bool valueUsed) {
+        if (!(rhs->analyze(context, true) & lhs->analyze(context, valueUsed))) {
             // Note that I used a bitwise AND to execute both lhs and rhs expressions
             return false;
         }
@@ -49,6 +49,7 @@ struct AssignOprNode : public ExpressionNode {
         type = lhs->type;
         reference = lhs->reference;
         isConst = lhs->isConst;
+        used = valueUsed;
 
         return true;
     }
@@ -91,8 +92,8 @@ struct BinaryOprNode : public ExpressionNode {
         if (rhs) delete rhs;
     }
 
-    virtual bool analyze(ScopeContext* context) {
-        if (!(lhs->analyze(context) & rhs->analyze(context))) {
+    virtual bool analyze(ScopeContext* context, bool valueUsed) {
+        if (!(lhs->analyze(context, valueUsed) & rhs->analyze(context, valueUsed))) {
             // Note that I used a bitwise AND to execute both lhs and rhs expressions
             return false;
         }
@@ -111,6 +112,7 @@ struct BinaryOprNode : public ExpressionNode {
         }
 
         isConst = (lhs->isConst && rhs->isConst);
+        used = valueUsed;
 
         return true;
     }
@@ -156,8 +158,8 @@ struct UnaryOprNode : public ExpressionNode {
         if (expr) delete expr;
     }
 
-    virtual bool analyze(ScopeContext* context) {
-        if (!expr->analyze(context)) {
+    virtual bool analyze(ScopeContext* context, bool valueUsed) {
+        if (!expr->analyze(context, valueUsed)) {
             return false;
         }
 
@@ -181,6 +183,7 @@ struct UnaryOprNode : public ExpressionNode {
         type = (Utils::isLogicalOpr(opr) ? DTYPE_BOOL : expr->type);
         reference = (Utils::isLvalueOpr(opr) ? expr->reference : NULL);
         isConst = expr->isConst;
+        used = valueUsed;
 
         return true;
     }

@@ -120,7 +120,7 @@ struct FunctionCallNode : public ExpressionNode {
         }
     }
 
-    virtual bool analyze(ScopeContext* context) {
+    virtual bool analyze(ScopeContext* context, bool valueUsed) {
         bool ret = true;
 
         Symbol* ptr = context->getSymbol(name->name);
@@ -146,7 +146,7 @@ struct FunctionCallNode : public ExpressionNode {
         }
 
         for (int i = 0; i < argList.size(); ++i) {
-            if (!argList[i]->analyze(context)) {
+            if (!argList[i]->analyze(context, true)) {
                 ret = false;
                 continue;
             }
@@ -157,6 +157,12 @@ struct FunctionCallNode : public ExpressionNode {
                     func->header() + "' call", argList[i]->loc);
                 return false;
             }
+        }
+
+        used = valueUsed;
+
+        if (ret) {
+            func->used = true;
         }
 
         return ret;

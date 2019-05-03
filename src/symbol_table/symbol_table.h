@@ -20,6 +20,7 @@ struct Symbol {
     DataType type;
     string identifier;
     string alias;
+    bool used = false;
 
     virtual string header() {
         return Utils::dtypeToStr(type) + " " + identifier;
