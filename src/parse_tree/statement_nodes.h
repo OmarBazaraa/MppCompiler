@@ -137,7 +137,7 @@ struct VarDeclarationNode : public StatementNode {
         }
 
         if (value || generationContext->declareFuncParams) {
-            ret += Utils::oprToQuad(Operator::OPR_POP, type->type) + name->name + "\n";
+            ret += Utils::oprToQuad(Operator::OPR_POP, type->type) + var.alias + "\n";
         }
 
         return ret;

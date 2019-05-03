@@ -84,7 +84,7 @@ struct FunctionNode : public StatementNode {
     virtual string generateQuad(GenerationContext* generationContext) {
         string ret = "";
 
-        ret += "PROC " + name->name + "\n";
+        ret += "PROC " + func.alias + "\n";
         generationContext->declareFuncParams = true;
 
         for (int i = 0; i < paramList.size(); ++i) {
@@ -93,7 +93,7 @@ struct FunctionNode : public StatementNode {
 
         generationContext->declareFuncParams = false;
         ret += body->generateQuad(generationContext);
-        ret += "ENDP " + name->name + "\n";
+        ret += "ENDP " + func.alias + "\n";
 
         return ret;
     }
@@ -178,7 +178,7 @@ struct FunctionCallNode : public ExpressionNode {
 			ret += Utils::dtypeConvQuad(argList[i]->type, func->paramList[i].type);
         }
 
-        ret += "CALL " + name->name + "\n";
+        ret += "CALL " + func->alias + "\n";
 
         return ret;
     }

@@ -66,7 +66,7 @@ struct AssignOprNode : public ExpressionNode {
 
         ret += rhs->generateQuad(generationContext);
         ret += Utils::dtypeConvQuad(rhs->type, type);
-        ret += Utils::oprToQuad(Operator::OPR_POP, type) + lhs->reference->identifier + "\n";
+        ret += Utils::oprToQuad(Operator::OPR_POP, type) + lhs->reference->alias + "\n";
 
         return ret;
     }
@@ -211,16 +211,16 @@ struct UnaryOprNode : public ExpressionNode {
             case OPR_PRE_INC:
 			case OPR_PRE_DEC:
                 ret += Utils::oprToQuad(opr, type) + "\n";
-                ret += Utils::oprToQuad(Operator::OPR_POP, type) + expr->reference->identifier + "\n";
-                ret += Utils::oprToQuad(Operator::OPR_PUSH, type) + expr->reference->identifier + "\n";
+                ret += Utils::oprToQuad(Operator::OPR_POP, type) + expr->reference->alias + "\n";
+                ret += Utils::oprToQuad(Operator::OPR_PUSH, type) + expr->reference->alias + "\n";
                 break;
             case OPR_SUF_INC:
 			case OPR_SUF_DEC:
-                ret += Utils::oprToQuad(Operator::OPR_POP, type)  + expr->reference->identifier + "\n";
-                ret += Utils::oprToQuad(Operator::OPR_PUSH, type) + expr->reference->identifier + "\n";
-                ret += Utils::oprToQuad(Operator::OPR_PUSH, type) + expr->reference->identifier + "\n";
+                ret += Utils::oprToQuad(Operator::OPR_POP, type)  + expr->reference->alias + "\n";
+                ret += Utils::oprToQuad(Operator::OPR_PUSH, type) + expr->reference->alias + "\n";
+                ret += Utils::oprToQuad(Operator::OPR_PUSH, type) + expr->reference->alias + "\n";
                 ret += Utils::oprToQuad(opr, type) + "\n";
-                ret += Utils::oprToQuad(Operator::OPR_POP, type) + expr->reference->identifier + "\n";
+                ret += Utils::oprToQuad(Operator::OPR_POP, type) + expr->reference->alias + "\n";
                 break;
 			case OPR_U_MINUS:
 			case OPR_NOT:
