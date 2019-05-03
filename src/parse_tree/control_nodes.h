@@ -168,7 +168,7 @@ struct CaseLabelNode : public StatementNode {
 		
 		string ret = "";
         int label1 = generationContext->labelCounter++;
-			
+		
 		ret += "PUSH SWITCH_COND@" + to_string(generationContext->breakLabels.top()) + "\n";
         ret += expr->generateQuad(generationContext);
 		ret += "EQU\n";

@@ -254,7 +254,6 @@ struct ReturnStmtNode : public StatementNode {
 		
 		return ret;
     }
-	
 };
 
 #endif
