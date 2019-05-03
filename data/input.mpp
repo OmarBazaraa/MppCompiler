@@ -38,7 +38,7 @@ int main() {
                 case x:
                     func(0);
         case x:
-            func(5);
+            func((c + a) * 5);
         default:
             return 0;
     }

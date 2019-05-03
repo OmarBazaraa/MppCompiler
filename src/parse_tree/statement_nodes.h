@@ -133,9 +133,12 @@ struct VarDeclarationNode : public StatementNode {
 		
         if (value) {
             ret += value->generateQuad(generationContext);
+			ret += Utils::dtypeConvQuad(value->type, type->type);
         }
 		
-		ret += "POP " + name->name + "\n"; 
+		if (value || generationContext->declareFuncParams) {
+			ret += "POP " + name->name + "\n"; 
+		}		
 		
 		return ret;
     }

@@ -169,9 +169,7 @@ struct CaseLabelNode : public StatementNode {
 		string ret = "";
         int label1 = generationContext->labelCounter++;
 			
-		ret += "POP T" + to_string(generationContext->breakLabels.top()) + "\n";
-		ret += "PUSH T" + to_string(generationContext->breakLabels.top()) + "\n";
-		ret += "PUSH T" + to_string(generationContext->breakLabels.top()) + "\n";
+		ret += "PUSH SWITCH_COND@" + to_string(generationContext->breakLabels.top()) + "\n";
         ret += expr->generateQuad(generationContext);
 		ret += "EQU\n";
         ret += "JZ L" + to_string(label1) + "\n";
@@ -237,6 +235,7 @@ struct SwitchNode : public StatementNode {
 		int label1 = generationContext->labelCounter++;
 		
 		ret += cond->generateQuad(generationContext);
+		ret += "POP SWITCH_COND@" + to_string(label1) + "\n";
         generationContext->breakLabels.push(label1);
         
         ret += body->generateQuad(generationContext);

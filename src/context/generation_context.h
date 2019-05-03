@@ -17,9 +17,12 @@ struct GenerationContext {
 
     stack<int> breakLabels, continueLabels;
     int labelCounter;
+	
+	bool declareFuncParams;
 
     GenerationContext() {
         labelCounter = 1;
+		declareFuncParams = false;
     }
 };
 

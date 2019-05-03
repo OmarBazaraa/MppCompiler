@@ -85,11 +85,13 @@ struct FunctionNode : public StatementNode {
         string ret = "";
 		
 		ret += "PROC " + name->name + "\n";
+		generationContext->declareFuncParams = true;
         
 		for (int i = 0; i < paramList.size(); ++i) {
             ret += paramList[i]->generateQuad(generationContext);
         }
 		
+		generationContext->declareFuncParams = false;
         ret += body->generateQuad(generationContext);
         ret += "ENDP " + name->name + "\n";
 		

@@ -129,7 +129,7 @@ struct BinaryOprNode : public ExpressionNode {
 		
         ret += rhs->generateQuad(generationContext);
 		ret += Utils::dtypeConvQuad(rhs->type, type);
-        ret += Utils::binOprToQuad(opr) + "\n";
+        ret += Utils::binOprToQuad(opr, type) + "\n";
 		
 		return ret;
     }
