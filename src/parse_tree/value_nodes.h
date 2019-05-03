@@ -88,7 +88,7 @@ struct IdentifierNode : public ExpressionNode {
     }
 
     virtual string generateQuad(GenerationContext* generationContext) {
-        return Utils::oprToQuad(Operator::OPR_PUSH, type) + name + "\n";
+        return Utils::oprToQuad(Operator::OPR_PUSH, type) + reference->alias + "\n";
     }
 };
 
