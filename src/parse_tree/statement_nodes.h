@@ -165,7 +165,7 @@ struct BreakStmtNode : public StatementNode {
     }
 
     virtual string generateQuad(GenerationContext* generationContext) {
-        return Utils::oprToQuad(Operator::OPR_JMP, DataType::DTYPE_ERROR) + "L" + to_string(generationContext->breakLabels.top()) + "\n";
+        return Utils::oprToQuad(Operator::OPR_JMP) + "L" + to_string(generationContext->breakLabels.top()) + "\n";
     }
 };
 
@@ -190,7 +190,7 @@ struct ContinueStmtNode : public StatementNode {
     }
 
     virtual string generateQuad(GenerationContext* generationContext) {
-        return Utils::oprToQuad(Operator::OPR_JMP, DataType::DTYPE_ERROR) + "L" + to_string(generationContext->continueLabels.top()) + "\n";
+        return Utils::oprToQuad(Operator::OPR_JMP) + "L" + to_string(generationContext->continueLabels.top()) + "\n";
     }
 };
 

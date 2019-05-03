@@ -71,7 +71,7 @@ struct IfNode : public StatementNode {
         if (elseBody) {
             int label2 = generationContext->labelCounter++;
 
-            ret += Utils::oprToQuad(Operator::OPR_JMP, DataType::DTYPE_ERROR) + "L" + to_string(label2) + "\n";
+            ret += Utils::oprToQuad(Operator::OPR_JMP) + "L" + to_string(label2) + "\n";
             ret += "L" + to_string(label1) + ":\n";
             ret += elseBody->generateQuad(generationContext);
             ret += "L" + to_string(label2) + ":\n";

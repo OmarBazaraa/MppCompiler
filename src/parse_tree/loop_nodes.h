@@ -63,7 +63,7 @@ struct WhileNode : public StatementNode {
         generationContext->breakLabels.pop();
         generationContext->continueLabels.pop();
 
-        ret += Utils::oprToQuad(Operator::OPR_JMP, DataType::DTYPE_ERROR) + "L" + to_string(label1) + "\n";
+        ret += Utils::oprToQuad(Operator::OPR_JMP) + "L" + to_string(label1) + "\n";
         ret += "L" + to_string(label2) + ":\n";
 
         return ret;
@@ -232,7 +232,7 @@ struct ForNode : public StatementNode {
 		if (inc)
             ret += inc->generateQuad(generationContext);
             
-        ret += Utils::oprToQuad(Operator::OPR_JMP, DataType::DTYPE_ERROR) + "L" + to_string(label1) + "\n";
+        ret += Utils::oprToQuad(Operator::OPR_JMP) + "L" + to_string(label1) + "\n";
 		ret += "L" + to_string(label3) + ":\n";
 
         return ret;

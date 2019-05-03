@@ -51,7 +51,8 @@ enum DataType {
     DTYPE_INT,
     DTYPE_FLOAT,
     DTYPE_FUNC_PTR,
-    DTYPE_ERROR
+    DTYPE_ERROR,
+    DTYPE_UNKNOWN
 };
 
 /**

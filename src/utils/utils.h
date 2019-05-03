@@ -199,7 +199,7 @@ struct Utils {
      *
      * @return the corresponding quadruple string.
      */
-    static string oprToQuad(Operator opr, DataType type) {
+    static string oprToQuad(Operator opr, DataType type = DTYPE_UNKNOWN) {
 		switch (opr) {
             case OPR_ADD:
                 return "ADD_" + dtypeToQuad(type);
