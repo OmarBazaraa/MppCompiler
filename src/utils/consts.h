@@ -32,6 +32,10 @@ enum Operator {
     OPR_LESS_EQUAL,         // a <= b
     OPR_EQUAL,              // a == b
     OPR_NOT_EQUAL,          // a != b
+	OPR_PUSH,				// PUSH X, push to the stack (used in Quad gen.)
+	OPR_POP, 				// POP A, pop last element from the stack (used in Quad gen.)
+	OPR_JMP,				// JMP L1, unconditional jump (used in Quad gen.)
+	OPR_JZ, 				// JZ L1, jmp if the top of the stack is zero and pops it.
 };
 
 /**
