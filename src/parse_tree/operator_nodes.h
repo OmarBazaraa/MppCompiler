@@ -58,15 +58,15 @@ struct AssignOprNode : public ExpressionNode {
     }
     
     virtual string generateQuad(GenerationContext* generationContext) {
-		// TODO: What about the quad of the lhs ?
+        // TODO: What about the quad of the lhs ?
         string ret = "";
-		
-		ret += rhs->generateQuad(generationContext);
-		
-		ret += Utils::dtypeConvQuad(rhs->type, type);
+        
+        ret += rhs->generateQuad(generationContext);
+        
+        ret += Utils::dtypeConvQuad(rhs->type, type);
         ret += "POP " + lhs->reference->identifier + "\n";
-		
-		return ret;
+        
+        return ret;
     }
 };
 
@@ -103,7 +103,7 @@ struct BinaryOprNode : public ExpressionNode {
         }
 
         if (Utils::isLogicalOpr(opr)) {
-            type == DTYPE_BOOL;
+            type = DTYPE_BOOL;
         } else {
             type = max(lhs->type, rhs->type);
         }
@@ -122,16 +122,16 @@ struct BinaryOprNode : public ExpressionNode {
     }
     
     virtual string generateQuad(GenerationContext* generationContext) {
-		string ret = "";
-		
+        string ret = "";
+        
         ret += lhs->generateQuad(generationContext);
-		ret += Utils::dtypeConvQuad(lhs->type, type);
-		
+        ret += Utils::dtypeConvQuad(lhs->type, type);
+        
         ret += rhs->generateQuad(generationContext);
-		ret += Utils::dtypeConvQuad(rhs->type, type);
+        ret += Utils::dtypeConvQuad(rhs->type, type);
         ret += Utils::binOprToQuad(opr, type) + "\n";
-		
-		return ret;
+        
+        return ret;
     }
 };
 
@@ -197,8 +197,8 @@ struct UnaryOprNode : public ExpressionNode {
     }
     
     virtual string generateQuad(GenerationContext* generationContext) {
-		string ret = "";
-		
+        string ret = "";
+        
         switch (opr) {
             case OPR_U_MINUS:
                 ret += expr->generateQuad(generationContext);
@@ -208,37 +208,37 @@ struct UnaryOprNode : public ExpressionNode {
                 ret += expr->generateQuad(generationContext);
                 ret += "PUSH 1\n";
                 ret += "ADD\n";
-				ret += "POP " + expr->reference->identifier + "\n";
-				ret += "PUSH " + expr->reference->identifier + "\n";
+                ret += "POP " + expr->reference->identifier + "\n";
+                ret += "PUSH " + expr->reference->identifier + "\n";
                 break;
             case OPR_SUF_INC:
                 ret += expr->generateQuad(generationContext);
-				ret += "POP " + expr->reference->identifier + "\n";
-				ret += "PUSH " + expr->reference->identifier + "\n";
-				ret += "PUSH " + expr->reference->identifier + "\n";
+                ret += "POP " + expr->reference->identifier + "\n";
+                ret += "PUSH " + expr->reference->identifier + "\n";
+                ret += "PUSH " + expr->reference->identifier + "\n";
                 ret += "PUSH 1\n";
                 ret += "ADD\n";
-				ret += "POP " + expr->reference->identifier + "\n";
+                ret += "POP " + expr->reference->identifier + "\n";
                 break;
             case OPR_PRE_DEC:
                 expr->generateQuad(generationContext);
                 ret += "PUSH 1\n";
                 ret += "SUB\n";
-				ret += "POP " + expr->reference->identifier + "\n";
-				ret += "PUSH " + expr->reference->identifier + "\n";
+                ret += "POP " + expr->reference->identifier + "\n";
+                ret += "PUSH " + expr->reference->identifier + "\n";
                 break;
             case OPR_SUF_DEC:
                 expr->generateQuad(generationContext);
-				ret += "POP " + expr->reference->identifier + "\n";
-				ret += "PUSH " + expr->reference->identifier + "\n";
-				ret += "PUSH " + expr->reference->identifier + "\n";
+                ret += "POP " + expr->reference->identifier + "\n";
+                ret += "PUSH " + expr->reference->identifier + "\n";
+                ret += "PUSH " + expr->reference->identifier + "\n";
                 ret += "PUSH 1\n";
                 ret += "SUB\n";
-				ret += "POP " + expr->reference->identifier + "\n";
+                ret += "POP " + expr->reference->identifier + "\n";
                 break;
         }
-		
-		return ret;
+        
+        return ret;
     }
 };
 

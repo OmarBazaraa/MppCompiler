@@ -9,10 +9,7 @@ gen:
 	bison -d -o out/rules/parser.cpp out/rules/parser_grammar.y
 
 comp:
-	g++ -c out/rules/lexer.cpp -o out/lexer.o
-	g++ -c out/rules/parser.cpp -o out/parser.o
-	g++ -c out/main.cpp -o out/main.o
-	g++ -o out/M++.exe out/main.o out/lexer.o out/parser.o
+	g++ -o out/M++.exe out/main.cpp out/rules/lexer.cpp out/rules/parser.cpp
 
 build:
 	@make -s clear

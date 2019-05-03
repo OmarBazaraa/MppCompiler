@@ -25,7 +25,7 @@ struct TypeNode : public StatementNode {
     
     virtual string generateQuad(GenerationContext* generationContext) {
         // TODO: Should it be empty ?
-		return "";
+        return "";
     }
 };
 

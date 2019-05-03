@@ -116,8 +116,8 @@ struct ExprContainerNode : public ExpressionNode {
     virtual string toString(int ind = 0) {
         return expr->toString(ind);
     }
-	
-	virtual string generateQuad(GenerationContext* generationContext) {
+    
+    virtual string generateQuad(GenerationContext* generationContext) {
         return expr->generateQuad(generationContext);
     }
 };

@@ -83,19 +83,19 @@ struct FunctionNode : public StatementNode {
     
     virtual string generateQuad(GenerationContext* generationContext) {
         string ret = "";
-		
-		ret += "PROC " + name->name + "\n";
-		generationContext->declareFuncParams = true;
         
-		for (int i = 0; i < paramList.size(); ++i) {
+        ret += "PROC " + name->name + "\n";
+        generationContext->declareFuncParams = true;
+        
+        for (int i = 0; i < paramList.size(); ++i) {
             ret += paramList[i]->generateQuad(generationContext);
         }
-		
-		generationContext->declareFuncParams = false;
+        
+        generationContext->declareFuncParams = false;
         ret += body->generateQuad(generationContext);
         ret += "ENDP " + name->name + "\n";
-		
-		return ret;
+        
+        return ret;
     } 
 };
 
@@ -170,17 +170,16 @@ struct FunctionCallNode : public ExpressionNode {
     }
     
     virtual string generateQuad(GenerationContext* generationContext) {
-		string ret = "";
-		
+        string ret = "";
+        
         for (int i = argList.size() - 1; i >= 0; --i) {
             ret += argList[i]->generateQuad(generationContext);
         }
-		
+        
         ret += "CALL " + name->name + "\n";
-		
-		return ret;
+        
+        return ret;
     }
-    
 };
 
 #endif

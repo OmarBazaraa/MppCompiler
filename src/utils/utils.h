@@ -190,17 +190,17 @@ struct Utils {
 
         return "#";
     }
-	
-	/**
+    
+    /**
      * Converts the given operator into its corresponding quadruple string.
      * 
      * @param opr the operator to convert.
-	 * @param type the type of the resulting operation.
+     * @param type the type of the resulting operation.
      * 
      * @return the corresponding quadruple string.
      */
-	static string binOprToQuad(Operator opr, DataType type) {
-		switch (opr) {
+    static string binOprToQuad(Operator opr, DataType type) {
+        switch (opr) {
             case OPR_ADD:
                 return "ADD_" + dtypeToQuad(type);
             case OPR_SUB:
@@ -242,9 +242,9 @@ struct Utils {
             case OPR_NOT_EQUAL:
                 return "NEQ";
         }
-		
-		return "#";
-	}
+        
+        return "#";
+    }
 
     /**
      * Checks whether the given type is an integer data type.
@@ -284,8 +284,8 @@ struct Utils {
 
         return "unknown";
     }
-	
-	/**
+    
+    /**
      * Converts the given data type into its corresponding quadruple string.
      * 
      * @param type the type to convert.
@@ -312,19 +312,19 @@ struct Utils {
 
         return "unknown";
     }
-	
-	/**
+    
+    /**
      * Convert data type from t1 into t2.
      * 
      * @param t1 the type to convert from.
-	 * @param t2 the type to convert to.
+     * @param t2 the type to convert to.
      * 
      * @return the corresponding quadruple string.
      */
     static string dtypeConvQuad(DataType t1, DataType t2) {
         if (t1 != t2)
-			return dtypeToQuad(t1) + "_TO_" + dtypeToQuad(t2) + "\n";
-		return "";
+            return dtypeToQuad(t1) + "_TO_" + dtypeToQuad(t2) + "\n";
+        return "";
     }
 };
 

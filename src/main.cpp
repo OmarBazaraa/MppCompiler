@@ -49,8 +49,9 @@ int main(int argc, char* argv[]) {
     // Parse incoming arguments
     parseArguments(argc, argv);
 
-    // Construct a context file
-    ScopeContext context(inputFilename);
+    // Construct a context objects
+    ScopeContext scopeContext(inputFilename);
+    GenerationContext genContext;
 
     // Open input file for Lex & Yacc
     yyin = fopen(inputFilename.c_str(), "r");
@@ -61,13 +62,11 @@ int main(int argc, char* argv[]) {
     }
 
     // Construct the parse tree
-    GenerationContext* generationContext = new GenerationContext();
-    
     yyparse();
 
     // Apply semantic check and quadruple generation
-    if (programRoot->analyze(&context)) {
-        cout << programRoot->generateQuad(generationContext);
+    if (programRoot->analyze(&scopeContext)) {
+        cout << programRoot->generateQuad(&genContext);
     }
 
     // Finalize and release allocated memory

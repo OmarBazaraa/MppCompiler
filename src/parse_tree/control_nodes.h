@@ -61,10 +61,10 @@ struct IfNode : public StatementNode {
     }
     
     virtual string generateQuad(GenerationContext* generationContext) {
-		string ret = "";
+        string ret = "";
         int label1 = generationContext->labelCounter++;
         ret += cond->generateQuad(generationContext);
-		
+        
         if (elseBody) {
             int label2 = generationContext->labelCounter++;
             ret += "JZ L" + to_string(label1) + "\n";
@@ -78,15 +78,15 @@ struct IfNode : public StatementNode {
             
             ret += "L" + to_string(label2) + ":\n";
         } 
-		else {
+        else {
             ret += "JZ L" + to_string(label1) + "\n";
             
             ret += ifBody->generateQuad(generationContext);
             
             ret += "L" + to_string(label1) + ":\n";
         }
-		
-		return ret;
+        
+        return ret;
     }
     
 };
@@ -160,23 +160,23 @@ struct CaseLabelNode : public StatementNode {
         ret += stmt->toString(ind);
         return ret;
     }
-	
-	virtual string generateQuad(GenerationContext* generationContext) {
+    
+    virtual string generateQuad(GenerationContext* generationContext) {
         if (expr == NULL) {
             return stmt->generateQuad(generationContext);
         }
-		
-		string ret = "";
+        
+        string ret = "";
         int label1 = generationContext->labelCounter++;
-		
-		ret += "PUSH SWITCH_COND@" + to_string(generationContext->breakLabels.top()) + "\n";
+        
+        ret += "PUSH SWITCH_COND@" + to_string(generationContext->breakLabels.top()) + "\n";
         ret += expr->generateQuad(generationContext);
-		ret += "EQU\n";
+        ret += "EQU\n";
         ret += "JZ L" + to_string(label1) + "\n";
         ret += stmt->generateQuad(generationContext);
         ret += "L" + to_string(label1) + ":\n";
-		
-		return ret;
+        
+        return ret;
     }
 };
 
@@ -232,20 +232,19 @@ struct SwitchNode : public StatementNode {
     
     virtual string generateQuad(GenerationContext* generationContext) {
         string ret = "";
-		int label1 = generationContext->labelCounter++;
-		
-		ret += cond->generateQuad(generationContext);
-		ret += "POP SWITCH_COND@" + to_string(label1) + "\n";
+        int label1 = generationContext->labelCounter++;
+        
+        ret += cond->generateQuad(generationContext);
+        ret += "POP SWITCH_COND@" + to_string(label1) + "\n";
         generationContext->breakLabels.push(label1);
         
         ret += body->generateQuad(generationContext);
         
         generationContext->breakLabels.pop();
         ret += "L" + to_string(label1) + ":\n";
-		
-		return ret;
+        
+        return ret;
     }
-    
 };
 
 #endif

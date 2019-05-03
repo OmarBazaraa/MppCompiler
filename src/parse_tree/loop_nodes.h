@@ -48,10 +48,10 @@ struct WhileNode : public StatementNode {
     }
     
     virtual string generateQuad(GenerationContext* generationContext) {
-		string ret = "";
+        string ret = "";
         int label1 = generationContext->labelCounter++;
-		int label2 = generationContext->labelCounter++;
-		
+        int label2 = generationContext->labelCounter++;
+        
         ret += "L" + to_string(label1) + ":\n";
         ret += cond->generateQuad(generationContext);
         ret += "JZ L" + to_string(label2) + "\n";
@@ -66,8 +66,8 @@ struct WhileNode : public StatementNode {
         
         ret += "JMP L" + to_string(label1) + "\n";
         ret += "L" + to_string(label2) + ":\n";
-		
-		return ret;
+        
+        return ret;
     }
   
 };
@@ -115,10 +115,10 @@ struct DoWhileNode : public StatementNode {
     }
     
     virtual string generateQuad(GenerationContext* generationContext) {
-		string ret = "";
+        string ret = "";
         int label1 = generationContext->labelCounter++;
-		int label2 = generationContext->labelCounter++;
-		int label3 = generationContext->labelCounter++;
+        int label2 = generationContext->labelCounter++;
+        int label3 = generationContext->labelCounter++;
 
         ret += "L" + to_string(label1) + ":\n";
         
@@ -134,8 +134,8 @@ struct DoWhileNode : public StatementNode {
         ret += cond->generateQuad(generationContext);
         ret += "JNZ L" + to_string(label1) + "\n";
         ret += "L" + to_string(label3) + ":\n";
-		
-		return ret;
+        
+        return ret;
     }
    
 };
@@ -209,7 +209,7 @@ struct ForNode : public StatementNode {
      * L5 (exit)
      **/
     virtual string generateQuad(GenerationContext* generationContext) {
-		string ret = "";
+        string ret = "";
         int label1 = generationContext->labelCounter++;
         int label2 = generationContext->labelCounter++;
         int label3 = generationContext->labelCounter++;
@@ -217,19 +217,19 @@ struct ForNode : public StatementNode {
         int label5 = generationContext->labelCounter++;           
                                                                                 
         if (initStmt) 
-			ret += initStmt->generateQuad(generationContext);                                    
+            ret += initStmt->generateQuad(generationContext);                                    
         
-		ret += "L" + to_string(label1) + ":\n";                                   
+        ret += "L" + to_string(label1) + ":\n";                                   
         
-		if (cond) 
-			ret += cond->generateQuad(generationContext);                                        
+        if (cond) 
+            ret += cond->generateQuad(generationContext);                                        
         
-		ret += "JMP L" + to_string(label4) + "\n";                                      
+        ret += "JMP L" + to_string(label4) + "\n";                                      
         ret += "L" + to_string(label2) + ":\n";                                   
         
-		if (inc) 
-			ret += inc->generateQuad(generationContext);                                         
-		
+        if (inc) 
+            ret += inc->generateQuad(generationContext);                                         
+        
         ret += "JMP L" + to_string(label1) + "\n";                                      
         ret += "L" + to_string(label3) + ":\n";   
         
@@ -246,10 +246,9 @@ struct ForNode : public StatementNode {
         ret += "JZ L" + to_string(label5) + "\n";                                       
         ret += "JMP L" + to_string(label3) + "\n";                                      
         ret += "L" + to_string(label5) + ":\n";
-		
-		return ret;
+        
+        return ret;
     }
-    
 };
 
 #endif
