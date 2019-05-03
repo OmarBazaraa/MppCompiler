@@ -119,9 +119,7 @@ struct Utils {
         switch (opr) {
             case OPR_ASSIGN:
             case OPR_PRE_INC:
-            case OPR_SUF_INC:
             case OPR_PRE_DEC:
-            case OPR_SUF_DEC:
                 return true;
         }
         return false;
