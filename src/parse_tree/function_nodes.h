@@ -175,6 +175,7 @@ struct FunctionCallNode : public ExpressionNode {
 
         for (int i = argList.size() - 1; i >= 0; --i) {
             ret += argList[i]->generateQuad(generationContext);
+			ret += Utils::dtypeConvQuad(argList[i]->type, func->paramList[i].type);
         }
 
         ret += "CALL " + name->name + "\n";

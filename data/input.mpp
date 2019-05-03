@@ -4,7 +4,7 @@ char fun(int y) {
 }
 
 int main() {
-    int x = fun(2);
+    int x = fun(true);
 	if (x > 3 && fun(15) > 50) {
 		int y = x + 5;
 	}

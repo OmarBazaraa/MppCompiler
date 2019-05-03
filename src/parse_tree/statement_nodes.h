@@ -248,8 +248,10 @@ struct ReturnStmtNode : public StatementNode {
     virtual string generateQuad(GenerationContext* generationContext) {
         string ret = "";
 
-        if (value)
+        if (value) {
             ret += value->generateQuad(generationContext);
+			ret += Utils::dtypeConvQuad(value->type, func->type);
+		}
 
         ret += "RET\n";
 
