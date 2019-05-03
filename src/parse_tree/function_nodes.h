@@ -105,6 +105,7 @@ struct FunctionNode : public StatementNode {
 struct FunctionCallNode : public ExpressionNode {
     IdentifierNode* name;
     ExprList argList;
+    Func* func;
 
     FunctionCallNode(IdentifierNode* name, const ExprList& argList) : ExpressionNode(name->loc) {
         this->name = name;
@@ -123,7 +124,7 @@ struct FunctionCallNode : public ExpressionNode {
         bool ret = true;
 
         Symbol* ptr = context->getSymbol(name->name);
-        Func* func = dynamic_cast<Func*>(ptr);
+        func = dynamic_cast<Func*>(ptr);
 
         if (ptr == NULL) {
             context->printError("'" + name->name + "' was not declared in this scope", loc);

@@ -99,7 +99,7 @@ struct BinaryOprNode : public ExpressionNode {
 
         if (lhs->type == DTYPE_VOID || lhs->type == DTYPE_FUNC_PTR ||
             rhs->type == DTYPE_VOID || rhs->type == DTYPE_FUNC_PTR ||
-            Utils::isBitwiseOpr(opr) && (lhs->type == DTYPE_FLOAT || rhs->type == DTYPE_FLOAT)) {
+            (Utils::isBitwiseOpr(opr) || opr == OPR_MOD) && (lhs->type == DTYPE_FLOAT || rhs->type == DTYPE_FLOAT)) {
             context->printError("invalid operands of types '" + lhs->getType() + "' and '" + rhs->getType() + "' to " + getOpr(), loc);
             return false;
         }

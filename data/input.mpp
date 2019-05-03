@@ -12,5 +12,4 @@ int main() {
 	while (x) {
 		int z = x--;
 	}
-	
 }
