@@ -203,6 +203,7 @@ struct ContinueStmtNode : public StatementNode {
  */
 struct ReturnStmtNode : public StatementNode {
     ExpressionNode* value;
+    Func* func;
 
     ReturnStmtNode(const Location& loc, ExpressionNode* value) : StatementNode(loc) {
         this->value = value;
@@ -213,7 +214,7 @@ struct ReturnStmtNode : public StatementNode {
     }
 
     virtual bool analyze(ScopeContext* context) {
-        Func* func = context->functions.empty() ? NULL : context->functions.top();
+        func = context->functions.empty() ? NULL : context->functions.top();
 
         if (func == NULL) {
             context->printError("return-statement not within function", loc);
