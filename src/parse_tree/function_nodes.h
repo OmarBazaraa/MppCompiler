@@ -72,7 +72,7 @@ struct FunctionNode : public StatementNode {
     }
 
     virtual string toString(int ind = 0) {
-        string ret = string(ind, ' ') + type->toString() + " " + name->toString() + "(";
+        string ret = string(ind, ' ') + type->toString() + " " + func.identifier + "(";
         for (int i = 0; i < paramList.size(); ++i) {
             ret += (i > 0 ? ", " : "") + paramList[i]->toString();
         }
@@ -163,7 +163,7 @@ struct FunctionCallNode : public ExpressionNode {
     }
 
     virtual string toString(int ind = 0) {
-        string ret = string(ind, ' ') + name->toString() + "(";
+        string ret = string(ind, ' ') + func->identifier + "(";
         for (int i = 0; i < argList.size(); ++i) {
             ret += (i > 0 ? ", " : "") + argList[i]->toString();
         }

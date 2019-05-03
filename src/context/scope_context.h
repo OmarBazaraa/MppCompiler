@@ -29,6 +29,8 @@ private:
     vector<string> sourceCode;
     vector<Scope*> scopes;
 
+    unordered_map<string, int> aliases;
+
 public:
     //
     // Public member variables
@@ -61,8 +63,14 @@ public:
      * Removes the lastly added scope from this context.
      */
     void popScope() {
-        delete scopes.back();
+        Scope* scope = scopes.back();
         scopes.pop_back();
+
+        for (auto& it : scope->table) {
+            aliases[it.first]--;
+        }
+
+        delete scope;
     }
 
     /**
@@ -86,6 +94,15 @@ public:
 
         if (table.count(sym->identifier)) {
             return false;
+        }
+
+        // Form a new alias name for the identifier
+        int num = aliases[sym->identifier]++;
+
+        if (num > 0) {
+            sym->alias = sym->identifier + "@" + to_string(num);
+        } else {
+            sym->alias = sym->identifier;
         }
 
         table[sym->identifier] = sym;

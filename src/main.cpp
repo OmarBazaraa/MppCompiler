@@ -66,7 +66,11 @@ int main(int argc, char* argv[]) {
 
     // Apply semantic check and quadruple generation
     if (programRoot->analyze(&scopeContext)) {
-        cout << programRoot->generateQuad(&genContext);
+        cout << "---------------------------" << endl << endl;
+        cout << programRoot->toString() << endl << endl;
+        cout << "---------------------------" << endl << endl;
+        cout << programRoot->generateQuad(&genContext) << endl << endl;
+        cout << "---------------------------" << endl;
     }
 
     // Finalize and release allocated memory

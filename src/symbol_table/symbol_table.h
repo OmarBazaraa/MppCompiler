@@ -19,6 +19,7 @@ using namespace std;
 struct Symbol {
     DataType type;
     string identifier;
+    string alias;
 
     virtual string header() {
         return Utils::dtypeToStr(type) + " " + identifier;

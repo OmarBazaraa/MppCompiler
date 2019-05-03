@@ -1,4 +1,16 @@
+const int x = 1;
+
+void func(int x) {
+    x++;
+}
+
 int main() {
+    int x;
+    x = 1;
     
-    5 % 5.5;
+    for (int x;;) {
+        x = 5;
+    }
+
+
 }

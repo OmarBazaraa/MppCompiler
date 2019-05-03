@@ -196,8 +196,7 @@ struct ForNode : public StatementNode {
         string ret = string(ind, ' ') + "for (";
         ret += (initStmt ? initStmt->toString() : "") + ";";
         ret += (cond ? cond->toString() : "") + ";";
-        ret += (inc ? inc->toString() : "") + ";";
-        ret += ")\n";
+        ret += (inc ? inc->toString() : "") + ")\n";
         ret += body->toString(ind + (dynamic_cast<BlockNode*>(body) ? 0 : 4));
         return ret;
     }
