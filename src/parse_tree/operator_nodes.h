@@ -65,11 +65,8 @@ struct AssignOprNode : public ExpressionNode {
         string ret = "";
 
         ret += rhs->generateQuad(generationContext);
-
         ret += Utils::dtypeConvQuad(rhs->type, type);
-
-        // @OmarBazaraa: again, add type to pop :D
-        ret += "POP " + lhs->reference->identifier + "\n";
+        ret += Utils::oprToQuad(Operator::OPR_POP, type) + lhs->reference->identifier + "\n";
 
         return ret;
     }
@@ -128,20 +125,16 @@ struct BinaryOprNode : public ExpressionNode {
 
     virtual string generateQuad(GenerationContext* generationContext) {
         string ret = "";
-
-        // @OmarBazaraa: I figured out a ZEEEW here that does not follow the general
-        // @OmarBazaraa: pattern of type conversion
-        // @OmarBazaraa: if we have an expression like this "5 > 6".
-        // @OmarBazaraa: here the resulting type is boolean, but if we convert the operand
-        // @OmarBazaraa: before applying the operation, the result will be incorrect.
+		
+		DataType t = max(lhs->type, rhs->type);
 
         ret += lhs->generateQuad(generationContext);
-        ret += Utils::dtypeConvQuad(lhs->type, type);
+        ret += Utils::dtypeConvQuad(lhs->type, t);
 
         ret += rhs->generateQuad(generationContext);
-        ret += Utils::dtypeConvQuad(rhs->type, type);
+        ret += Utils::dtypeConvQuad(rhs->type, t);
 
-        ret += Utils::binOprToQuad(opr, type) + "\n";
+        ret += Utils::oprToQuad(opr, t) + "\n";
 
         return ret;
     }
@@ -210,59 +203,30 @@ struct UnaryOprNode : public ExpressionNode {
 
     virtual string generateQuad(GenerationContext* generationContext) {
         string ret = "";
-
-        // @OmarBazaraa: what about other unary operations?
-        // @OmarBazaraa: bitwise not (~), logical not (!), unary plus (+)
-
-        // @OmarBazaraa: also the look of the function is not pleasent xD
-        // @OmarBazaraa: I think you should split this function into 3 cases
-        // @OmarBazaraa: 1. SUFFIX INC/DEC
-        // @OmarBazaraa: 2. PREFIX INC/DEC
-        // @OmarBazaraa: 3. Other unary operations
-
-        // @OmarBazaraa: I think you should extend function "binOprToQuad" to "oprToQuad"
-        // @OmarBazaraa: to accept both binary and unary operation.
-        // @OmarBazaraa: and you may extend it to accept push/pop also.
-
-        // @OmarBazaraa: again, take care of push/pop types
+		
+		ret += expr->generateQuad(generationContext);
+		ret += Utils::dtypeConvQuad(expr->type, type);
 
         switch (opr) {
-            case OPR_U_MINUS:
-                ret += expr->generateQuad(generationContext);
-                ret += "NEG\n";
-                break;
             case OPR_PRE_INC:
-                ret += expr->generateQuad(generationContext);
-                ret += "PUSH 1\n";
-                ret += "ADD\n";
-                ret += "POP " + expr->reference->identifier + "\n";
-                ret += "PUSH " + expr->reference->identifier + "\n";
+			case OPR_PRE_DEC:
+                ret += Utils::oprToQuad(opr, type) + "\n";
+                ret += Utils::oprToQuad(Operator::OPR_POP, type) + expr->reference->identifier + "\n";
+                ret += Utils::oprToQuad(Operator::OPR_PUSH, type) + expr->reference->identifier + "\n";
                 break;
             case OPR_SUF_INC:
-                ret += expr->generateQuad(generationContext);
-                ret += "POP " + expr->reference->identifier + "\n";
-                ret += "PUSH " + expr->reference->identifier + "\n";
-                ret += "PUSH " + expr->reference->identifier + "\n";
-                ret += "PUSH 1\n";
-                ret += "ADD\n";
-                ret += "POP " + expr->reference->identifier + "\n";
+			case OPR_SUF_DEC:
+                ret += Utils::oprToQuad(Operator::OPR_POP, type)  + expr->reference->identifier + "\n";
+                ret += Utils::oprToQuad(Operator::OPR_PUSH, type) + expr->reference->identifier + "\n";
+                ret += Utils::oprToQuad(Operator::OPR_PUSH, type) + expr->reference->identifier + "\n";
+                ret += Utils::oprToQuad(opr, type) + "\n";
+                ret += Utils::oprToQuad(Operator::OPR_POP, type) + expr->reference->identifier + "\n";
                 break;
-            case OPR_PRE_DEC:
-                expr->generateQuad(generationContext);
-                ret += "PUSH 1\n";
-                ret += "SUB\n";
-                ret += "POP " + expr->reference->identifier + "\n";
-                ret += "PUSH " + expr->reference->identifier + "\n";
-                break;
-            case OPR_SUF_DEC:
-                expr->generateQuad(generationContext);
-                ret += "POP " + expr->reference->identifier + "\n";
-                ret += "PUSH " + expr->reference->identifier + "\n";
-                ret += "PUSH " + expr->reference->identifier + "\n";
-                ret += "PUSH 1\n";
-                ret += "SUB\n";
-                ret += "POP " + expr->reference->identifier + "\n";
-                break;
+			case OPR_U_MINUS:
+			case OPR_NOT:
+			case OPR_LOGICAL_NOT:
+				ret += Utils::oprToQuad(opr, type) + "\n";
+				break;
         }
 
         return ret;

@@ -137,8 +137,7 @@ struct VarDeclarationNode : public StatementNode {
         }
 
         if (value || generationContext->declareFuncParams) {
-            // @OmarBazaraa: add type to pop instruction.
-            ret += "POP " + name->name + "\n";
+            ret += Utils::oprToQuad(Operator::OPR_POP, type->type) + name->name + "\n";
         }
 
         return ret;
@@ -166,10 +165,7 @@ struct BreakStmtNode : public StatementNode {
     }
 
     virtual string generateQuad(GenerationContext* generationContext) {
-        // @OmarBazaraa: I think it is better to rename all "generationContext" objects
-        // @OmarBazaraa: across all "generateQuad" function to just "context".
-        // @OmarBazaraa: the name is too long xD.
-        return "JMP L" + to_string(generationContext->breakLabels.top()) + "\n";
+        return Utils::oprToQuad(Operator::OPR_JMP, DataType::DTYPE_ERROR) + "L" + to_string(generationContext->breakLabels.top()) + "\n";
     }
 };
 
@@ -194,7 +190,7 @@ struct ContinueStmtNode : public StatementNode {
     }
 
     virtual string generateQuad(GenerationContext* generationContext) {
-        return "JMP L" + to_string(generationContext->continueLabels.top()) + "\n";
+        return Utils::oprToQuad(Operator::OPR_JMP, DataType::DTYPE_ERROR) + "L" + to_string(generationContext->continueLabels.top()) + "\n";
     }
 };
 
@@ -252,8 +248,10 @@ struct ReturnStmtNode : public StatementNode {
     virtual string generateQuad(GenerationContext* generationContext) {
         string ret = "";
 
-        if (value)
+        if (value) {
             ret += value->generateQuad(generationContext);
+			ret += Utils::dtypeConvQuad(value->type, func->type);
+		}
 
         ret += "RET\n";
 

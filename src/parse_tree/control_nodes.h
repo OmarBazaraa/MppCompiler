@@ -63,26 +63,20 @@ struct IfNode : public StatementNode {
     virtual string generateQuad(GenerationContext* generationContext) {
         string ret = "";
         int label1 = generationContext->labelCounter++;
+		
         ret += cond->generateQuad(generationContext);
-
+		ret += Utils::oprToQuad(Operator::OPR_JZ, cond->type) + "L" + to_string(label1) + "\n";
+		ret += ifBody->generateQuad(generationContext);
+		
         if (elseBody) {
             int label2 = generationContext->labelCounter++;
-            ret += "JZ L" + to_string(label1) + "\n";
 
-            ret += ifBody->generateQuad(generationContext);
-
-            ret += "JMP L" + to_string(label2) + "\n";
+            ret += Utils::oprToQuad(Operator::OPR_JMP, DataType::DTYPE_ERROR) + "L" + to_string(label2) + "\n";
             ret += "L" + to_string(label1) + ":\n";
-
             ret += elseBody->generateQuad(generationContext);
-
             ret += "L" + to_string(label2) + ":\n";
         }
         else {
-            ret += "JZ L" + to_string(label1) + "\n";
-
-            ret += ifBody->generateQuad(generationContext);
-
             ret += "L" + to_string(label1) + ":\n";
         }
 
@@ -166,17 +160,14 @@ struct CaseLabelNode : public StatementNode {
             return stmt->generateQuad(generationContext);
         }
 
-        // @OmarBazaraa: switch case statements are incorrect in the situation where
-        // @OmarBazaraa: one case label has no direct statement under it,
-        // @OmarBazaraa: or when it has more than one direct statements under it.
-
         string ret = "";
         int label1 = generationContext->labelCounter++;
 
-        ret += "PUSH SWITCH_COND@" + to_string(generationContext->breakLabels.top()) + "\n";
+		// @AbdoEed The type of this push is incorrect it should be the type of the switch expr. not the case expr.
+        ret += Utils::oprToQuad(Operator::OPR_PUSH, expr->type) + "SWITCH_COND@" + to_string(generationContext->breakLabels.top()) + "\n";
         ret += expr->generateQuad(generationContext);
-        ret += "EQU\n";
-        ret += "JZ L" + to_string(label1) + "\n";
+        ret += Utils::oprToQuad(Operator::OPR_EQUAL, expr->type);
+        ret += Utils::oprToQuad(Operator::OPR_JZ, DataType::DTYPE_BOOL) + "L" + to_string(label1) + "\n";
         ret += stmt->generateQuad(generationContext);
         ret += "L" + to_string(label1) + ":\n";
 
@@ -239,7 +230,7 @@ struct SwitchNode : public StatementNode {
         int label1 = generationContext->labelCounter++;
 
         ret += cond->generateQuad(generationContext);
-        ret += "POP SWITCH_COND@" + to_string(label1) + "\n";
+        ret += Utils::oprToQuad(Operator::OPR_POP, cond->type) + "SWITCH_COND@" + to_string(label1) + "\n";
         generationContext->breakLabels.push(label1);
 
         ret += body->generateQuad(generationContext);

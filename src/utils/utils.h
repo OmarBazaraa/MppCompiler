@@ -199,53 +199,61 @@ struct Utils {
      *
      * @return the corresponding quadruple string.
      */
-    static string binOprToQuad(Operator opr, DataType type) {
-        // @OmarBazaraa: I think it is better to extend this function to handle
-        // @OmarBazaraa: binary operations, unary operations, and push/pop instructions
-
-        switch (opr) {
+    static string oprToQuad(Operator opr, DataType type) {
+		switch (opr) {
             case OPR_ADD:
                 return "ADD_" + dtypeToQuad(type);
             case OPR_SUB:
-                return "SUB_" + dtypeToQuad(type);
+				return "SUB_" + dtypeToQuad(type);
             case OPR_MUL:
                 return "MUL_" + dtypeToQuad(type);
             case OPR_DIV:
                 return "DIV_" + dtypeToQuad(type);
             case OPR_MOD:
-                return "MOD"; // @OmarBazaraa: why not "MOD"? xD
+                return "MOD_" + dtypeToQuad(type);
             case OPR_AND:
+			case OPR_LOGICAL_AND:
                 return "AND_" + dtypeToQuad(type);
             case OPR_OR:
+			case OPR_LOGICAL_OR:
                 return "OR_" + dtypeToQuad(type);
             case OPR_XOR:
                 return "XOR_" + dtypeToQuad(type);
             case OPR_NOT:
+			case OPR_LOGICAL_NOT:
                 return "NOT_" + dtypeToQuad(type);
             case OPR_SHL:
                 return "SHL_" + dtypeToQuad(type);
             case OPR_SHR:
                 return "SHR_" + dtypeToQuad(type);
-            // @OmarBazaraa: there is no logical AND, OR, NOT in the processor :D
-            // @OmarBazaraa: you can use the same AND, OR, NOT as above.
-            case OPR_LOGICAL_AND:   
-                return "LAND";
-            case OPR_LOGICAL_OR:
-                return "LOR";
-            case OPR_LOGICAL_NOT:
-                return "LNOT";
             case OPR_GREATER:
-                return "GT";
+                return "GT_" + dtypeToQuad(type);
             case OPR_GREATER_EQUAL:
-                return "GTE";
+                return "GTE_" + dtypeToQuad(type);
             case OPR_LESS:
-                return "LT";
+                return "LT_" + dtypeToQuad(type);
             case OPR_LESS_EQUAL:
-                return "LTE";
+                return "LTE_" + dtypeToQuad(type);
             case OPR_EQUAL:
-                return "EQU";
+                return "EQU_" + dtypeToQuad(type);
             case OPR_NOT_EQUAL:
-                return "NEQ";
+                return "NEQ_" + dtypeToQuad(type);
+			case OPR_U_MINUS:
+                return "NEG_" + dtypeToQuad(type);
+			case OPR_PRE_INC:
+            case OPR_SUF_INC:
+                return "INC_" + dtypeToQuad(type);
+            case OPR_PRE_DEC:
+            case OPR_SUF_DEC:
+                return "DEC_" + dtypeToQuad(type);
+			case OPR_PUSH:
+				return "PUSH_" + dtypeToQuad(type) + " ";
+			case OPR_POP:
+				return "POP_" + dtypeToQuad(type) + " ";
+			case OPR_JMP:
+				return "JMP ";
+			case OPR_JZ:
+				return "JZ_" + dtypeToQuad(type) + " ";
         }
 
         return "#";

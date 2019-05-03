@@ -1,16 +1,15 @@
-const int x = 1;
 
-void func(int x) {
-    x++;
+char fun(int y) {
+	return 5;
 }
 
 int main() {
-    int x;
-    x = 1;
-    
-    for (int x;;) {
-        x = 5;
-    }
-
-
+    int x = fun(true);
+	if (x > 3 && fun(15) > 50) {
+		int y = x + 5;
+	}
+	
+	while (x) {
+		int z = x--;
+	}
 }
