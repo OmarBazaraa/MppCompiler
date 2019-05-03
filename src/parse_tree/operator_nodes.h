@@ -56,16 +56,21 @@ struct AssignOprNode : public ExpressionNode {
     virtual string toString(int ind = 0) {
         return string(ind, ' ') + "(" + lhs->toString() + " = " + rhs->toString() + ")";
     }
-    
+
     virtual string generateQuad(GenerationContext* generationContext) {
         // TODO: What about the quad of the lhs ?
+        // @OmarBazaraa: I think you should call the lhs
+        // @OmarBazaraa: If we have an expression like this one "(x = y++) = 5".
+        // @OmarBazaraa: "y" should be incremented, and "x" should be assigned 5.
         string ret = "";
-        
+
         ret += rhs->generateQuad(generationContext);
-        
+
         ret += Utils::dtypeConvQuad(rhs->type, type);
+
+        // @OmarBazaraa: again, add type to pop :D
         ret += "POP " + lhs->reference->identifier + "\n";
-        
+
         return ret;
     }
 };
@@ -120,17 +125,24 @@ struct BinaryOprNode : public ExpressionNode {
     virtual string toString(int ind = 0) {
         return string(ind, ' ') + "(" + lhs->toString() + " " + Utils::oprToStr(opr) + " " + rhs->toString() + ")";
     }
-    
+
     virtual string generateQuad(GenerationContext* generationContext) {
         string ret = "";
-        
+
+        // @OmarBazaraa: I figured out a ZEEEW here that does not follow the general
+        // @OmarBazaraa: pattern of type conversion
+        // @OmarBazaraa: if we have an expression like this "5 > 6".
+        // @OmarBazaraa: here the resulting type is boolean, but if we convert the operand
+        // @OmarBazaraa: before applying the operation, the result will be incorrect.
+
         ret += lhs->generateQuad(generationContext);
         ret += Utils::dtypeConvQuad(lhs->type, type);
-        
+
         ret += rhs->generateQuad(generationContext);
         ret += Utils::dtypeConvQuad(rhs->type, type);
+
         ret += Utils::binOprToQuad(opr, type) + "\n";
-        
+
         return ret;
     }
 };
@@ -195,10 +207,25 @@ struct UnaryOprNode : public ExpressionNode {
 
         return ret += ")";
     }
-    
+
     virtual string generateQuad(GenerationContext* generationContext) {
         string ret = "";
-        
+
+        // @OmarBazaraa: what about other unary operations?
+        // @OmarBazaraa: bitwise not (~), logical not (!), unary plus (+)
+
+        // @OmarBazaraa: also the look of the function is not pleasent xD
+        // @OmarBazaraa: I think you should split this function into 3 cases
+        // @OmarBazaraa: 1. SUFFIX INC/DEC
+        // @OmarBazaraa: 2. PREFIX INC/DEC
+        // @OmarBazaraa: 3. Other unary operations
+
+        // @OmarBazaraa: I think you should extend function "binOprToQuad" to "oprToQuad"
+        // @OmarBazaraa: to accept both binary and unary operation.
+        // @OmarBazaraa: and you may extend it to accept push/pop also.
+
+        // @OmarBazaraa: again, take care of push/pop types
+
         switch (opr) {
             case OPR_U_MINUS:
                 ret += expr->generateQuad(generationContext);
@@ -237,7 +264,7 @@ struct UnaryOprNode : public ExpressionNode {
                 ret += "POP " + expr->reference->identifier + "\n";
                 break;
         }
-        
+
         return ret;
     }
 };

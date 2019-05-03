@@ -22,9 +22,10 @@ struct TypeNode : public StatementNode {
     virtual string toString(int ind = 0) {
         return string(ind, ' ') + Utils::dtypeToStr(type);
     }
-    
+
     virtual string generateQuad(GenerationContext* generationContext) {
         // TODO: Should it be empty ?
+        // @OmarBazaraa: yes it should, and it is better not to call this node
         return "";
     }
 };
@@ -48,9 +49,13 @@ struct ValueNode : public ExpressionNode {
     virtual string toString(int ind = 0) {
         return string(ind, ' ') + value;
     }
-    
+
     virtual string generateQuad(GenerationContext* generationContext) {
         // is this correct ?
+        // @OmarBazaraa: depending on your logic it correct.
+        // @OmarBazaraa: but add type to "push" instruction.
+        // @OmarBazaraa: I think it is better to add function for push/pop instructions to the Utils class
+        // @OmarBazaraa: accepting a DataType argument.
         return "PUSH " + value + "\n";
     }
 };
@@ -81,15 +86,16 @@ struct IdentifierNode : public ExpressionNode {
             type = ptr->type;
             isConst = ((Var*) ptr)->isConst;
         }
-        
+
         return true;
     }
 
     virtual string toString(int ind = 0) {
         return string(ind, ' ') + name;
     }
-    
+
     virtual string generateQuad(GenerationContext* generationContext) {
+        // @OmarBazaraa: add type to push.
         return "PUSH " + name + "\n";
     }
 };

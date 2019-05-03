@@ -62,7 +62,7 @@ struct FunctionNode : public StatementNode {
             ret &= paramList[i]->analyze(context);
         }
         context->declareFuncParams = false;
-        
+
         ret &= body->analyze(context);
 
         context->functions.pop();
@@ -80,23 +80,23 @@ struct FunctionNode : public StatementNode {
         ret += body->toString(ind);
         return ret;
     }
-    
+
     virtual string generateQuad(GenerationContext* generationContext) {
         string ret = "";
-        
+
         ret += "PROC " + name->name + "\n";
         generationContext->declareFuncParams = true;
-        
+
         for (int i = 0; i < paramList.size(); ++i) {
             ret += paramList[i]->generateQuad(generationContext);
         }
-        
+
         generationContext->declareFuncParams = false;
         ret += body->generateQuad(generationContext);
         ret += "ENDP " + name->name + "\n";
-        
+
         return ret;
-    } 
+    }
 };
 
 /**
@@ -152,7 +152,7 @@ struct FunctionCallNode : public ExpressionNode {
 
             if (func && argList[i]->type == DTYPE_VOID || argList[i]->type == DTYPE_FUNC_PTR) {
                 context->printError("invalid conversion from '" + argList[i]->getType() + "' to '" +
-                    func->paramList[i].getType() + "' in function '" + 
+                    func->paramList[i].getType() + "' in function '" +
                     func->header() + "' call", argList[i]->loc);
                 return false;
             }
@@ -168,16 +168,16 @@ struct FunctionCallNode : public ExpressionNode {
         }
         return ret += ")";
     }
-    
+
     virtual string generateQuad(GenerationContext* generationContext) {
         string ret = "";
-        
+
         for (int i = argList.size() - 1; i >= 0; --i) {
             ret += argList[i]->generateQuad(generationContext);
         }
-        
+
         ret += "CALL " + name->name + "\n";
-        
+
         return ret;
     }
 };

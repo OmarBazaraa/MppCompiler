@@ -50,7 +50,7 @@ public:
 
     /**
      * Adds a new scope to this context.
-     * 
+     *
      * @param type the type of the scope to add.
      */
     void addScope(ScopeType type) {
@@ -67,7 +67,7 @@ public:
 
     /**
      * Checks whether the current scope is the global scope within this context or not.
-     * 
+     *
      * @return {@code true} if the current scope is the global scope; {@code false} otherwise.
      */
     bool isGlobalScope() {
@@ -76,9 +76,9 @@ public:
 
     /**
      * Declares a new symbol in the the lastly added scope in this context.
-     * 
+     *
      * @param sym the symbol to add.
-     * 
+     *
      * @return {@code true} if the symbol was declared successfully; {@code false} if already declared.
      */
     bool declareSymbol(Symbol* sym) {
@@ -94,9 +94,9 @@ public:
 
     /**
      * Searches for the given identifier in the symbol table.
-     * 
+     *
      * @param identifier the name of the symbol to search for.
-     * 
+     *
      * @return a pointer on the found symbol table entry, or {@code NULL} if not available.
      */
     Symbol* getSymbol(const string& identifier) {
@@ -112,7 +112,7 @@ public:
     /**
      * Checks whether this context has a scope that can accept
      * break statement or not. That is, a loop scope or switch scope.
-     * 
+     *
      * @return {@code true} if this context has a break scope, {@code false} otherwise.
      */
     bool hasBreakScope() {
@@ -128,7 +128,7 @@ public:
     /**
      * Checks whether this context has a scope that can accept
      * case statement or not. That is, a switch scope.
-     * 
+     *
      * @return {@code true} if this context has a switch scope, {@code false} otherwise.
      */
     bool hasSwitchScope() {
@@ -144,7 +144,7 @@ public:
     /**
      * Checks whether this context has a scope that can accept
      * continue statement or not. That is, a loop scope.
-     * 
+     *
      * @return {@code true} if this context has a continue scope, {@code false} otherwise.
      */
     bool hasLoopScope() {
@@ -160,7 +160,7 @@ public:
     /**
      * Checks whether this context has a scope that can accept
      * return statement or not. That is, a function scope.
-     * 
+     *
      * @return {@code true} if this context has a continue scope, {@code false} otherwise.
      */
     bool hasFunctionScope() {

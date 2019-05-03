@@ -46,9 +46,9 @@ struct Utils {
 
     /**
      * Checks whether the given operator is an arithmetic operator or not.
-     * 
+     *
      * @param opr the operator to check.
-     * 
+     *
      * @return {@code true} if the given operator is arithmetic; {@code false} otherwise.
      */
     static bool isArithmeticOpr(Operator opr) {
@@ -67,9 +67,9 @@ struct Utils {
 
     /**
      * Checks whether the given operator is a logical operator or not.
-     * 
+     *
      * @param opr the operator to check.
-     * 
+     *
      * @return {@code true} if the given operator is logical; {@code false} otherwise.
      */
     static bool isLogicalOpr(Operator opr) {
@@ -90,9 +90,9 @@ struct Utils {
 
     /**
      * Checks whether the given operator is a bitwise operator or not.
-     * 
+     *
      * @param opr the operator to check.
-     * 
+     *
      * @return {@code true} if the given operator is bitwise; {@code false} otherwise.
      */
     static bool isBitwiseOpr(Operator opr) {
@@ -110,9 +110,9 @@ struct Utils {
 
     /**
      * Checks whether the given operator requires l-value operand or not.
-     * 
+     *
      * @param opr the operator to check.
-     * 
+     *
      * @return {@code true} if the given operator requires l-value operand; {@code false} otherwise.
      */
     static bool isLvalueOpr(Operator opr) {
@@ -129,9 +129,9 @@ struct Utils {
 
     /**
      * Converts the given operator into its corresponding token string.
-     * 
+     *
      * @param opr the operator to convert.
-     * 
+     *
      * @return the corresponding token string.
      */
     static string oprToStr(Operator opr) {
@@ -190,16 +190,19 @@ struct Utils {
 
         return "#";
     }
-    
+
     /**
      * Converts the given operator into its corresponding quadruple string.
-     * 
+     *
      * @param opr the operator to convert.
      * @param type the type of the resulting operation.
-     * 
+     *
      * @return the corresponding quadruple string.
      */
     static string binOprToQuad(Operator opr, DataType type) {
+        // @OmarBazaraa: I think it is better to extend this function to handle
+        // @OmarBazaraa: binary operations, unary operations, and push/pop instructions
+
         switch (opr) {
             case OPR_ADD:
                 return "ADD_" + dtypeToQuad(type);
@@ -210,7 +213,7 @@ struct Utils {
             case OPR_DIV:
                 return "DIV_" + dtypeToQuad(type);
             case OPR_MOD:
-                return "MOD";
+                return "MOD"; // @OmarBazaraa: why not "MOD"? xD
             case OPR_AND:
                 return "AND_" + dtypeToQuad(type);
             case OPR_OR:
@@ -223,7 +226,9 @@ struct Utils {
                 return "SHL_" + dtypeToQuad(type);
             case OPR_SHR:
                 return "SHR_" + dtypeToQuad(type);
-            case OPR_LOGICAL_AND:
+            // @OmarBazaraa: there is no logical AND, OR, NOT in the processor :D
+            // @OmarBazaraa: you can use the same AND, OR, NOT as above.
+            case OPR_LOGICAL_AND:   
                 return "LAND";
             case OPR_LOGICAL_OR:
                 return "LOR";
@@ -242,15 +247,15 @@ struct Utils {
             case OPR_NOT_EQUAL:
                 return "NEQ";
         }
-        
+
         return "#";
     }
 
     /**
      * Checks whether the given type is an integer data type.
-     * 
+     *
      * @param type the type to check.
-     * 
+     *
      * @return {@code true} if the given type is integer type; {@code false} otherwise.
      */
     static bool isIntegerType(DataType type) {
@@ -259,9 +264,9 @@ struct Utils {
 
     /**
      * Converts the given data type into its corresponding token string.
-     * 
+     *
      * @param type the type to convert.
-     * 
+     *
      * @return the corresponding token string.
      */
     static string dtypeToStr(DataType type) {
@@ -284,12 +289,12 @@ struct Utils {
 
         return "unknown";
     }
-    
+
     /**
      * Converts the given data type into its corresponding quadruple string.
-     * 
+     *
      * @param type the type to convert.
-     * 
+     *
      * @return the corresponding quadruple string.
      */
     static string dtypeToQuad(DataType type) {
@@ -312,19 +317,17 @@ struct Utils {
 
         return "unknown";
     }
-    
+
     /**
      * Convert data type from t1 into t2.
-     * 
+     *
      * @param t1 the type to convert from.
      * @param t2 the type to convert to.
-     * 
+     *
      * @return the corresponding quadruple string.
      */
     static string dtypeConvQuad(DataType t1, DataType t2) {
-        if (t1 != t2)
-            return dtypeToQuad(t1) + "_TO_" + dtypeToQuad(t2) + "\n";
-        return "";
+        return (t1 != t2 ? dtypeToQuad(t1) + "_TO_" + dtypeToQuad(t2) + "\n" : "");
     }
 };
 

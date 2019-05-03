@@ -52,14 +52,14 @@ struct BlockNode : public StatementNode {
         }
         return ret += string(ind, ' ') + "}";
     }
-    
+
     virtual string generateQuad(GenerationContext* generationContext) {
         string ret = "";
-        
+
         for (int i = 0; i < statements.size(); ++i) {
             ret += statements[i]->generateQuad(generationContext);
         }
-        
+
         return ret;
     }
 };
@@ -127,19 +127,20 @@ struct VarDeclarationNode : public StatementNode {
         }
         return ret;
     }
-    
+
     virtual string generateQuad(GenerationContext* generationContext) {
         string ret = "";
-        
+
         if (value) {
             ret += value->generateQuad(generationContext);
             ret += Utils::dtypeConvQuad(value->type, type->type);
         }
-        
+
         if (value || generationContext->declareFuncParams) {
-            ret += "POP " + name->name + "\n"; 
-        }		
-        
+            // @OmarBazaraa: add type to pop instruction.
+            ret += "POP " + name->name + "\n";
+        }
+
         return ret;
     }
 };
@@ -163,9 +164,12 @@ struct BreakStmtNode : public StatementNode {
     virtual string toString(int ind = 0) {
         return string(ind, ' ') + "break";
     }
-    
+
     virtual string generateQuad(GenerationContext* generationContext) {
-        return "JMP L" + to_string(generationContext->breakLabels.top()) + "\n"; 
+        // @OmarBazaraa: I think it is better to rename all "generationContext" objects
+        // @OmarBazaraa: across all "generateQuad" function to just "context".
+        // @OmarBazaraa: the name is too long xD.
+        return "JMP L" + to_string(generationContext->breakLabels.top()) + "\n";
     }
 };
 
@@ -188,9 +192,9 @@ struct ContinueStmtNode : public StatementNode {
     virtual string toString(int ind = 0) {
         return string(ind, ' ') + "continue";
     }
-    
+
     virtual string generateQuad(GenerationContext* generationContext) {
-        return "JMP L" + to_string(generationContext->continueLabels.top()) + "\n"; 
+        return "JMP L" + to_string(generationContext->continueLabels.top()) + "\n";
     }
 };
 
@@ -232,7 +236,7 @@ struct ReturnStmtNode : public StatementNode {
                 return false;
             }
         }
-        
+
         return true;
     }
 
@@ -243,15 +247,15 @@ struct ReturnStmtNode : public StatementNode {
         }
         return ret;
     }
-    
+
     virtual string generateQuad(GenerationContext* generationContext) {
         string ret = "";
-        
+
         if (value)
             ret += value->generateQuad(generationContext);
-        
+
         ret += "RET\n";
-        
+
         return ret;
     }
 };

@@ -38,7 +38,7 @@ struct IfNode : public StatementNode {
 
         ret &= cond->analyze(context);
         ret &= ifBody->analyze(context);
-        
+
         if (elseBody) {
             ret &= elseBody->analyze(context);
         }
@@ -59,36 +59,36 @@ struct IfNode : public StatementNode {
 
         return ret;
     }
-    
+
     virtual string generateQuad(GenerationContext* generationContext) {
         string ret = "";
         int label1 = generationContext->labelCounter++;
         ret += cond->generateQuad(generationContext);
-        
+
         if (elseBody) {
             int label2 = generationContext->labelCounter++;
             ret += "JZ L" + to_string(label1) + "\n";
-            
+
             ret += ifBody->generateQuad(generationContext);
-            
+
             ret += "JMP L" + to_string(label2) + "\n";
             ret += "L" + to_string(label1) + ":\n";
-            
+
             ret += elseBody->generateQuad(generationContext);
-            
+
             ret += "L" + to_string(label2) + ":\n";
-        } 
+        }
         else {
             ret += "JZ L" + to_string(label1) + "\n";
-            
+
             ret += ifBody->generateQuad(generationContext);
-            
+
             ret += "L" + to_string(label1) + ":\n";
         }
-        
+
         return ret;
     }
-    
+
 };
 
 /**
@@ -160,22 +160,26 @@ struct CaseLabelNode : public StatementNode {
         ret += stmt->toString(ind);
         return ret;
     }
-    
+
     virtual string generateQuad(GenerationContext* generationContext) {
         if (expr == NULL) {
             return stmt->generateQuad(generationContext);
         }
-        
+
+        // @OmarBazaraa: switch case statements are incorrect in the situation where
+        // @OmarBazaraa: one case label has no direct statement under it,
+        // @OmarBazaraa: or when it has more than one direct statements under it.
+
         string ret = "";
         int label1 = generationContext->labelCounter++;
-        
+
         ret += "PUSH SWITCH_COND@" + to_string(generationContext->breakLabels.top()) + "\n";
         ret += expr->generateQuad(generationContext);
         ret += "EQU\n";
         ret += "JZ L" + to_string(label1) + "\n";
         ret += stmt->generateQuad(generationContext);
         ret += "L" + to_string(label1) + ":\n";
-        
+
         return ret;
     }
 };
@@ -229,20 +233,20 @@ struct SwitchNode : public StatementNode {
         ret += body->toString(ind + (dynamic_cast<BlockNode*>(body) ? 0 : 4));
         return ret;
     }
-    
+
     virtual string generateQuad(GenerationContext* generationContext) {
         string ret = "";
         int label1 = generationContext->labelCounter++;
-        
+
         ret += cond->generateQuad(generationContext);
         ret += "POP SWITCH_COND@" + to_string(label1) + "\n";
         generationContext->breakLabels.push(label1);
-        
+
         ret += body->generateQuad(generationContext);
-        
+
         generationContext->breakLabels.pop();
         ret += "L" + to_string(label1) + ":\n";
-        
+
         return ret;
     }
 };
