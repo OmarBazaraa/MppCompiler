@@ -136,7 +136,7 @@ StatementNode* programRoot = NULL;
         // printf(">> DESTRUCTOR NULL\n");
     }
 }
-<blockNode> <stmtNode>  <varDeclNode>
+<blockNode> <stmtNode> <varDeclNode>
 <ifNode> <switchNode> <caseStmtNode>
 <whileNode> <doWhileNode> <forNode>
 <functionNode> <functionCallNode> <returnStmtNode>

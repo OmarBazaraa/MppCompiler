@@ -51,7 +51,7 @@ struct Utils {
      * 
      * @return the string after replacing tabs with spaces.
      */
-    string replaceTabsWithSpaces(const string& str) {
+    static string replaceTabsWithSpaces(const string& str) {
         string ret;
         for (int i = 0; i < str.size(); ++i) {
             if (str[i] == '\t') {

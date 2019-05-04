@@ -241,7 +241,7 @@ private:
         // Read the source code line by line
         string line;
         while (getline(fin, line)) {
-            sourceCode.push_back(line);
+            sourceCode.push_back(Utils::replaceTabsWithSpaces(line));
         }
 
         // Close

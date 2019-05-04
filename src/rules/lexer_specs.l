@@ -57,6 +57,8 @@ WHITESPACE          [ \t]+
 // Token localization
 %}
 \n                                  curLoc.lineNum++; curLoc.pos = 0;
+\t                                  curLoc.pos += 4;
+" "                                 curLoc.pos++;
 
 %{
 // Data types
@@ -112,7 +114,6 @@ WHITESPACE          [ \t]+
 %{
 // Others
 %}
-<INITIAL>{WHITESPACE}               ADVANCE_CURSOR; // Ignore whitespace
 <INITIAL>{LINE_COMMENT}             ADVANCE_CURSOR; // Ignore comments
 <INITIAL>"/*"                       ADVANCE_CURSOR; BEGIN BLOCK_COMMENT;
 <BLOCK_COMMENT>"*/"                 ADVANCE_CURSOR; BEGIN INITIAL;
