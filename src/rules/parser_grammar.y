@@ -124,6 +124,26 @@ StatementNode* programRoot = NULL;
 %type <location>            '-' '+' '*' '/' '%' '&' '|' '^' '~' '!' '<' '>' '=' '(' ')' '{' '}' '[' ']' ',' ':' ';'
 
 // =====================================================================================================
+// Destructors
+// ===========
+
+%destructor {
+    if ($$ != NULL) {
+        delete $$;
+        $$ = NULL;
+        // printf(">> DESTRUCTOR\n");
+    } else {
+        // printf(">> DESTRUCTOR NULL\n");
+    }
+}
+<blockNode> <stmtNode>  <varDeclNode>
+<ifNode> <switchNode> <caseStmtNode>
+<whileNode> <doWhileNode> <forNode>
+<functionNode> <functionCallNode> <returnStmtNode>
+<stmtList> <varList> <exprList>
+<exprNode> <typeNode> <valueNode> <identifierNode>
+
+// =====================================================================================================
 // Precendence & Associativity
 // ===========================
 
@@ -153,8 +173,8 @@ StatementNode* programRoot = NULL;
 // Rules Section
 // =============
 
-program:            /* epsilon */               { programRoot = new BlockNode(); }
-    |               stmt_list                   { programRoot = new BlockNode((*$1)[0]->loc, *$1); delete $1; }
+program:            /* epsilon */               { $$ = NULL; programRoot = new BlockNode(); }
+    |               stmt_list                   { $$ = NULL; programRoot = new BlockNode((*$1)[0]->loc, *$1); delete $1; }
     ;
 
 stmt_list:          stmt                        { $$ = new StmtList(); $$->push_back($1); }

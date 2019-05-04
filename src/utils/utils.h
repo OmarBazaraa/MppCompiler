@@ -45,6 +45,25 @@ struct Token {
 struct Utils {
 
     /**
+     * Converts the tabs in the given string into spaces.
+     * 
+     * @param str the string to convert.
+     * 
+     * @return the string after replacing tabs with spaces.
+     */
+    string replaceTabsWithSpaces(const string& str) {
+        string ret;
+        for (int i = 0; i < str.size(); ++i) {
+            if (str[i] == '\t') {
+                ret += "    ";
+            } else {
+                ret += str[i];
+            }
+        }
+        return ret;
+    }
+
+    /**
      * Checks whether the given operator is an arithmetic operator or not.
      *
      * @param opr the operator to check.
