@@ -120,6 +120,8 @@ struct Utils {
             case OPR_ASSIGN:
             case OPR_PRE_INC:
             case OPR_PRE_DEC:
+            case OPR_SUF_INC:
+            case OPR_SUF_DEC:
                 return true;
         }
         return false;
@@ -245,13 +247,15 @@ struct Utils {
             case OPR_SUF_DEC:
                 return "DEC_" + dtypeToQuad(type);
 			case OPR_PUSH:
-				return "PUSH_" + dtypeToQuad(type) + " ";
+				return "PUSH_" + dtypeToQuad(type);
 			case OPR_POP:
-				return "POP_" + dtypeToQuad(type) + " ";
+				return "POP_" + dtypeToQuad(type);
 			case OPR_JMP:
-				return "JMP ";
+				return "JMP";
+            case OPR_JNZ:
+				return "JNZ_" + dtypeToQuad(type);
 			case OPR_JZ:
-				return "JZ_" + dtypeToQuad(type) + " ";
+				return "JZ_" + dtypeToQuad(type);
         }
 
         return "#";

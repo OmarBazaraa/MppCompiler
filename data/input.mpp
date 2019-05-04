@@ -1,12 +1,13 @@
 
-void func() {
-
+int func(int x, char y, float z) {
+	return 1;
 }
 
 int main() {
-	int x = 1;
-	int y = 2;
-	int z = 3;
 
-    ((((++x) = y++) = 7) = (z = 8));
+	int x;
+	
+	func(5.5, (x = 7)++, 5.5);
+
+	// (((++x) = y++) = 7) = (z = 8);
 }

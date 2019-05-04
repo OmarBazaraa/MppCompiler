@@ -54,12 +54,10 @@ struct BlockNode : public StatementNode {
     }
 
     virtual string generateQuad(GenerationContext* generationContext) {
-        string ret = "";
-
+        string ret;
         for (int i = 0; i < statements.size(); ++i) {
             ret += statements[i]->generateQuad(generationContext);
         }
-
         return ret;
     }
 };
@@ -129,7 +127,7 @@ struct VarDeclarationNode : public StatementNode {
     }
 
     virtual string generateQuad(GenerationContext* generationContext) {
-        string ret = "";
+        string ret;
 
         if (value) {
             ret += value->generateQuad(generationContext);
@@ -137,7 +135,7 @@ struct VarDeclarationNode : public StatementNode {
         }
 
         if (value || generationContext->declareFuncParams) {
-            ret += Utils::oprToQuad(Operator::OPR_POP, type->type) + var.alias + "\n";
+            ret += Utils::oprToQuad(OPR_POP, type->type) + " " + var.alias + "\n";
         }
 
         return ret;
@@ -165,7 +163,7 @@ struct BreakStmtNode : public StatementNode {
     }
 
     virtual string generateQuad(GenerationContext* generationContext) {
-        return Utils::oprToQuad(Operator::OPR_JMP) + "L" + to_string(generationContext->breakLabels.top()) + "\n";
+        return Utils::oprToQuad(OPR_JMP) + " L" + to_string(generationContext->breakLabels.top()) + "\n";
     }
 };
 
@@ -190,7 +188,7 @@ struct ContinueStmtNode : public StatementNode {
     }
 
     virtual string generateQuad(GenerationContext* generationContext) {
-        return Utils::oprToQuad(Operator::OPR_JMP) + "L" + to_string(generationContext->continueLabels.top()) + "\n";
+        return Utils::oprToQuad(OPR_JMP) + " L" + to_string(generationContext->continueLabels.top()) + "\n";
     }
 };
 
@@ -246,7 +244,7 @@ struct ReturnStmtNode : public StatementNode {
     }
 
     virtual string generateQuad(GenerationContext* generationContext) {
-        string ret = "";
+        string ret;
 
         if (value) {
             ret += value->generateQuad(generationContext);

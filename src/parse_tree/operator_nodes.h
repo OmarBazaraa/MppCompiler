@@ -24,7 +24,7 @@ struct AssignOprNode : public ExpressionNode {
     }
 
     virtual bool analyze(ScopeContext* context, bool valueUsed) {
-        if (!(rhs->analyze(context, true) & lhs->analyze(context, valueUsed))) {
+        if (!(rhs->analyze(context, true) & lhs->analyze(context, false))) {
             // Note that I used a bitwise AND to execute both lhs and rhs expressions
             return false;
         }
@@ -59,15 +59,16 @@ struct AssignOprNode : public ExpressionNode {
     }
 
     virtual string generateQuad(GenerationContext* generationContext) {
-        // TODO: What about the quad of the lhs ?
-        // @OmarBazaraa: I think you should call the lhs
-        // @OmarBazaraa: If we have an expression like this one "(x = y++) = 5".
-        // @OmarBazaraa: "y" should be incremented, and "x" should be assigned 5.
-        string ret = "";
+        string ret;
 
+        ret += lhs->generateQuad(generationContext);
         ret += rhs->generateQuad(generationContext);
         ret += Utils::dtypeConvQuad(rhs->type, type);
-        ret += Utils::oprToQuad(Operator::OPR_POP, type) + lhs->reference->alias + "\n";
+        ret += Utils::oprToQuad(OPR_POP, type) + " " + lhs->reference->alias + "\n";
+
+        if (used) {
+            ret += Utils::oprToQuad(OPR_PUSH, type) + " " + lhs->reference->alias + "\n";
+        }
 
         return ret;
     }
@@ -126,17 +127,23 @@ struct BinaryOprNode : public ExpressionNode {
     }
 
     virtual string generateQuad(GenerationContext* generationContext) {
-        string ret = "";
+        string ret;
 		
 		DataType t = max(lhs->type, rhs->type);
 
-        ret += lhs->generateQuad(generationContext);
-        ret += Utils::dtypeConvQuad(lhs->type, t);
+        if (used) {
+            ret += lhs->generateQuad(generationContext);
+            ret += Utils::dtypeConvQuad(lhs->type, t);
 
-        ret += rhs->generateQuad(generationContext);
-        ret += Utils::dtypeConvQuad(rhs->type, t);
+            ret += rhs->generateQuad(generationContext);
+            ret += Utils::dtypeConvQuad(rhs->type, t);
 
-        ret += Utils::oprToQuad(opr, t) + "\n";
+            ret += Utils::oprToQuad(opr, t) + "\n";
+        }
+        else {
+            ret += lhs->generateQuad(generationContext);
+            ret += rhs->generateQuad(generationContext);
+        }
 
         return ret;
     }
@@ -159,7 +166,7 @@ struct UnaryOprNode : public ExpressionNode {
     }
 
     virtual bool analyze(ScopeContext* context, bool valueUsed) {
-        if (!expr->analyze(context, valueUsed)) {
+        if (!expr->analyze(context, valueUsed || Utils::isLvalueOpr(opr))) {
             return false;
         }
 
@@ -181,7 +188,7 @@ struct UnaryOprNode : public ExpressionNode {
         }
 
         type = (Utils::isLogicalOpr(opr) ? DTYPE_BOOL : expr->type);
-        reference = (Utils::isLvalueOpr(opr) ? expr->reference : NULL);
+        reference = (opr == OPR_PRE_INC || opr == OPR_PRE_DEC ? expr->reference : NULL);
         isConst = expr->isConst;
         used = valueUsed;
 
@@ -205,30 +212,39 @@ struct UnaryOprNode : public ExpressionNode {
     }
 
     virtual string generateQuad(GenerationContext* generationContext) {
-        string ret = "";
+        string ret;
 		
 		ret += expr->generateQuad(generationContext);
-		ret += Utils::dtypeConvQuad(expr->type, type);
+
+        if (used) {
+		    ret += Utils::dtypeConvQuad(expr->type, type);
+        }
 
         switch (opr) {
             case OPR_PRE_INC:
 			case OPR_PRE_DEC:
                 ret += Utils::oprToQuad(opr, type) + "\n";
-                ret += Utils::oprToQuad(Operator::OPR_POP, type) + expr->reference->alias + "\n";
-                ret += Utils::oprToQuad(Operator::OPR_PUSH, type) + expr->reference->alias + "\n";
+                ret += Utils::oprToQuad(OPR_POP, type) + " " + expr->reference->alias + "\n";
+
+                if (used) {
+                    ret += Utils::oprToQuad(OPR_PUSH, type) + " " + expr->reference->alias + "\n";
+                }
                 break;
             case OPR_SUF_INC:
 			case OPR_SUF_DEC:
-                ret += Utils::oprToQuad(Operator::OPR_POP, type)  + expr->reference->alias + "\n";
-                ret += Utils::oprToQuad(Operator::OPR_PUSH, type) + expr->reference->alias + "\n";
-                ret += Utils::oprToQuad(Operator::OPR_PUSH, type) + expr->reference->alias + "\n";
+                if (used) {
+                    ret += Utils::oprToQuad(OPR_PUSH, type) + " " + expr->reference->alias + "\n";
+                }
+                
                 ret += Utils::oprToQuad(opr, type) + "\n";
-                ret += Utils::oprToQuad(Operator::OPR_POP, type) + expr->reference->alias + "\n";
+                ret += Utils::oprToQuad(OPR_POP, type) + " " + expr->reference->alias + "\n";
                 break;
 			case OPR_U_MINUS:
 			case OPR_NOT:
 			case OPR_LOGICAL_NOT:
-				ret += Utils::oprToQuad(opr, type) + "\n";
+                if (used) {
+				    ret += Utils::oprToQuad(opr, type) + "\n";
+                }
 				break;
         }
 

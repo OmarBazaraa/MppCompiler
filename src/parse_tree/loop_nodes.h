@@ -32,7 +32,7 @@ struct WhileNode : public StatementNode {
 
         context->addScope(SCOPE_LOOP);
 
-        ret &= cond->analyze(context);
+        ret &= cond->analyze(context, true);
         ret &= body->analyze(context);
 
         context->popScope();
@@ -47,13 +47,13 @@ struct WhileNode : public StatementNode {
     }
 
     virtual string generateQuad(GenerationContext* generationContext) {
-        string ret = "";
+        string ret;
         int label1 = generationContext->labelCounter++;
         int label2 = generationContext->labelCounter++;
 
         ret += "L" + to_string(label1) + ":\n";
         ret += cond->generateQuad(generationContext);
-        ret += Utils::oprToQuad(Operator::OPR_JZ, cond->type) + "L" + to_string(label2) + "\n";
+        ret += Utils::oprToQuad(OPR_JZ, cond->type) + " L" + to_string(label2) + "\n";
 
         generationContext->breakLabels.push(label2);
         generationContext->continueLabels.push(label1);
@@ -63,12 +63,11 @@ struct WhileNode : public StatementNode {
         generationContext->breakLabels.pop();
         generationContext->continueLabels.pop();
 
-        ret += Utils::oprToQuad(Operator::OPR_JMP) + "L" + to_string(label1) + "\n";
+        ret += Utils::oprToQuad(OPR_JMP) + " L" + to_string(label1) + "\n";
         ret += "L" + to_string(label2) + ":\n";
 
         return ret;
     }
-
 };
 
 /**
@@ -98,7 +97,7 @@ struct DoWhileNode : public StatementNode {
 
         context->addScope(SCOPE_LOOP);
 
-        ret &= cond->analyze(context);
+        ret &= cond->analyze(context, true);
         ret &= body->analyze(context);
 
         context->popScope();
@@ -114,7 +113,7 @@ struct DoWhileNode : public StatementNode {
     }
 
     virtual string generateQuad(GenerationContext* generationContext) {
-        string ret = "";
+        string ret;
         int label1 = generationContext->labelCounter++;
         int label2 = generationContext->labelCounter++;
         int label3 = generationContext->labelCounter++;
@@ -126,17 +125,16 @@ struct DoWhileNode : public StatementNode {
 
         ret += body->generateQuad(generationContext);
 
-        generationContext->breakLabels.pop();
         generationContext->continueLabels.pop();
+        generationContext->breakLabels.pop();
 
         ret += "L" + to_string(label2) + ":\n";
         ret += cond->generateQuad(generationContext);
-        ret += "JNZ L" + to_string(label1) + "\n";
+        ret += Utils::oprToQuad(OPR_JNZ, cond->type) + " L" + to_string(label1) + "\n";
         ret += "L" + to_string(label3) + ":\n";
 
         return ret;
     }
-
 };
 
 /**
@@ -173,8 +171,8 @@ struct ForNode : public StatementNode {
         context->addScope(SCOPE_LOOP);
 
         if (initStmt) ret &= initStmt->analyze(context);
-        if (cond) ret &= cond->analyze(context);
-        if (inc) ret &= inc->analyze(context);
+        if (cond) ret &= cond->analyze(context, true);
+        if (inc) ret &= inc->analyze(context, false);
         ret &= body->analyze(context);
 
         context->popScope();
@@ -191,32 +189,35 @@ struct ForNode : public StatementNode {
         return ret;
     }
 
-	 /**
-	  * InitStmt Code
-	  * L1: Cond Code
-	  * JMP L3 if Condition is false
-	  *
-	  * Body Code
-	  * L2: Inc. Code
-	  * JMP L1
-	  *
-	  * L3 (exit)
-	  *
-	  **/
+	 
     virtual string generateQuad(GenerationContext* generationContext) {
-        string ret = "";
+        /**
+         * InitStmt Code
+         * L1: Cond Code
+         * JMP L3 if Condition is false
+         *
+         * Body Code
+         * L2: Inc. Code
+         * JMP L1
+         *
+         * L3 (exit)
+         *
+         **/
+
+        string ret;
         int label1 = generationContext->labelCounter++;
         int label2 = generationContext->labelCounter++;
         int label3 = generationContext->labelCounter++;
 
-        if (initStmt)
+        if (initStmt) {
             ret += initStmt->generateQuad(generationContext);
+        }
 
         ret += "L" + to_string(label1) + ":\n";
 
         if (cond) {
 			ret += cond->generateQuad(generationContext);
-			ret += Utils::oprToQuad(Operator::OPR_JZ, cond->type) + "L" + to_string(label3) + "\n";
+			ret += Utils::oprToQuad(OPR_JZ, cond->type) + " L" + to_string(label3) + "\n";
 		}
 		
 		generationContext->breakLabels.push(label3);
@@ -224,15 +225,16 @@ struct ForNode : public StatementNode {
 
         ret += body->generateQuad(generationContext);
 
-        generationContext->breakLabels.pop();
         generationContext->continueLabels.pop();
+        generationContext->breakLabels.pop();
 		
 		ret += "L" + to_string(label2) + ":\n";
 		
-		if (inc)
+		if (inc) {
             ret += inc->generateQuad(generationContext);
+        }
             
-        ret += Utils::oprToQuad(Operator::OPR_JMP) + "L" + to_string(label1) + "\n";
+        ret += Utils::oprToQuad(OPR_JMP) + " L" + to_string(label1) + "\n";
 		ret += "L" + to_string(label3) + ":\n";
 
         return ret;

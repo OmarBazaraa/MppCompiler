@@ -114,7 +114,7 @@ struct ExprContainerNode : public ExpressionNode {
             return false;
         }
 
-        bool ret = expr->analyze(context);
+        bool ret = expr->analyze(context, valueUsed);
 
         type = expr->type;
         reference = expr->reference;

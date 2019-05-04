@@ -36,7 +36,7 @@ struct IfNode : public StatementNode {
 
         context->addScope(SCOPE_IF);
 
-        ret &= cond->analyze(context);
+        ret &= cond->analyze(context, true);
         ret &= ifBody->analyze(context);
 
         if (elseBody) {
@@ -61,17 +61,17 @@ struct IfNode : public StatementNode {
     }
 
     virtual string generateQuad(GenerationContext* generationContext) {
-        string ret = "";
+        string ret;
         int label1 = generationContext->labelCounter++;
 		
         ret += cond->generateQuad(generationContext);
-		ret += Utils::oprToQuad(Operator::OPR_JZ, cond->type) + "L" + to_string(label1) + "\n";
+		ret += Utils::oprToQuad(OPR_JZ, cond->type) + " L" + to_string(label1) + "\n";
 		ret += ifBody->generateQuad(generationContext);
 		
         if (elseBody) {
             int label2 = generationContext->labelCounter++;
 
-            ret += Utils::oprToQuad(Operator::OPR_JMP) + "L" + to_string(label2) + "\n";
+            ret += Utils::oprToQuad(OPR_JMP) + " L" + to_string(label2) + "\n";
             ret += "L" + to_string(label1) + ":\n";
             ret += elseBody->generateQuad(generationContext);
             ret += "L" + to_string(label2) + ":\n";
@@ -82,7 +82,6 @@ struct IfNode : public StatementNode {
 
         return ret;
     }
-
 };
 
 /**
@@ -113,7 +112,7 @@ struct CaseLabelNode : public StatementNode {
         bool ret = true;
 
         if (expr) {     // case label
-            ret = expr->analyze(context);
+            ret = expr->analyze(context, true);
 
             if (ret && !expr->isConst) {
                 context->printError("constant expression required in case label", expr->loc);
@@ -160,14 +159,14 @@ struct CaseLabelNode : public StatementNode {
             return stmt->generateQuad(generationContext);
         }
 
-        string ret = "";
+        string ret;
         int label1 = generationContext->labelCounter++;
 
 		// @AbdoEed The type of this push is incorrect it should be the type of the switch expr. not the case expr.
-        ret += Utils::oprToQuad(Operator::OPR_PUSH, expr->type) + "SWITCH_COND@" + to_string(generationContext->breakLabels.top()) + "\n";
+        ret += Utils::oprToQuad(OPR_PUSH, expr->type) + " SWITCH_COND@" + to_string(generationContext->breakLabels.top()) + "\n";
         ret += expr->generateQuad(generationContext);
-        ret += Utils::oprToQuad(Operator::OPR_EQUAL, expr->type);
-        ret += Utils::oprToQuad(Operator::OPR_JZ, DataType::DTYPE_BOOL) + "L" + to_string(label1) + "\n";
+        ret += Utils::oprToQuad(OPR_EQUAL, expr->type);
+        ret += Utils::oprToQuad(OPR_JZ, DTYPE_BOOL) + " L" + to_string(label1) + "\n";
         ret += stmt->generateQuad(generationContext);
         ret += "L" + to_string(label1) + ":\n";
 
@@ -204,7 +203,7 @@ struct SwitchNode : public StatementNode {
         context->addScope(SCOPE_SWITCH);
         context->switches.push(&switchStmt);
 
-        ret &= cond->analyze(context);
+        ret &= cond->analyze(context, true);
 
         if (!Utils::isIntegerType(cond->type)) {
             context->printError("switch quantity not an integer", cond->loc);
@@ -226,11 +225,11 @@ struct SwitchNode : public StatementNode {
     }
 
     virtual string generateQuad(GenerationContext* generationContext) {
-        string ret = "";
+        string ret;
         int label1 = generationContext->labelCounter++;
 
         ret += cond->generateQuad(generationContext);
-        ret += Utils::oprToQuad(Operator::OPR_POP, cond->type) + "SWITCH_COND@" + to_string(label1) + "\n";
+        ret += Utils::oprToQuad(OPR_POP, cond->type) + " SWITCH_COND@" + to_string(label1) + "\n";
         generationContext->breakLabels.push(label1);
 
         ret += body->generateQuad(generationContext);

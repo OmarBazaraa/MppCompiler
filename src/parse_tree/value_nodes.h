@@ -50,7 +50,11 @@ struct ValueNode : public ExpressionNode {
     }
 
     virtual string generateQuad(GenerationContext* generationContext) {
-        return Utils::oprToQuad(Operator::OPR_PUSH, type) + value + "\n";
+        string ret;
+        if (used) {
+            ret += Utils::oprToQuad(OPR_PUSH, type) + " " + value + "\n";
+        }
+        return ret;
     }
 };
 
@@ -86,7 +90,7 @@ struct IdentifierNode : public ExpressionNode {
         if (used) {
             ptr->used = true;
         }
-        
+
         return true;
     }
 
@@ -95,7 +99,11 @@ struct IdentifierNode : public ExpressionNode {
     }
 
     virtual string generateQuad(GenerationContext* generationContext) {
-        return Utils::oprToQuad(Operator::OPR_PUSH, type) + reference->alias + "\n";
+        string ret;
+        if (used) {
+            ret += Utils::oprToQuad(OPR_PUSH, type) + " " + reference->alias + "\n";;
+        }
+        return ret;
     }
 };
 
