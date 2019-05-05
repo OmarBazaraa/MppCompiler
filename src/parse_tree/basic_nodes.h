@@ -78,7 +78,7 @@ struct DeclarationNode : public StatementNode {
     TypeNode* type;
     IdentifierNode* ident;
     string alias;
-    bool used = false;
+    int used = 0;
 
     DeclarationNode(const Location& loc) : StatementNode(loc) {}
 

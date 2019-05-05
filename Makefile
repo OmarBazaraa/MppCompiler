@@ -33,7 +33,7 @@ build:
 
 run:
 	@make -s clear
-	out\\M++.exe data/input.mpp
+	out\\M++.exe data/input.mpp -o data/out.quad -s data/symbol_table.txt
 
 all:
 	@make -s build

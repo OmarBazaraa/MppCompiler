@@ -25,13 +25,14 @@ Run `make run` to run the recently built compiler.
 **_Note:_** You can change the input file from the `Makefile`.
 
 # M++ Compiler Commands
-**Syntax**: `M++ [-h|--help] [-v|--version] [-o|--output <output_file>]  <input_file>`
+**Syntax**: `M++ [-h|--help] [-v|--version] [-o|--output <output_file>] [-s|--sym_table <filename>]  <input_file>`
 
 | Command                                         | Description                                                      |
 | ----------------------------------------------- | ---------------------------------------------------------------- |
 | `-h` or `--help`                                | Print help menu and exit.                                        |
 | `-v` or `--version`                             | Print the installed version number and exit.                     |
 | `-o` or `--output` `<filename>`                 | Specify the output filename.                                     |
+| `-s` or `--sym_table` `<filename>`              | Output the symbol table to the given file                        |
 
 # Syntax Errors Detected by M++
 ### Scope-related errors

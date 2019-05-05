@@ -18,3 +18,5 @@ out/*
 *.o
 *.exe
 *.mpp
+*.txt
+*.quad

@@ -3,6 +3,8 @@
 
 #include <iostream>
 #include <fstream>
+#include <sstream>
+#include <iomanip>
 #include <string>
 #include <vector>
 #include <stack>
@@ -25,9 +27,9 @@ typedef unordered_map<string, DeclarationNode*> SymbolTable;
  * Struct holding scope information.
  */
 struct Scope {
-    ScopeType type;         // the type of the scope
-    Node* ptr;              // a pointer to the node of the scope
-    SymbolTable table;      // the symbol table of this scope
+    ScopeType type;         // The type of the scope
+    Node* ptr;              // A pointer to the node of the scope
+    SymbolTable table;      // The symbol table of this scope
 
     Scope(ScopeType type, Node* ptr = NULL) {
         this->type = type;
@@ -55,6 +57,8 @@ public:
     bool declareFuncParams = false;
     bool initializeVar = false;
 
+    string symbolTableStr;
+
 public:
 
     /**
@@ -63,6 +67,8 @@ public:
     ScopeContext(const string& sourceFilename) {
         this->sourceFilename = sourceFilename;
         this->readSourceCode();
+
+        this->symbolTableStr += symTableHeaderStr();
     }
 
     /**
@@ -85,16 +91,18 @@ public:
         for (auto& it : scope->table) {
             DeclarationNode* sym = it.second;
 
-            if (!sym->used) {
+            if (sym->used > 0) {
                 if (dynamic_cast<VarDeclarationNode*>(sym)) {
-                    printWarning("the value of variable '" + sym->declaredHeader() + "' is never used");
+                    printWarning("the value of variable '" + sym->declaredHeader() + "' is never used", sym->loc);
                 }
                 else if (sym->ident->name != "main") {
-                    printWarning("function '" + sym->declaredHeader() + "' is never called");
+                    printWarning("function '" + sym->declaredHeader() + "' is never called", sym->loc);
                 }
             }
             
             aliases[sym->ident->name]--;
+
+            symbolTableStr += symTableEntryStr(sym, scopes.size());
         }
 
         delete scope;
@@ -248,10 +256,18 @@ public:
     }
 
     /**
-     * Prints warning message.
+     * Prints warning message at the given location in this context..
      */
-    void printWarning(const string& what) {
-        fprintf(stdout, "warning: %s\n", what.c_str());
+    void printWarning(const string& what, const Location& loc) {
+        fprintf(stdout, "%s:%d:%d: warning: %s\n", sourceFilename.c_str(), loc.lineNum, loc.pos, what.c_str());
+        fprintf(stdout, "%s\n", sourceCode[loc.lineNum - 1].c_str());
+        fprintf(stdout, "%*s", loc.pos, "^");
+
+        if (loc.len > 1) {
+            fprintf(stdout, "%s", string(loc.len - 1, '~').c_str());
+        }
+
+        fprintf(stdout, "\n");
     }
 
     /**
@@ -270,6 +286,42 @@ public:
     }
 
 private:
+
+    /**
+     * Returns the symbol table header string.
+     *
+     * @return the header string of the symbol table.
+     */
+    string symTableHeaderStr() {
+        string ret;
+
+        ret += "+-------+-------------------------------+-------------------------------+-------------------------------+-------+\n";
+        ret += "| scope | type                          | identifier                    | alias                         | used  |\n";
+        ret += "+-------+-------------------------------+-------------------------------+-------------------------------+-------+\n";
+
+        return ret;
+    }
+
+    /**
+     * Returns the symbol table entry string of the given symbol.
+     *
+     * @param sym   the symbol table entry.
+     * @param scope the scope of the symbol.
+     *
+     * @return the entry string of the symbol table entry.
+     */
+    string symTableEntryStr(DeclarationNode* sym, int scope = 0) {
+        stringstream ss;
+
+        ss << "| " << left << setw(6) << scope;
+        ss << "| " << left << setw(30) << sym->declaredType();
+        ss << "| " << left << setw(30) << sym->ident->name;
+        ss << "| " << left << setw(30) << sym->alias;
+        ss << "| " << left << setw(6) << sym->used << "|\n";
+        ss << "+-------+-------------------------------+-------------------------------+-------------------------------+-------+\n";
+
+        return ss.str();
+    }
 
     /**
      * Reads the given source code file and fills
