@@ -94,10 +94,10 @@ struct ExpressionNode : public StatementNode {
     //
     // NOTE: the following variables will be computed after calling analyze function
     //
-    DataType type = DTYPE_ERROR;        // data type of the expression
-    DeclarationNode* reference = NULL;  // reference variable of the expression is exist
-    bool isConst = false;               // whether the expression is of constant value or not
-    bool used = false;                  // whether the value of the expression is to be used or not
+    DataType type = DTYPE_ERROR;        // Data type of the expression
+    DeclarationNode* reference = NULL;  // Reference variable of the expression is exist
+    bool isConst = false;               // Whether the expression is of constant value or not
+    bool used = false;                  // Whether the value of the expression is to be used or not
 
     ExpressionNode() {}
 

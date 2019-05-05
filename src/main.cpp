@@ -29,7 +29,6 @@ extern StatementNode* programRoot;
 //
 string inputFilename;
 string outputFilename = "out.o";
-vector<string> sourceCode;
 
 //
 // Functions prototypes
@@ -65,7 +64,7 @@ int main(int argc, char* argv[]) {
     yyparse();
 
     // Apply semantic check and quadruple generation
-    if (programRoot->analyze(&scopeContext)) {
+    if (programRoot != NULL && programRoot->analyze(&scopeContext)) {
         cout << "---------------------------" << endl << endl;
         cout << programRoot->toString() << endl << endl;
         cout << "---------------------------" << endl << endl;
@@ -75,7 +74,10 @@ int main(int argc, char* argv[]) {
 
     // Finalize and release allocated memory
     fclose(yyin);
-    delete programRoot;
+
+    if (programRoot != NULL) {
+        delete programRoot;
+    }
 
     return 0;
 }

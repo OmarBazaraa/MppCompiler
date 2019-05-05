@@ -13,9 +13,9 @@ struct FunctionNode : public DeclarationNode {
     BlockNode* body;
 
     FunctionNode(TypeNode* type, IdentifierNode* ident, const VarList& paramList, BlockNode* body)
-        : DeclarationNode(type->loc) {
+            : DeclarationNode(type->loc) {
         this->type = type;
-        this->ident = ident;            
+        this->ident = ident;
         this->paramList = paramList;
         this->body = body;
     }

@@ -14,7 +14,8 @@ struct IfNode : public StatementNode {
     StatementNode* ifBody;
     StatementNode* elseBody;
 
-    IfNode(const Location& loc, ExpressionNode* cond, StatementNode* ifBody, StatementNode* elseBody = NULL) : StatementNode(loc) {
+    IfNode(const Location& loc, ExpressionNode* cond, StatementNode* ifBody, StatementNode* elseBody = NULL)
+            : StatementNode(loc) {
         this->cond = cond;
         this->ifBody = ifBody;
         this->elseBody = elseBody;
@@ -77,7 +78,13 @@ struct CaseLabelNode : public StatementNode {
 struct SwitchNode : public StatementNode {
     ExpressionNode* cond;
     StatementNode* body;
-    bool hasDefaultLabel = false;
+
+    //
+    // NOTE: the following variables will be computed after calling analyze function
+    //
+    bool hasDefaultLabel = false;       // Whether this switch has default label or not
+    vector<ExpressionNode*> caseLabels; // List of all case labels in this switch
+    vector<StmtList> caseStmts;         // List of statements corresponding to each case label
 
     SwitchNode(const Location& loc, ExpressionNode* cond, StatementNode* body) : StatementNode(loc) {
         this->cond = cond;
@@ -89,6 +96,34 @@ struct SwitchNode : public StatementNode {
         if (body) delete body;
     }
 
+    virtual void populate() {
+        BlockNode* block = dynamic_cast<BlockNode*>(body);
+
+        if (block == NULL) {
+            addCaseBlock(body);
+            return;
+        }
+
+        for (int i = 0; i < block->statements.size(); ++i) {
+            addCaseBlock(block->statements[i]);
+        }
+    }
+
+    virtual void addCaseBlock(StatementNode* stmt) {
+        CaseLabelNode* caseLabel;
+
+        while (caseLabel = dynamic_cast<CaseLabelNode*>(stmt)) {
+            caseLabels.push_back(caseLabel->expr);
+            caseStmts.push_back(StmtList());
+
+            stmt = caseLabel->stmt;
+        }
+
+        if (caseStmts.size() > 0) {
+            caseStmts.back().push_back(stmt);
+        }
+    }
+
     virtual bool analyze(ScopeContext* context);
 
     virtual string generateQuad(GenerationContext* generationContext);
@@ -96,6 +131,28 @@ struct SwitchNode : public StatementNode {
     virtual string toString(int ind = 0) {
         string ret = string(ind, ' ') + "switch (" + cond->toString() + ")\n";
         ret += body->toString(ind + (dynamic_cast<BlockNode*>(body) ? 0 : 4));
+
+        //
+        // Switch case block population debugging code
+        //
+
+        // string ret = string(ind, ' ') + "switch (" + cond->toString() + ")\n";
+        // ret += string(ind, ' ') + "{\n";
+        //
+        // for (int i = 0; i < caseLabels.size(); ++i) {
+        //     if (caseLabels[i] != NULL) {
+        //         ret += string(ind, ' ') + "case " + caseLabels[i]->toString() + ":\n";
+        //     } else {
+        //         ret += string(ind, ' ') + "default:\n";
+        //     }
+        //
+        //     for (int j = 0; j < caseStmts[i].size(); ++j) {
+        //         ret += caseStmts[i][j]->toString(ind + 4) + "\n";
+        //     }
+        // }
+        //
+        // ret += string(ind, ' ') + "}";
+
         return ret;
     }
 };
@@ -166,7 +223,8 @@ struct ForNode : public StatementNode {
     ExpressionNode* inc;
     StatementNode* body;
 
-    ForNode(const Location& loc, StatementNode* initStmt, ExpressionNode* cond, ExpressionNode* inc, StatementNode* body) : StatementNode(loc) {
+    ForNode(const Location& loc, StatementNode* initStmt, ExpressionNode* cond, ExpressionNode* inc,
+            StatementNode* body) : StatementNode(loc) {
         this->initStmt = initStmt;
         this->cond = cond;
         this->inc = inc;

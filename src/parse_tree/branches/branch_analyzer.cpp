@@ -92,6 +92,10 @@ bool SwitchNode::analyze(ScopeContext* context) {
 
     context->popScope();
 
+    if (ret) {
+        populate();
+    }
+
     return ret;
 }
 

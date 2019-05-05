@@ -118,7 +118,8 @@ struct UnaryOprNode : public ExpressionNode {
             ret += Utils::oprToStr(opr) + expr->toString();
         }
 
-        return ret += ")";
+        ret += ")";
+        return ret;
     }
 };
 

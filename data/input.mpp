@@ -9,9 +9,22 @@ int main() {
 	
 	func(5.5, (x = 7)++, 5.5);
 
-    // switch (x) {
-    //     case 5.5:;
-    // }
+    switch (x) {
+    case 5:
+    case 6:
+        int y = 1;
+        if (y > 0) {
+            break;
+        }
+    case 7:
+        switch (y)
+            case 4:
+            case 1100:
+                break;
+                int x;
+    default:
+        5 && 5;
+    }
 
-	(((++x) = y++) = 7) = (z = 8);
+	// (((++x) = y++) = 7) = (z = 8);
 }
