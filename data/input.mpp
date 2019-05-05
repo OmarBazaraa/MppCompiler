@@ -10,7 +10,8 @@ int main() {
 	func(5.5, (x = 7)++, 5.5);
 
     switch (x) {
-    break;
+	default:
+        x++;
     case 5:
     case 6:
         int y = 1;
@@ -23,8 +24,6 @@ int main() {
             case 1100:
                 break;
                 int x;
-    default:
-        5 && 5;
     }
 
 	// (((++x) = y++) = 7) = (z = 8);
