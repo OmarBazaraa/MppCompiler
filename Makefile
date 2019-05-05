@@ -12,15 +12,15 @@ comp:
 	g++ -o out/M++.exe \
 		out/main.cpp \
 		\
-		out/analyzer/statement_analyzer.cpp \
-		out/analyzer/expression_analyzer.cpp \
-		out/analyzer/branch_analyzer.cpp \
-		out/analyzer/function_analyzer.cpp \
+		out/parse_tree/statements/statement_analyzer.cpp \
+		out/parse_tree/expressions/expression_analyzer.cpp \
+		out/parse_tree/branches/branch_analyzer.cpp \
+		out/parse_tree/functions/function_analyzer.cpp \
 		\
-		out/generator/statement_generator.cpp \
-		out/generator/expression_generator.cpp \
-		out/generator/branch_generator.cpp \
-		out/generator/function_generator.cpp \
+		out/parse_tree/statements/statement_generator.cpp \
+		out/parse_tree/expressions/expression_generator.cpp \
+		out/parse_tree/branches/branch_generator.cpp \
+		out/parse_tree/functions/function_generator.cpp \
 		\
 		out/rules/lexer.cpp \
 		out/rules/parser.cpp

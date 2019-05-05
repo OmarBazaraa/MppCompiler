@@ -1,6 +1,6 @@
-#include "../symbol_table/symbol_table.h"
-#include "../context/scope_context.h"
-#include "../parse_tree/parse_tree.h"
+#include "../parse_tree.h"
+#include "../../context/scope_context.h"
+#include "../../symbol_table/symbol_table.h"
 
 
 bool ExprContainerNode::analyze(ScopeContext* context, bool valueUsed) {

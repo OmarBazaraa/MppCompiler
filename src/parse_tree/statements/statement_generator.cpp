@@ -1,5 +1,5 @@
-#include "../context/generation_context.h"
-#include "../parse_tree/parse_tree.h"
+#include "../parse_tree.h"
+#include "../../context/generation_context.h"
 
 
 string BlockNode::generateQuad(GenerationContext* generationContext) {

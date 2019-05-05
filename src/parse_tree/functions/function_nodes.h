@@ -1,8 +1,8 @@
 #ifndef __FUNCTION_NODES_H_
 #define __FUNCTION_NODES_H_
 
-#include "basic_nodes.h"
-#include "statement_nodes.h"
+#include "../basic_nodes.h"
+#include "../statements/statement_nodes.h"
 
 
 /**

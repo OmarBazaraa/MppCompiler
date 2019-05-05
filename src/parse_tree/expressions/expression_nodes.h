@@ -1,7 +1,7 @@
 #ifndef __OPERATOR_NODES_H_
 #define __OPERATOR_NODES_H_
 
-#include "basic_nodes.h"
+#include "../basic_nodes.h"
 
 
 /**
