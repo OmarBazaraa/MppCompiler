@@ -3,10 +3,8 @@
 
 #include "basic_nodes.h"
 #include "statement_nodes.h"
-#include "control_nodes.h"
-#include "loop_nodes.h"
-#include "operator_nodes.h"
-#include "value_nodes.h"
+#include "expression_nodes.h"
+#include "branch_nodes.h"
 #include "function_nodes.h"
 
 #endif

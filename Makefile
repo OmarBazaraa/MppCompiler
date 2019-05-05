@@ -9,7 +9,21 @@ gen:
 	bison -d -o out/rules/parser.cpp out/rules/parser_grammar.y
 
 comp:
-	g++ -o out/M++.exe out/main.cpp out/rules/lexer.cpp out/rules/parser.cpp
+	g++ -o out/M++.exe \
+		out/main.cpp \
+		\
+		out/analyzer/statement_analyzer.cpp \
+		out/analyzer/expression_analyzer.cpp \
+		out/analyzer/branch_analyzer.cpp \
+		out/analyzer/function_analyzer.cpp \
+		\
+		out/generator/statement_generator.cpp \
+		out/generator/expression_generator.cpp \
+		out/generator/branch_generator.cpp \
+		out/generator/function_generator.cpp \
+		\
+		out/rules/lexer.cpp \
+		out/rules/parser.cpp
 
 build:
 	@make -s clear

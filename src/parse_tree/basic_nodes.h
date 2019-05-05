@@ -5,11 +5,7 @@
 #include <string>
 #include <vector>
 
-#include "../context/scope_context.h"
-
 #include "../symbol_table/symbol_table.h"
-
-#include "../context/generation_context.h"
 
 #include "../utils/consts.h"
 #include "../utils/utils.h"
@@ -18,10 +14,13 @@
 //
 // Prototypes
 //
+struct ScopeContext;
+struct GenerationContext;
 struct StatementNode;
 struct ExpressionNode;
 struct VarDeclarationNode;
 struct FunctionNode;
+struct TypeNode;
 
 typedef vector<StatementNode*> StmtList;
 typedef vector<ExpressionNode*> ExprList;
@@ -42,18 +41,17 @@ struct StatementNode {
 
     ~StatementNode() {}
 
-    virtual bool analyze(ScopeContext* context) {
-        return true;
-    }
-
     virtual string toString(int ind = 0) {
         return string(ind, ' ') + ";" ;
+    }
+
+    virtual bool analyze(ScopeContext* context) {
+        return true;
     }
 
     virtual string generateQuad(GenerationContext* generationContext) {
         return "";
     }
-
 };
 
 /**
@@ -72,6 +70,10 @@ struct ExpressionNode : public StatementNode {
 
     ExpressionNode(const Location& loc) : StatementNode(loc) {}
     
+    virtual string getType() {
+        return reference ? reference->getType() : Utils::dtypeToStr(type);
+    }
+
     virtual bool analyze(ScopeContext* context) {
         return analyze(context, false);
     }
@@ -80,56 +82,20 @@ struct ExpressionNode : public StatementNode {
         used = valueUsed;
         return true;
     }
-
-    virtual string getType() {
-        if (reference) {
-            return reference->getType();
-        } else {
-            return Utils::dtypeToStr(type);
-        }
-    }
-
-    virtual string generateQuad(GenerationContext* generationContext) {
-        return "";
-    }
 };
 
 /**
- * An expression container class.
+ * The node class holding a data type in the parse tree.
  */
-struct ExprContainerNode : public ExpressionNode {
-    ExpressionNode* expr;
+struct TypeNode : public StatementNode {
+    DataType type;
 
-    ExprContainerNode(const Location& loc, ExpressionNode* expr) : ExpressionNode(loc) {
-        this->expr = expr;
-    }
-
-    virtual ~ExprContainerNode() {
-        if (expr) delete expr;
-    }
-
-    virtual bool analyze(ScopeContext* context, bool valueUsed) {
-        if (!context->initializeVar && context->isGlobalScope()) {
-            context->printError("expression is not allowed in global scope", loc);
-            return false;
-        }
-
-        bool ret = expr->analyze(context, valueUsed);
-
-        type = expr->type;
-        reference = expr->reference;
-        isConst = expr->isConst;
-        used = valueUsed;
-
-        return ret;
+    TypeNode(const Location& loc, DataType type) : StatementNode(loc) {
+        this->type = type;
     }
 
     virtual string toString(int ind = 0) {
-        return expr->toString(ind);
-    }
-
-    virtual string generateQuad(GenerationContext* generationContext) {
-        return expr->generateQuad(generationContext);
+        return string(ind, ' ') + Utils::dtypeToStr(type);
     }
 };
 
@@ -142,18 +108,15 @@ struct ErrorNode : public StatementNode {
     ErrorNode(const Location& loc, const string& what) {
         this->loc = loc;
         this->what = what;
-
         this->loc.pos -= this->loc.len - 1;
-    }
-
-    virtual bool analyze(ScopeContext* context) {
-        context->printError(what, loc);
-        return false;
     }
 
     virtual string toString(int ind) {
         return string(ind, ' ') + ">> ERROR" ;
     }
+    
+    virtual bool analyze(ScopeContext* context);
 };
+
 
 #endif

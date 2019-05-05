@@ -11,10 +11,10 @@ using namespace std;
 
 
 /**
- * Struct holding the current context in the quadruple generation phase.
+ * Class holding the current context in the quadruple generation phase.
  */
-struct GenerationContext {
-
+class GenerationContext {
+public:
     stack<int> breakLabels, continueLabels;
     int labelCounter;
 

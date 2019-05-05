@@ -18,7 +18,7 @@ using namespace std;
 
 
 /**
- * Struct holding the current context in the semantic analyzing phase.
+ * Class holding the current context in the semantic analyzing phase.
  */
 class ScopeContext {
 private:
