@@ -84,6 +84,7 @@ string SwitchNode::generateQuad(GenerationContext* generationContext) {
         }
     }
     
+    generationContext->breakLabels.pop();
     ret += "L" + to_string(breakLabel) + ":\n";
 
     return ret;
