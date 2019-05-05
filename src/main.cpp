@@ -15,7 +15,7 @@ using namespace std;
 //
 #define LANG_NAME           "M++"
 #define VERSION             "0.1"
-#define VERSION_DATE        "Apr 26, 2019"
+#define VERSION_DATE        "May 5, 2019"
 
 //
 // External functions & variables
