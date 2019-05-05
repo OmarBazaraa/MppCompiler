@@ -70,7 +70,7 @@ int main(int argc, char* argv[]) {
         cout << programRoot->toString() << endl << endl;
 
         writeToFile(programRoot->generateQuad(&genContext), outputFilename);
-        writeToFile(scopeContext.symbolTableStr, symbolTableFilename);
+        writeToFile(scopeContext.getSymbolTableStr(), symbolTableFilename);
     }
 
     // Finalize and release allocated memory

@@ -63,7 +63,7 @@ bool FunctionCallNode::analyze(ScopeContext* context, bool valueUsed) {
 
         if (func && argList[i]->type == DTYPE_VOID || argList[i]->type == DTYPE_FUNC_PTR) {
             context->printError("invalid conversion from '" + argList[i]->exprTypeStr() + "' to '" +
-                func->paramList[i]->declaredType() + "' in function '" +
+                func->paramList[i]->type->toString() + "' in function '" +
                 func->declaredHeader() + "' call", argList[i]->loc);
             return false;
         }

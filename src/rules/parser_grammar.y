@@ -173,7 +173,7 @@ StatementNode* programRoot = NULL;
 // Rules Section
 // =============
 
-program:            /* epsilon */               { $$ = NULL; programRoot = NULL; }
+program:            /* epsilon */               { $$ = NULL; programRoot = new BlockNode(); }
     |               stmt_list                   { $$ = NULL; programRoot = new BlockNode((*$1)[0]->loc, *$1); delete $1; }
     ;
 

@@ -77,7 +77,7 @@ struct VarDeclarationNode : public DeclarationNode {
     }
 
     virtual string declaredType() {
-        return type->toString();
+        return (isConst ? "const " : "") + type->toString();
     }
 };
 

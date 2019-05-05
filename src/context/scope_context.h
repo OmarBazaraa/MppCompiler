@@ -49,6 +49,7 @@ private:
     vector<string> sourceCode;
     vector<Scope*> scopes;
     unordered_map<string, int> aliases;
+    vector<pair<int, DeclarationNode*>> symbols;    // Used just for printing the symbol table. NOT IMPORTANT!
 
 public:
     //
@@ -56,8 +57,6 @@ public:
     //
     bool declareFuncParams = false;
     bool initializeVar = false;
-
-    string symbolTableStr;
 
 public:
 
@@ -67,8 +66,6 @@ public:
     ScopeContext(const string& sourceFilename) {
         this->sourceFilename = sourceFilename;
         this->readSourceCode();
-
-        this->symbolTableStr += symTableHeaderStr();
     }
 
     /**
@@ -101,8 +98,6 @@ public:
             }
             
             aliases[sym->ident->name]--;
-
-            symbolTableStr += symTableEntryStr(sym, scopes.size());
         }
 
         delete scope;
@@ -160,6 +155,9 @@ public:
         if (table.count(sym->ident->name)) {
             return false;
         }
+
+        // Add symbol for later printing
+        symbols.push_back({ scopes.size() - 1, sym });
 
         // Form a new alias name for the identifier
         int num = aliases[sym->ident->name]++;
@@ -274,54 +272,45 @@ public:
      * Prints error message at the given location in this context.
      */
     void printError(const string& what, const Location& loc) {
-        fprintf(stderr, "%s:%d:%d: error: %s\n", sourceFilename.c_str(), loc.lineNum, loc.pos, what.c_str());
-        fprintf(stderr, "%s\n", sourceCode[loc.lineNum - 1].c_str());
-        fprintf(stderr, "%*s", loc.pos, "^");
+        fprintf(stdout, "%s:%d:%d: error: %s\n", sourceFilename.c_str(), loc.lineNum, loc.pos, what.c_str());
+        fprintf(stdout, "%s\n", sourceCode[loc.lineNum - 1].c_str());
+        fprintf(stdout, "%*s", loc.pos, "^");
 
         if (loc.len > 1) {
-            fprintf(stderr, "%s", string(loc.len - 1, '~').c_str());
+            fprintf(stdout, "%s", string(loc.len - 1, '~').c_str());
         }
 
-        fprintf(stderr, "\n");
-    }
-
-private:
-
-    /**
-     * Returns the symbol table header string.
-     *
-     * @return the header string of the symbol table.
-     */
-    string symTableHeaderStr() {
-        string ret;
-
-        ret += "+-------+-------------------------------+-------------------------------+-------------------------------+-------+\n";
-        ret += "| scope | type                          | identifier                    | alias                         | used  |\n";
-        ret += "+-------+-------------------------------+-------------------------------+-------------------------------+-------+\n";
-
-        return ret;
+        fprintf(stdout, "\n");
     }
 
     /**
-     * Returns the symbol table entry string of the given symbol.
+     * Returns the symbol table as a string for visualization.
      *
-     * @param sym   the symbol table entry.
-     * @param scope the scope of the symbol.
-     *
-     * @return the entry string of the symbol table entry.
+     * @return a string representing the symbol table.
      */
-    string symTableEntryStr(DeclarationNode* sym, int scope = 0) {
+    string getSymbolTableStr() {
         stringstream ss;
 
-        ss << "| " << left << setw(6) << scope;
-        ss << "| " << left << setw(30) << sym->declaredType();
-        ss << "| " << left << setw(30) << sym->ident->name;
-        ss << "| " << left << setw(30) << sym->alias;
-        ss << "| " << left << setw(6) << sym->used << "|\n";
-        ss << "+-------+-------------------------------+-------------------------------+-------------------------------+-------+\n";
+        ss << "+-------+---------------------------------------------------+---------------------+---------------------+-------+\n";
+        ss << "| scope | type                                              | identifier          | alias               | used  |\n";
+        ss << "+-------+---------------------------------------------------+---------------------+---------------------+-------+\n";
+
+        for (int i = 0; i < symbols.size(); ++i) {
+            int scope = symbols[i].first;
+            DeclarationNode* sym = symbols[i].second;
+
+            ss << "| " << left << setw(6) << scope;
+            ss << "| " << left << setw(50) << sym->declaredType();
+            ss << "| " << left << setw(20) << sym->ident->name;
+            ss << "| " << left << setw(20) << sym->alias;
+            ss << "| " << left << setw(6) << sym->used << "|\n";
+            ss << "+-------+---------------------------------------------------+---------------------+---------------------+-------+\n";
+        }
 
         return ss.str();
     }
+
+private:
 
     /**
      * Reads the given source code file and fills

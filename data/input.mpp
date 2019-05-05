@@ -5,7 +5,7 @@ int func(int x, char y, float z) {
 
 int main() {
 
-	int x;
+	const int x;
 	
 	func(5.5, (x = 7)++, 5.5);
 
