@@ -63,8 +63,6 @@ struct CaseLabelNode : public StatementNode {
 
     virtual bool analyze(ScopeContext* context);
 
-    virtual string generateQuad(GenerationContext* generationContext);
-
     virtual string toString(int ind = 0) {
         string ret = string(max(0, ind - 4), ' ') + (expr ? "case " + expr->toString() + ":\n" : "default:\n");
         ret += stmt->toString(ind);

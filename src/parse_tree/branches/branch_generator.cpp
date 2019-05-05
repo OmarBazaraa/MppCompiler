@@ -25,13 +25,9 @@ string IfNode::generateQuad(GenerationContext* generationContext) {
     return ret;
 }
 
-string CaseLabelNode::generateQuad(GenerationContext* generationContext) {
-    return "";
-}
-
 string SwitchNode::generateQuad(GenerationContext* generationContext) {
     string ret;
-    vector<pair<int, int> > labelPairs;
+    vector<pair<int, int>> labelPairs;
     int defaultLabel = -1;
     int breakLabel = generationContext->labelCounter++;
     
@@ -56,14 +52,14 @@ string SwitchNode::generateQuad(GenerationContext* generationContext) {
             if (i  > 0) {
                 ret += Utils::oprToQuad(OPR_JMP, DTYPE_ERROR) + " L" + to_string(labelPairs[i].second) + "\n";
             }
-            DataType resultdType = max(cond->type, caseLabels[i]->type);
+            DataType resultedType = max(cond->type, caseLabels[i]->type);
             
             ret += "L" + to_string(labelPairs[i].first) + ":\n";
             ret += Utils::oprToQuad(OPR_PUSH, cond->type) + " SWITCH_COND@" + to_string(generationContext->breakLabels.top()) + "\n";
-            ret += Utils::dtypeConvQuad(cond->type, resultdType);
+            ret += Utils::dtypeConvQuad(cond->type, resultedType);
             ret += caseLabels[i]->generateQuad(generationContext);
-            ret += Utils::dtypeConvQuad(caseLabels[i]->type, resultdType);
-            ret += Utils::oprToQuad(OPR_EQUAL, resultdType) + "\n";
+            ret += Utils::dtypeConvQuad(caseLabels[i]->type, resultedType);
+            ret += Utils::oprToQuad(OPR_EQUAL, resultedType) + "\n";
             ret += Utils::oprToQuad(OPR_JZ, DTYPE_BOOL) + " L";
             
             if (i == caseLabels.size() - 1) {               // my case label is last
