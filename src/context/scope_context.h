@@ -6,16 +6,34 @@
 #include <string>
 #include <vector>
 #include <stack>
-#include <map>
 #include <unordered_map>
 
-#include "../symbol_table/symbol_table.h"
+#include "../parse_tree/parse_tree.h"
 
 #include "../utils/utils.h"
 #include "../utils/consts.h"
 
 using namespace std;
 
+
+/**
+ * Symbol table type.
+ */
+typedef unordered_map<string, DeclarationNode*> SymbolTable;
+
+/**
+ * Struct holding scope information.
+ */
+struct Scope {
+    ScopeType type;         // the type of the scope
+    Node* ptr;              // a pointer to the node of the scope
+    SymbolTable table;      // the symbol table of this scope
+
+    Scope(ScopeType type, Node* ptr = NULL) {
+        this->type = type;
+        this->ptr = ptr;
+    }
+};
 
 /**
  * Class holding the current context in the semantic analyzing phase.
@@ -28,7 +46,6 @@ private:
     string sourceFilename;
     vector<string> sourceCode;
     vector<Scope*> scopes;
-
     unordered_map<string, int> aliases;
 
 public:
@@ -37,8 +54,6 @@ public:
     //
     bool declareFuncParams = false;
     bool initializeVar = false;
-    stack<Func*> functions;
-    stack<Switch*> switches;
 
 public:
 
@@ -54,9 +69,10 @@ public:
      * Adds a new scope to this context.
      *
      * @param type the type of the scope to add.
+     * @param ptr  a pointer to the node of the scope in the parse tree.
      */
-    void addScope(ScopeType type) {
-        scopes.push_back(new Scope(type));
+    void addScope(ScopeType type, Node* ptr = NULL) {
+        scopes.push_back(new Scope(type, ptr));
     }
 
     /**
@@ -67,18 +83,18 @@ public:
         scopes.pop_back();
 
         for (auto& it : scope->table) {
-            Symbol* sym = it.second;
+            DeclarationNode* sym = it.second;
 
             if (!sym->used) {
-                if (dynamic_cast<Var*>(sym)) {
-                    printWarning("the value of variable '" + sym->header() + "' is never used");
+                if (dynamic_cast<VarDeclarationNode*>(sym)) {
+                    printWarning("the value of variable '" + sym->declaredHeader() + "' is never used");
                 }
-                else if (sym->identifier != "main") {
-                    printWarning("function '" + sym->header() + "' is never called");
+                else if (sym->ident->name != "main") {
+                    printWarning("function '" + sym->declaredHeader() + "' is never called");
                 }
             }
             
-            aliases[sym->identifier]--;
+            aliases[sym->ident->name]--;
         }
 
         delete scope;
@@ -94,29 +110,59 @@ public:
     }
 
     /**
+     * Searches for the inner most function scope.
+     *
+     * @return a pointer on the found function scope, or {@code NULL} if not available.
+     */
+    FunctionNode* getFunctionScope() {
+        for (int i = (int) scopes.size() - 1; i >= 0; --i) {
+            if (scopes[i]->type == SCOPE_FUNCTION) {
+                return (FunctionNode*) scopes[i]->ptr;
+            }
+        }
+
+        return NULL;
+    }
+
+    /**
+     * Searches for the inner most switch scope.
+     *
+     * @return a pointer on the found switch scope, or {@code NULL} if not available.
+     */
+    SwitchNode* getSwitchScope() {
+        for (int i = (int) scopes.size() - 1; i >= 0; --i) {
+            if (scopes[i]->type == SCOPE_SWITCH) {
+                return (SwitchNode*) scopes[i]->ptr;
+            }
+        }
+
+        return NULL;
+    }
+
+    /**
      * Declares a new symbol in the the lastly added scope in this context.
      *
-     * @param sym the symbol to add.
+     * @param sym the symbol to add in the symbol table.
      *
      * @return {@code true} if the symbol was declared successfully; {@code false} if already declared.
      */
-    bool declareSymbol(Symbol* sym) {
+    bool declareSymbol(DeclarationNode* sym) {
         SymbolTable& table = scopes.back()->table;
 
-        if (table.count(sym->identifier)) {
+        if (table.count(sym->ident->name)) {
             return false;
         }
 
         // Form a new alias name for the identifier
-        int num = aliases[sym->identifier]++;
+        int num = aliases[sym->ident->name]++;
 
         if (num > 0) {
-            sym->alias = sym->identifier + "@" + to_string(num);
+            sym->alias = sym->ident->name + "@" + to_string(num);
         } else {
-            sym->alias = sym->identifier;
+            sym->alias = sym->ident->name;
         }
 
-        table[sym->identifier] = sym;
+        table[sym->ident->name] = sym;
         return true;
     }
 
@@ -127,7 +173,7 @@ public:
      *
      * @return a pointer on the found symbol table entry, or {@code NULL} if not available.
      */
-    Symbol* getSymbol(const string& identifier) {
+    DeclarationNode* getSymbol(const string& identifier) {
         for (int i = (int) scopes.size() - 1; i >= 0; --i) {
             if (scopes[i]->table.count(identifier)) {
                 return scopes[i]->table[identifier];

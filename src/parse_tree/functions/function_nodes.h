@@ -8,30 +8,21 @@
 /**
  * The node class holding a function in the parse tree.
  */
-struct FunctionNode : public StatementNode {
-    TypeNode* type;
-    IdentifierNode* name;
+struct FunctionNode : public DeclarationNode {
     VarList paramList;
     BlockNode* body;
-    Func func;
 
-    FunctionNode(TypeNode* type, IdentifierNode* name, const VarList& paramList, BlockNode* body) : StatementNode(type->loc) {
+    FunctionNode(TypeNode* type, IdentifierNode* ident, const VarList& paramList, BlockNode* body)
+        : DeclarationNode(type->loc) {
         this->type = type;
-        this->name = name;
+        this->ident = ident;            
         this->paramList = paramList;
         this->body = body;
-
-        this->func.type = type->type;
-        this->func.identifier = name->name;
-
-        for (int i = 0; i < paramList.size(); ++i) {
-            this->func.paramList.push_back(paramList[i]->var);
-        }
     }
 
     virtual ~FunctionNode() {
         if (type) delete type;
-        if (name) delete name;
+        if (ident) delete ident;
         if (body) delete body;
 
         for (int i = 0; i < paramList.size(); ++i) {
@@ -39,8 +30,12 @@ struct FunctionNode : public StatementNode {
         }
     }
 
+    virtual bool analyze(ScopeContext* context);
+
+    virtual string generateQuad(GenerationContext* generationContext);
+
     virtual string toString(int ind = 0) {
-        string ret = string(ind, ' ') + type->toString() + " " + func.identifier + "(";
+        string ret = string(ind, ' ') + type->toString() + " " + ident->toString() + "(";
         for (int i = 0; i < paramList.size(); ++i) {
             ret += (i > 0 ? ", " : "") + paramList[i]->toString();
         }
@@ -49,43 +44,58 @@ struct FunctionNode : public StatementNode {
         return ret;
     }
 
-    virtual bool analyze(ScopeContext* context);
+    virtual string declaredHeader() {
+        string ret = type->toString() + " " + ident->name + "(";
+        for (int i = 0; i < paramList.size(); ++i) {
+            ret += (i > 0 ? ", " : "") + paramList[i]->type->toString();
+        }
+        ret += ")";
+        return ret;
+    }
 
-    virtual string generateQuad(GenerationContext* generationContext);
+    virtual string declaredType() {
+        string ret = type->toString() + "(*)(";
+        for (int i = 0; i < paramList.size(); ++i) {
+            ret += (i > 0 ? ", " : "") + paramList[i]->type->toString();
+        }
+        ret += ")";
+        return ret;
+    }
 };
 
 /**
  * The node class holding a function call expression in the parse tree.
  */
 struct FunctionCallNode : public ExpressionNode {
-    IdentifierNode* name;
+    IdentifierNode* ident;
     ExprList argList;
-    Func* func;
+    FunctionNode* func;
 
-    FunctionCallNode(IdentifierNode* name, const ExprList& argList) : ExpressionNode(name->loc) {
-        this->name = name;
+    FunctionCallNode(IdentifierNode* ident, const ExprList& argList) : ExpressionNode(ident->loc) {
+        this->ident = ident;
         this->argList = argList;
     }
 
     virtual ~FunctionCallNode() {
-        if (name) delete name;
+        if (ident) delete ident;
 
         for (int i = 0; i < argList.size(); ++i) {
             delete argList[i];
         }
     }
 
-    virtual string toString(int ind = 0) {
-        string ret = string(ind, ' ') + func->identifier + "(";
-        for (int i = 0; i < argList.size(); ++i) {
-            ret += (i > 0 ? ", " : "") + argList[i]->toString();
-        }
-        return ret += ")";
-    }
-
     virtual bool analyze(ScopeContext* context, bool valueUsed);
 
     virtual string generateQuad(GenerationContext* generationContext);
+
+    virtual string toString(int ind = 0) {
+        string ret = string(ind, ' ') + ident->name + "(";
+        for (int i = 0; i < argList.size(); ++i) {
+            ret += (i > 0 ? ", " : "") + argList[i]->toString();
+        }
+        ret += ")";
+        return ret;
+    }
 };
 
 /**
@@ -93,7 +103,7 @@ struct FunctionCallNode : public ExpressionNode {
  */
 struct ReturnStmtNode : public StatementNode {
     ExpressionNode* value;
-    Func* func;
+    FunctionNode* func;
 
     ReturnStmtNode(const Location& loc, ExpressionNode* value) : StatementNode(loc) {
         this->value = value;
@@ -103,6 +113,10 @@ struct ReturnStmtNode : public StatementNode {
         if (value) delete value;
     }
 
+    virtual bool analyze(ScopeContext* context);
+
+    virtual string generateQuad(GenerationContext* generationContext);
+
     virtual string toString(int ind = 0) {
         string ret = string(ind, ' ') + "return";
         if (value) {
@@ -110,10 +124,6 @@ struct ReturnStmtNode : public StatementNode {
         }
         return ret;
     }
-
-    virtual bool analyze(ScopeContext* context);
-
-    virtual string generateQuad(GenerationContext* generationContext);
 };
 
 #endif

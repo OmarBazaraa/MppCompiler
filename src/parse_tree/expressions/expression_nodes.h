@@ -18,13 +18,13 @@ struct ExprContainerNode : public ExpressionNode {
         if (expr) delete expr;
     }
 
-    virtual string toString(int ind = 0) {
-        return expr->toString(ind);
-    }
-
     virtual bool analyze(ScopeContext* context, bool valueUsed);
 
     virtual string generateQuad(GenerationContext* generationContext);
+
+    virtual string toString(int ind = 0) {
+        return expr->toString(ind);
+    }
 };
 
 /**
@@ -44,13 +44,13 @@ struct AssignOprNode : public ExpressionNode {
         if (rhs) delete rhs;
     }
 
-    virtual string toString(int ind = 0) {
-        return string(ind, ' ') + "(" + lhs->toString() + " = " + rhs->toString() + ")";
-    }
-
     virtual bool analyze(ScopeContext* context, bool valueUsed);
 
     virtual string generateQuad(GenerationContext* generationContext);
+
+    virtual string toString(int ind = 0) {
+        return string(ind, ' ') + "(" + lhs->toString() + " = " + rhs->toString() + ")";
+    }
 };
 
 /**
@@ -72,6 +72,10 @@ struct BinaryOprNode : public ExpressionNode {
         if (rhs) delete rhs;
     }
 
+    virtual bool analyze(ScopeContext* context, bool valueUsed);
+
+    virtual string generateQuad(GenerationContext* generationContext);
+
     virtual string getOpr() {
         return "binary operator '" + Utils::oprToStr(opr) + "'";
     }
@@ -79,10 +83,6 @@ struct BinaryOprNode : public ExpressionNode {
     virtual string toString(int ind = 0) {
         return string(ind, ' ') + "(" + lhs->toString() + " " + Utils::oprToStr(opr) + " " + rhs->toString() + ")";
     }
-
-    virtual bool analyze(ScopeContext* context, bool valueUsed);
-
-    virtual string generateQuad(GenerationContext* generationContext);
 };
 
 /**
@@ -101,6 +101,10 @@ struct UnaryOprNode : public ExpressionNode {
         if (expr) delete expr;
     }
 
+    virtual bool analyze(ScopeContext* context, bool valueUsed);
+
+    virtual string generateQuad(GenerationContext* generationContext);
+
     virtual string getOpr() {
         return "unary operator '" + Utils::oprToStr(opr) + "'";
     }
@@ -116,10 +120,6 @@ struct UnaryOprNode : public ExpressionNode {
 
         return ret += ")";
     }
-
-    virtual bool analyze(ScopeContext* context, bool valueUsed);
-
-    virtual string generateQuad(GenerationContext* generationContext);
 };
 
 /**
@@ -132,13 +132,13 @@ struct IdentifierNode : public ExpressionNode {
         this->name = name;
     }
 
-    virtual string toString(int ind = 0) {
-        return string(ind, ' ') + name;
-    }
-
     virtual bool analyze(ScopeContext* context, bool valueUsed);
 
     virtual string generateQuad(GenerationContext* generationContext);
+
+    virtual string toString(int ind = 0) {
+        return string(ind, ' ') + name;
+    }
 };
 
 /**
@@ -153,11 +153,11 @@ struct ValueNode : public ExpressionNode {
         this->isConst = true;
     }
 
+    virtual string generateQuad(GenerationContext* generationContext);
+
     virtual string toString(int ind = 0) {
         return string(ind, ' ') + value;
     }
-
-    virtual string generateQuad(GenerationContext* generationContext);
 };
 
 #endif

@@ -4,9 +4,11 @@
 
 string BlockNode::generateQuad(GenerationContext* generationContext) {
     string ret;
+
     for (int i = 0; i < statements.size(); ++i) {
         ret += statements[i]->generateQuad(generationContext);
     }
+    
     return ret;
 }
 
@@ -19,7 +21,7 @@ string VarDeclarationNode::generateQuad(GenerationContext* generationContext) {
     }
 
     if (value || generationContext->declareFuncParams) {
-        ret += Utils::oprToQuad(OPR_POP, type->type) + " " + var.alias + "\n";
+        ret += Utils::oprToQuad(OPR_POP, type->type) + " " + alias + "\n";
     }
 
     return ret;

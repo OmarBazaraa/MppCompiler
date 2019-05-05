@@ -5,8 +5,6 @@
 #include <string>
 #include <vector>
 
-#include "../symbol_table/symbol_table.h"
-
 #include "../utils/consts.h"
 #include "../utils/utils.h"
 
@@ -16,34 +14,35 @@
 //
 struct ScopeContext;
 struct GenerationContext;
+
+struct Node;
 struct StatementNode;
-struct ExpressionNode;
+struct DeclarationNode;
 struct VarDeclarationNode;
 struct FunctionNode;
+struct ExpressionNode;
+struct IdentifierNode;
 struct TypeNode;
 
+typedef vector<Node*> NodeList;
 typedef vector<StatementNode*> StmtList;
-typedef vector<ExpressionNode*> ExprList;
 typedef vector<VarDeclarationNode*> VarList;
+typedef vector<ExpressionNode*> ExprList;
 
 
 /**
- * The base class of all statement nodes in the parse tree.
+ * The base class of all nodes in the parse tree.
  */
-struct StatementNode {
+struct Node {
     Location loc;
 
-    StatementNode() {}
+    Node() {}
 
-    StatementNode(const Location& loc) {
+    Node(const Location& loc) {
         this->loc = loc;
     }
 
-    ~StatementNode() {}
-
-    virtual string toString(int ind = 0) {
-        return string(ind, ' ') + ";" ;
-    }
+    virtual ~Node() {}
 
     virtual bool analyze(ScopeContext* context) {
         return true;
@@ -52,6 +51,40 @@ struct StatementNode {
     virtual string generateQuad(GenerationContext* generationContext) {
         return "";
     }
+
+    virtual string toString() {
+        return "";
+    }
+};
+
+/**
+ * The base class of all statement nodes in the parse tree.
+ */
+struct StatementNode : public Node {
+
+    StatementNode() {}
+
+    StatementNode(const Location& loc) : Node(loc) {}
+
+    virtual string toString(int ind = 0) {
+        return string(ind, ' ') + ";" ;
+    }
+};
+
+/**
+ * The base class of all declaration statement nodes in the parse tree.
+ */
+struct DeclarationNode : public StatementNode {
+    TypeNode* type;
+    IdentifierNode* ident;
+    string alias;
+    bool used = false;
+
+    DeclarationNode(const Location& loc) : StatementNode(loc) {}
+
+    virtual string declaredHeader() = 0;
+
+    virtual string declaredType() = 0;
 };
 
 /**
@@ -61,19 +94,15 @@ struct ExpressionNode : public StatementNode {
     //
     // NOTE: the following variables will be computed after calling analyze function
     //
-    DataType type = DTYPE_ERROR;    // data type of the expression
-    Symbol* reference = NULL;       // reference of the expression is exist
-    bool isConst = false;           // whether the expression is of constant value or not
-    bool used = false;              // whether the value of the expression is used or not
+    DataType type = DTYPE_ERROR;        // data type of the expression
+    DeclarationNode* reference = NULL;  // reference variable of the expression is exist
+    bool isConst = false;               // whether the expression is of constant value or not
+    bool used = false;                  // whether the value of the expression is to be used or not
 
     ExpressionNode() {}
 
     ExpressionNode(const Location& loc) : StatementNode(loc) {}
     
-    virtual string getType() {
-        return reference ? reference->getType() : Utils::dtypeToStr(type);
-    }
-
     virtual bool analyze(ScopeContext* context) {
         return analyze(context, false);
     }
@@ -82,15 +111,19 @@ struct ExpressionNode : public StatementNode {
         used = valueUsed;
         return true;
     }
+
+    virtual string exprTypeStr() {
+        return reference ? reference->declaredType() : Utils::dtypeToStr(type);
+    }
 };
 
 /**
  * The node class holding a data type in the parse tree.
  */
-struct TypeNode : public StatementNode {
+struct TypeNode : public Node {
     DataType type;
 
-    TypeNode(const Location& loc, DataType type) : StatementNode(loc) {
+    TypeNode(const Location& loc, DataType type) : Node(loc) {
         this->type = type;
     }
 
@@ -105,18 +138,16 @@ struct TypeNode : public StatementNode {
 struct ErrorNode : public StatementNode {
     string what;
 
-    ErrorNode(const Location& loc, const string& what) {
-        this->loc = loc;
+    ErrorNode(const Location& loc, const string& what) : StatementNode(loc) {
         this->what = what;
         this->loc.pos -= this->loc.len - 1;
     }
 
+    virtual bool analyze(ScopeContext* context);
+
     virtual string toString(int ind) {
         return string(ind, ' ') + ">> ERROR" ;
     }
-    
-    virtual bool analyze(ScopeContext* context);
 };
-
 
 #endif

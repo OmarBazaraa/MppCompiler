@@ -25,6 +25,10 @@ struct BlockNode : public StatementNode {
         }
     }
 
+    virtual bool analyze(ScopeContext* context);
+
+    virtual string generateQuad(GenerationContext* generationContext);
+
     virtual string toString(int ind = 0) {
         string ret = string(ind, ' ') + "{\n";
         for (int i = 0; i < statements.size(); ++i) {
@@ -32,49 +36,48 @@ struct BlockNode : public StatementNode {
         }
         return ret += string(ind, ' ') + "}";
     }
-
-    virtual bool analyze(ScopeContext* context);
-
-    virtual string generateQuad(GenerationContext* generationContext);
 };
 
 /**
  * The node class holding a variable or constant declaration statement in the parse tree.
  */
-struct VarDeclarationNode : public StatementNode {
-    TypeNode* type;
-    IdentifierNode* name;
+struct VarDeclarationNode : public DeclarationNode {
     ExpressionNode* value;
-    Var var;
+    bool isConst;
 
-    VarDeclarationNode(TypeNode* type, IdentifierNode* name, ExpressionNode* value = NULL, bool isConst = false) : StatementNode(type->loc) {
+    VarDeclarationNode(TypeNode* type, IdentifierNode* ident, ExpressionNode* value = NULL, bool isConst = false)
+        : DeclarationNode(type->loc) {
         this->type = type;
-        this->name = name;
+        this->ident = ident;
         this->value = value;
-
-        this->var.type = type->type;
-        this->var.identifier = name->name;
-        this->var.isConst = isConst;
-        this->var.isInitialized = (value != NULL);
+        this->isConst = isConst;
     }
 
     virtual ~VarDeclarationNode() {
         if (type) delete type;
-        if (name) delete name;
+        if (ident) delete ident;
         if (value) delete value;
     }
 
+    virtual bool analyze(ScopeContext* context);
+    
+    virtual string generateQuad(GenerationContext* generationContext);
+
     virtual string toString(int ind = 0) {
-        string ret = string(ind, ' ') + var.header();
+        string ret = string(ind, ' ') + declaredHeader();
         if (value) {
             ret += " = " + value->toString();
         }
         return ret;
     }
 
-    virtual bool analyze(ScopeContext* context);
+    virtual string declaredHeader() {
+        return (isConst ? "const " : "") + type->toString() + " " + ident->name;
+    }
 
-    virtual string generateQuad(GenerationContext* generationContext);
+    virtual string declaredType() {
+        return type->toString();
+    }
 };
 
 #endif

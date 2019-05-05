@@ -1,6 +1,5 @@
 #include "../parse_tree.h"
 #include "../../context/scope_context.h"
-#include "../../symbol_table/symbol_table.h"
 
 
 bool ErrorNode::analyze(ScopeContext* context) {
@@ -16,7 +15,7 @@ bool BlockNode::analyze(ScopeContext* context) {
 
     bool ret = true;
 
-    context->addScope(SCOPE_BLOCK);
+    context->addScope(SCOPE_BLOCK, this);
 
     for (int i = 0; i < statements.size(); ++i) {
         ret &= statements[i]->analyze(context);
@@ -31,11 +30,11 @@ bool VarDeclarationNode::analyze(ScopeContext* context) {
     bool ret = true;
 
     if (type->type == DTYPE_VOID) {
-        context->printError("variable or field '" + name->name + "' declared void", name->loc);
+        context->printError("variable or field '" + ident->name + "' declared void", ident->loc);
         ret = false;
     }
-    else if (!context->declareSymbol(&var)) {
-        context->printError("'" + var.header() + "' redeclared", name->loc);
+    else if (!context->declareSymbol(this)) {
+        context->printError("'" + declaredHeader() + "' redeclared", ident->loc);
         ret = false;
     }
 
@@ -45,12 +44,12 @@ bool VarDeclarationNode::analyze(ScopeContext* context) {
         context->initializeVar = false;
     }
 
-    if (context->declareFuncParams && var.isInitialized) {
+    if (context->declareFuncParams && value != NULL) {
         context->printError("default function parameters are not allowed", value->loc);
         ret = false;
     }
-    else if (var.isConst && !var.isInitialized && !context->declareFuncParams) {
-        context->printError("uninitialized const '" + name->name + "'", name->loc);
+    else if (isConst && value == NULL && !context->declareFuncParams) {
+        context->printError("uninitialized const '" + ident->name + "'", ident->loc);
         ret = false;
     }
 

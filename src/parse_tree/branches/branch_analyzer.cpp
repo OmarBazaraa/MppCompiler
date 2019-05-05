@@ -1,6 +1,5 @@
 #include "../parse_tree.h"
 #include "../../context/scope_context.h"
-#include "../../symbol_table/symbol_table.h"
 
 
 bool IfNode::analyze(ScopeContext* context) {
@@ -11,7 +10,7 @@ bool IfNode::analyze(ScopeContext* context) {
 
     bool ret = true;
 
-    context->addScope(SCOPE_IF);
+    context->addScope(SCOPE_IF, this);
 
     ret &= cond->analyze(context, true);
     ret &= ifBody->analyze(context);
@@ -26,7 +25,7 @@ bool IfNode::analyze(ScopeContext* context) {
 }
 
 bool CaseLabelNode::analyze(ScopeContext* context) {
-    Switch* switchStmt = context->switches.empty() ? NULL : context->switches.top();
+    SwitchNode* switchStmt = context->getSwitchScope();
 
     if (switchStmt == NULL) {
         context->printError("case label not within switch statement", loc);
@@ -59,12 +58,12 @@ bool CaseLabelNode::analyze(ScopeContext* context) {
         }
     }
     else {          // default label
-        if (switchStmt->defaultLabel) {
+        if (switchStmt->hasDefaultLabel) {
             context->printError("multiple default labels in one switch", loc);
             ret = false;
         }
 
-        switchStmt->defaultLabel = true;
+        switchStmt->hasDefaultLabel = true;
     }
 
     ret &= stmt->analyze(context);
@@ -80,8 +79,7 @@ bool SwitchNode::analyze(ScopeContext* context) {
 
     bool ret = true;
 
-    context->addScope(SCOPE_SWITCH);
-    context->switches.push(&switchStmt);
+    context->addScope(SCOPE_SWITCH, this);
 
     ret &= cond->analyze(context, true);
 
@@ -92,7 +90,6 @@ bool SwitchNode::analyze(ScopeContext* context) {
 
     ret &= body->analyze(context);
 
-    context->switches.pop();
     context->popScope();
 
     return ret;
@@ -106,7 +103,7 @@ bool WhileNode::analyze(ScopeContext* context) {
 
     bool ret = true;
 
-    context->addScope(SCOPE_LOOP);
+    context->addScope(SCOPE_LOOP, this);
 
     ret &= cond->analyze(context, true);
     ret &= body->analyze(context);
@@ -124,7 +121,7 @@ bool DoWhileNode::analyze(ScopeContext* context) {
 
     bool ret = true;
 
-    context->addScope(SCOPE_LOOP);
+    context->addScope(SCOPE_LOOP, this);
 
     ret &= cond->analyze(context, true);
     ret &= body->analyze(context);
@@ -142,7 +139,7 @@ bool ForNode::analyze(ScopeContext* context) {
 
     bool ret = true;
 
-    context->addScope(SCOPE_LOOP);
+    context->addScope(SCOPE_LOOP, this);
 
     if (initStmt) ret &= initStmt->analyze(context);
     if (cond) ret &= cond->analyze(context, true);

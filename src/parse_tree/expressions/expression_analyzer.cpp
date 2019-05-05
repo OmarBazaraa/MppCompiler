@@ -1,6 +1,5 @@
 #include "../parse_tree.h"
 #include "../../context/scope_context.h"
-#include "../../symbol_table/symbol_table.h"
 
 
 bool ExprContainerNode::analyze(ScopeContext* context, bool valueUsed) {
@@ -26,7 +25,7 @@ bool AssignOprNode::analyze(ScopeContext* context, bool valueUsed) {
     }
 
     if (lhs->type == DTYPE_FUNC_PTR) {
-        context->printError("assignment of function '" + lhs->reference->header() + "'", lhs->loc);
+        context->printError("assignment of function '" + lhs->reference->declaredHeader() + "'", lhs->loc);
         return false;
     }
     if (lhs->reference == NULL) {
@@ -34,11 +33,11 @@ bool AssignOprNode::analyze(ScopeContext* context, bool valueUsed) {
         return false;
     }
     if (lhs->reference && lhs->isConst) {
-        context->printError("assignment of read-only variable '" + lhs->reference->header() + "'", lhs->loc);
+        context->printError("assignment of read-only variable '" + lhs->reference->declaredHeader() + "'", lhs->loc);
         return false;
     }
     if (rhs->type == DTYPE_VOID || rhs->type == DTYPE_FUNC_PTR) {
-        context->printError("invalid conversion from '" + rhs->getType() + "' to '" + lhs->getType() + "'", rhs->loc);
+        context->printError("invalid conversion from '" + rhs->exprTypeStr() + "' to '" + lhs->exprTypeStr() + "'", rhs->loc);
         return false;
     }
 
@@ -59,7 +58,7 @@ bool BinaryOprNode::analyze(ScopeContext* context, bool valueUsed) {
     if (lhs->type == DTYPE_VOID || lhs->type == DTYPE_FUNC_PTR ||
         rhs->type == DTYPE_VOID || rhs->type == DTYPE_FUNC_PTR ||
         (Utils::isBitwiseOpr(opr) || opr == OPR_MOD) && (lhs->type == DTYPE_FLOAT || rhs->type == DTYPE_FLOAT)) {
-        context->printError("invalid operands of types '" + lhs->getType() + "' and '" + rhs->getType() + "' to " + getOpr(), loc);
+        context->printError("invalid operands of types '" + lhs->exprTypeStr() + "' and '" + rhs->exprTypeStr() + "' to " + getOpr(), loc);
         return false;
     }
 
@@ -82,7 +81,7 @@ bool UnaryOprNode::analyze(ScopeContext* context, bool valueUsed) {
 
     if (expr->type == DTYPE_VOID || expr ->type == DTYPE_FUNC_PTR ||
         expr->type == DTYPE_FLOAT && Utils::isBitwiseOpr(opr)) {
-        context->printError("invalid operand of type '" + expr->getType() + "' to " + getOpr(), loc);
+        context->printError("invalid operand of type '" + expr->exprTypeStr() + "' to " + getOpr(), loc);
         return false;
     }
 
@@ -92,7 +91,7 @@ bool UnaryOprNode::analyze(ScopeContext* context, bool valueUsed) {
             return false;
         }
         if (expr->reference && expr->isConst) {
-            context->printError("increment/decrement of read-only variable '" + expr->reference->header() + "'", expr->loc);
+            context->printError("increment/decrement of read-only variable '" + expr->reference->declaredHeader() + "'", expr->loc);
             return false;
         }
     }
@@ -106,7 +105,7 @@ bool UnaryOprNode::analyze(ScopeContext* context, bool valueUsed) {
 }
 
 bool IdentifierNode::analyze(ScopeContext* context, bool valueUsed) {
-    Symbol* ptr = context->getSymbol(name);
+    DeclarationNode* ptr = context->getSymbol(name);
 
     if (ptr == NULL) {
         context->printError("'" + name + "' was not declared in this scope", loc);
@@ -115,11 +114,11 @@ bool IdentifierNode::analyze(ScopeContext* context, bool valueUsed) {
 
     reference = ptr;
 
-    if (dynamic_cast<Func*>(ptr)) {
+    if (dynamic_cast<FunctionNode*>(ptr)) {
         type = DTYPE_FUNC_PTR;
     } else {
-        type = ptr->type;
-        isConst = ((Var*) ptr)->isConst;
+        type = ptr->type->type;
+        isConst = ((VarDeclarationNode*) ptr)->isConst;
     }
 
     used = valueUsed;

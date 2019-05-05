@@ -26,6 +26,10 @@ struct IfNode : public StatementNode {
         if (elseBody) delete elseBody;
     }
 
+    virtual bool analyze(ScopeContext* context);
+
+    virtual string generateQuad(GenerationContext* generationContext);
+
     virtual string toString(int ind = 0) {
         string ret = string(ind, ' ') + "if (" + cond->toString() + ")\n";
         ret += ifBody->toString(ind + (dynamic_cast<BlockNode*>(ifBody) ? 0 : 4));
@@ -37,10 +41,6 @@ struct IfNode : public StatementNode {
 
         return ret;
     }
-
-    virtual bool analyze(ScopeContext* context);
-
-    virtual string generateQuad(GenerationContext* generationContext);
 };
 
 /**
@@ -60,15 +60,15 @@ struct CaseLabelNode : public StatementNode {
         if (stmt) delete stmt;
     }
 
+    virtual bool analyze(ScopeContext* context);
+
+    virtual string generateQuad(GenerationContext* generationContext);
+
     virtual string toString(int ind = 0) {
         string ret = string(max(0, ind - 4), ' ') + (expr ? "case " + expr->toString() + ":\n" : "default:\n");
         ret += stmt->toString(ind);
         return ret;
     }
-
-    virtual bool analyze(ScopeContext* context);
-
-    virtual string generateQuad(GenerationContext* generationContext);
 };
 
 /**
@@ -77,7 +77,7 @@ struct CaseLabelNode : public StatementNode {
 struct SwitchNode : public StatementNode {
     ExpressionNode* cond;
     StatementNode* body;
-    Switch switchStmt;
+    bool hasDefaultLabel = false;
 
     SwitchNode(const Location& loc, ExpressionNode* cond, StatementNode* body) : StatementNode(loc) {
         this->cond = cond;
@@ -89,15 +89,15 @@ struct SwitchNode : public StatementNode {
         if (body) delete body;
     }
 
+    virtual bool analyze(ScopeContext* context);
+
+    virtual string generateQuad(GenerationContext* generationContext);
+
     virtual string toString(int ind = 0) {
         string ret = string(ind, ' ') + "switch (" + cond->toString() + ")\n";
         ret += body->toString(ind + (dynamic_cast<BlockNode*>(body) ? 0 : 4));
         return ret;
     }
-
-    virtual bool analyze(ScopeContext* context);
-
-    virtual string generateQuad(GenerationContext* generationContext);
 };
 
 /**
@@ -117,15 +117,15 @@ struct WhileNode : public StatementNode {
         if (body) delete body;
     }
 
+    virtual bool analyze(ScopeContext* context);
+
+    virtual string generateQuad(GenerationContext* generationContext);
+
     virtual string toString(int ind = 0) {
         string ret = string(ind, ' ') + "while (" + cond->toString() + ") \n";
         ret += body->toString(ind + (dynamic_cast<BlockNode*>(body) ? 0 : 4));
         return ret;
     }
-
-    virtual bool analyze(ScopeContext* context);
-
-    virtual string generateQuad(GenerationContext* generationContext);
 };
 
 /**
@@ -145,16 +145,16 @@ struct DoWhileNode : public StatementNode {
         if (body) delete body;
     }
 
+    virtual bool analyze(ScopeContext* context);
+
+    virtual string generateQuad(GenerationContext* generationContext);
+
     virtual string toString(int ind = 0) {
         string ret = string(ind, ' ') + "do\n";
         ret += body->toString(ind + (dynamic_cast<BlockNode*>(body) ? 0 : 4)) + "\n";
         ret += string(ind, ' ') + "while (" + cond->toString() + ");";
         return ret;
     }
-
-    virtual bool analyze(ScopeContext* context);
-
-    virtual string generateQuad(GenerationContext* generationContext);
 };
 
 /**
@@ -180,6 +180,10 @@ struct ForNode : public StatementNode {
         if (body) delete body;
     }
 
+    virtual bool analyze(ScopeContext* context);
+
+    virtual string generateQuad(GenerationContext* generationContext);
+
     virtual string toString(int ind = 0) {
         string ret = string(ind, ' ') + "for (";
         ret += (initStmt ? initStmt->toString() : "") + ";";
@@ -188,10 +192,6 @@ struct ForNode : public StatementNode {
         ret += body->toString(ind + (dynamic_cast<BlockNode*>(body) ? 0 : 4));
         return ret;
     }
-
-    virtual bool analyze(ScopeContext* context);
-
-    virtual string generateQuad(GenerationContext* generationContext);
 };
 
 /**
@@ -201,13 +201,13 @@ struct BreakStmtNode : public StatementNode {
 
     BreakStmtNode(const Location& loc) : StatementNode(loc) {}
 
-    virtual string toString(int ind = 0) {
-        return string(ind, ' ') + "break";
-    }
-
     virtual bool analyze(ScopeContext* context);
 
     virtual string generateQuad(GenerationContext* generationContext);
+
+    virtual string toString(int ind = 0) {
+        return string(ind, ' ') + "break";
+    }
 };
 
 /**
@@ -217,13 +217,13 @@ struct ContinueStmtNode : public StatementNode {
 
     ContinueStmtNode(const Location& loc) : StatementNode(loc) {}
 
-    virtual string toString(int ind = 0) {
-        return string(ind, ' ') + "continue";
-    }
-
     virtual bool analyze(ScopeContext* context);
 
     virtual string generateQuad(GenerationContext* generationContext);
+
+    virtual string toString(int ind = 0) {
+        return string(ind, ' ') + "continue";
+    }
 };
 
 #endif
