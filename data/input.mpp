@@ -10,6 +10,7 @@ int main() {
 	func(5.5, (x = 7)++, 5.5);
 
     switch (x) {
+    break;
     case 5:
     case 6:
         int y = 1;

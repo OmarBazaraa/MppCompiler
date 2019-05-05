@@ -29,10 +29,12 @@ extern StatementNode* programRoot;
 //
 string inputFilename;
 string outputFilename = "out.o";
+string symbolTableFilename;
 
 //
 // Functions prototypes
 //
+void writeToFile(string data, string filename);
 void printHelp();
 void printVersion();
 void parseArguments(int argc, char* argv[]);
@@ -56,7 +58,7 @@ int main(int argc, char* argv[]) {
     yyin = fopen(inputFilename.c_str(), "r");
 
     if (yyin == NULL) {
-        fprintf(stderr, "Error: Could not open the input file '%s'!\n", inputFilename.c_str());
+        fprintf(stderr, "error: could not open the input file '%s'!\n", inputFilename.c_str());
         exit(0);
     }
 
@@ -65,11 +67,10 @@ int main(int argc, char* argv[]) {
 
     // Apply semantic check and quadruple generation
     if (programRoot != NULL && programRoot->analyze(&scopeContext)) {
-        cout << "---------------------------" << endl << endl;
         cout << programRoot->toString() << endl << endl;
-        cout << "---------------------------" << endl << endl;
-        cout << programRoot->generateQuad(&genContext) << endl << endl;
-        cout << "---------------------------" << endl;
+
+        writeToFile(programRoot->generateQuad(&genContext), outputFilename);
+        writeToFile(scopeContext.symbolTableStr, symbolTableFilename);
     }
 
     // Finalize and release allocated memory
@@ -83,6 +84,29 @@ int main(int argc, char* argv[]) {
 }
 
 /**
+ * Creates a new file and writes the given data into it.
+ *
+ * @param data     the data to write.
+ * @param filename the filename of the file to write into.
+ */
+void writeToFile(string data, string filename) {
+    if (filename.empty()) {
+        return;
+    }
+
+    ofstream fout(filename);
+
+    if (!fout.is_open()) {
+        fprintf(stderr, "error: could not write in file '%s'!\n", filename.c_str());
+        return;
+    }
+
+    fout << data << endl;
+
+    fout.close();
+}
+
+/**
  * Prints the help menu of the compiler into the
  * standard output stream, then terminates the program.
  */
@@ -92,6 +116,7 @@ void printHelp() {
     printf("    -h, --help                   Print the help menu and exit.\n");
     printf("    -v, --version                Print the installed version number and exit.\n");
     printf("    -o, --output <filename>      Specify the output filename.\n");
+    printf("    -s, --sym_table <filename>   Output the symbol table to the given file\n");
     exit(0);
 }
 
@@ -126,15 +151,24 @@ void parseArguments(int argc, char* argv[]) {
             // Set output filename
             else if (strcmp(*argv, "-o") == 0 || strcmp(*argv, "--output") == 0) {
                 if (--argc < 1) {
-                    fprintf(stderr, "Error: Missing output filename!\n\n");
+                    fprintf(stderr, "error: missing output filename!\n\n");
                     printHelp();
                 }
 
                 outputFilename = string(*(++argv));
             }
+            // Set symbol table output filename
+            else if (strcmp(*argv, "-s") == 0 || strcmp(*argv, "--sym_table") == 0) {
+                if (--argc < 1) {
+                    fprintf(stderr, "error: missing output filename!\n\n");
+                    printHelp();
+                }
+
+                symbolTableFilename = string(*(++argv));
+            }
             // Invalid command
             else {
-                fprintf(stderr, "Unknown argument '%s'\n", *argv);
+                fprintf(stderr, "unknown argument '%s'\n", *argv);
             }
         }
         // Set input filename
@@ -143,13 +177,13 @@ void parseArguments(int argc, char* argv[]) {
         }
         // Other arguments
         else {
-            fprintf(stderr, "Warning: too many arguments, '%s' ignored\n", *argv);
+            fprintf(stderr, "warning: too many arguments, '%s' ignored\n", *argv);
         }
     }
 
     // Check if input filename is specified
     if (inputFilename.empty()) {
-        fprintf(stderr, "Error: Missing input filename argument!\n\n");
+        fprintf(stderr, "error: missing input filename argument!\n\n");
         printHelp();
     }
 }

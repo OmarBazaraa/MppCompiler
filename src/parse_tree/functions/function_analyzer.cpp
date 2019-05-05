@@ -72,7 +72,7 @@ bool FunctionCallNode::analyze(ScopeContext* context, bool valueUsed) {
     used = valueUsed;
 
     if (ret) {
-        func->used = true;
+        func->used++;
     }
 
     return ret;

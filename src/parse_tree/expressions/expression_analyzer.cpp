@@ -124,7 +124,7 @@ bool IdentifierNode::analyze(ScopeContext* context, bool valueUsed) {
     used = valueUsed;
 
     if (used) {
-        ptr->used = true;
+        ptr->used++;
     }
 
     return true;
