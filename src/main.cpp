@@ -30,6 +30,7 @@ extern StatementNode* programRoot;
 string inputFilename;
 string outputFilename = "out.o";
 string symbolTableFilename;
+bool buildFailed = false;
 
 //
 // Functions prototypes
@@ -50,7 +51,7 @@ int main(int argc, char* argv[]) {
     // Parse incoming arguments
     parseArguments(argc, argv);
 
-    // Construct a context objects
+    // Construct context objects
     ScopeContext scopeContext(inputFilename);
     GenerationContext genContext;
 
@@ -67,10 +68,12 @@ int main(int argc, char* argv[]) {
 
     // Apply semantic check and quadruple generation
     if (programRoot != NULL && programRoot->analyze(&scopeContext)) {
-        cout << programRoot->toString() << endl << endl;
+        cout << programRoot->toString() << endl;
 
         writeToFile(programRoot->generateQuad(&genContext), outputFilename);
         writeToFile(scopeContext.getSymbolTableStr(), symbolTableFilename);
+    } else {
+        buildFailed = true;
     }
 
     // Finalize and release allocated memory
@@ -80,7 +83,7 @@ int main(int argc, char* argv[]) {
         delete programRoot;
     }
 
-    return 0;
+    return buildFailed;
 }
 
 /**
