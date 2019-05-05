@@ -34,7 +34,8 @@ struct BlockNode : public StatementNode {
         for (int i = 0; i < statements.size(); ++i) {
             ret += statements[i]->toString(ind + 4) + "\n";
         }
-        return ret += string(ind, ' ') + "}";
+        ret += string(ind, ' ') + "}";
+        return ret;
     }
 };
 
@@ -46,7 +47,7 @@ struct VarDeclarationNode : public DeclarationNode {
     bool isConst;
 
     VarDeclarationNode(TypeNode* type, IdentifierNode* ident, ExpressionNode* value = NULL, bool isConst = false)
-        : DeclarationNode(type->loc) {
+            : DeclarationNode(type->loc) {
         this->type = type;
         this->ident = ident;
         this->value = value;
@@ -60,7 +61,7 @@ struct VarDeclarationNode : public DeclarationNode {
     }
 
     virtual bool analyze(ScopeContext* context);
-    
+
     virtual string generateQuad(GenerationContext* generationContext);
 
     virtual string toString(int ind = 0) {

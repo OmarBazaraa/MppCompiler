@@ -3,9 +3,15 @@
 
 # CLion
 .idea/*
+cmake-build-debug/*
 
 # MacOS files
 .DS_Store
+
+# Lex & Yacc generated files
+lexer.cpp
+parser.cpp
+parser.hpp
 
 # Other files
 out/*
