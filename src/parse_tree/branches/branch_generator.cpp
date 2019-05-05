@@ -26,36 +26,65 @@ string IfNode::generateQuad(GenerationContext* generationContext) {
 }
 
 string CaseLabelNode::generateQuad(GenerationContext* generationContext) {
-    if (expr == NULL) {
-        return stmt->generateQuad(generationContext);
-    }
-
-    string ret;
-    int label1 = generationContext->labelCounter++;
-
-    // @AbdoEed The type of this push is incorrect it should be the type of the switch expr. not the case expr.
-    ret += Utils::oprToQuad(OPR_PUSH, expr->type) + " SWITCH_COND@" + to_string(generationContext->breakLabels.top()) + "\n";
-    ret += expr->generateQuad(generationContext);
-    ret += Utils::oprToQuad(OPR_EQUAL, expr->type);
-    ret += Utils::oprToQuad(OPR_JZ, DTYPE_BOOL) + " L" + to_string(label1) + "\n";
-    ret += stmt->generateQuad(generationContext);
-    ret += "L" + to_string(label1) + ":\n";
-
-    return ret;
+    return "";
 }
 
 string SwitchNode::generateQuad(GenerationContext* generationContext) {
     string ret;
-    int label1 = generationContext->labelCounter++;
-
-    ret += cond->generateQuad(generationContext);
-    ret += Utils::oprToQuad(OPR_POP, cond->type) + " SWITCH_COND@" + to_string(label1) + "\n";
-    generationContext->breakLabels.push(label1);
-
-    ret += body->generateQuad(generationContext);
-
-    generationContext->breakLabels.pop();
-    ret += "L" + to_string(label1) + ":\n";
+	vector<pair<int, int> > labelPairs;
+	int defaultLabel = -1;
+	int breakLabel = generationContext->labelCounter++;
+	
+	ret += cond->generateQuad(generationContext);
+    ret += Utils::oprToQuad(OPR_POP, cond->type) + " SWITCH_COND@" + to_string(breakLabel) + "\n";
+	generationContext->breakLabels.push(breakLabel);
+	
+	for (int i = 0; i < caseLabels.size(); i++) {
+		int label1 = generationContext->labelCounter++;
+		if (caseLabels[i] == NULL) {
+			defaultLabel = label1;
+			labelPairs.push_back({-1, label1});
+		} 
+		else {
+			int label2 = generationContext->labelCounter++;
+			labelPairs.push_back({label1, label2});
+		}
+	}
+	
+	for (int i = 0; i < caseLabels.size(); i++) {
+		if (caseLabels[i]) {
+			if (i  > 0) {
+				ret += Utils::oprToQuad(OPR_JMP, DTYPE_ERROR) + " L" + to_string(labelPairs[i].second) + "\n";
+			}
+			DataType resultdType = max(cond->type, caseLabels[i]->type);
+			
+			ret += "L" + to_string(labelPairs[i].first) + ":\n";
+			ret += Utils::oprToQuad(OPR_PUSH, cond->type) + " SWITCH_COND@" + to_string(generationContext->breakLabels.top()) + "\n";
+			ret += Utils::dtypeConvQuad(cond->type, resultdType);
+			ret += caseLabels[i]->generateQuad(generationContext);
+			ret += Utils::dtypeConvQuad(caseLabels[i]->type, resultdType);
+			ret += Utils::oprToQuad(OPR_EQUAL, resultdType) + "\n";
+			ret += Utils::oprToQuad(OPR_JZ, DTYPE_BOOL) + " L";
+			
+			if (i == caseLabels.size() - 1) {				// my case label is last
+				ret += (hasDefaultLabel ? to_string(defaultLabel) : to_string(breakLabel)) + "\n";
+			}
+			else if (labelPairs[i + 1].first == -1) {		// my next label is default
+				ret += ((i + 1 == caseLabels.size() - 1) ? to_string(defaultLabel) : to_string(labelPairs[i + 2].first)) + "\n";
+			}
+			else {											// my next is case
+				ret += to_string(labelPairs[i + 1].first) + "\n";
+			}
+		}
+		
+		ret += "L" + to_string(labelPairs[i].second) + ":\n";
+			
+		for (int j = 0;j < caseStmts[i].size();j++) {
+			ret += caseStmts[i][j]->generateQuad(generationContext);
+		}
+	}
+	
+	ret += "L" + to_string(breakLabel) + ":\n";
 
     return ret;
 }
