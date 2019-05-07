@@ -37,7 +37,7 @@ bool CaseLabelNode::analyze(ScopeContext* context) {
     if (expr) {     // case label
         ret = expr->analyze(context, true);
 
-        if (ret && !expr->isConst) {
+        if (ret && !expr->constant) {
             context->printError("constant expression required in case label", expr->loc);
             ret = false;
         }
@@ -45,7 +45,7 @@ bool CaseLabelNode::analyze(ScopeContext* context) {
             context->printError("case quantity not an integer", expr->loc);
             ret = false;
         }
-        if (ret && expr->isConst && Utils::isIntegerType(expr->type)) {
+        if (ret && expr->constant && Utils::isIntegerType(expr->type)) {
             // TODO: calculate this value
             // int val = 0;
 

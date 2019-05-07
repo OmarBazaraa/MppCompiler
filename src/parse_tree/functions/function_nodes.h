@@ -18,6 +18,7 @@ struct FunctionNode : public DeclarationNode {
         this->ident = ident;
         this->paramList = paramList;
         this->body = body;
+        this->initialized = true;
     }
 
     virtual ~FunctionNode() {

@@ -48,7 +48,7 @@ bool VarDeclarationNode::analyze(ScopeContext* context) {
         context->printError("default function parameters are not allowed", value->loc);
         ret = false;
     }
-    else if (isConst && value == NULL && !context->declareFuncParams) {
+    else if (constant && value == NULL && !context->declareFuncParams) {
         context->printError("uninitialized const '" + ident->name + "'", ident->loc);
         ret = false;
     }

@@ -77,8 +77,13 @@ struct StatementNode : public Node {
 struct DeclarationNode : public StatementNode {
     TypeNode* type;
     IdentifierNode* ident;
-    string alias;
-    int used = 0;
+
+    //
+    // NOTE: the following variables will be computed after calling analyze function
+    //
+    string alias;                       // Alias name to avoid same identifier in different scopes
+    int used = 0;                       // The number of times this declaration node has been read
+    bool initialized = false;           // Whether this declaration node has been initialized or not
 
     DeclarationNode(const Location& loc) : StatementNode(loc) {}
 
@@ -96,7 +101,7 @@ struct ExpressionNode : public StatementNode {
     //
     DataType type = DTYPE_ERROR;        // Data type of the expression
     DeclarationNode* reference = NULL;  // Reference variable of the expression is exist
-    bool isConst = false;               // Whether the expression is of constant value or not
+    bool constant = false;              // Whether the expression is of constant value or not
     bool used = false;                  // Whether the value of the expression is to be used or not
 
     ExpressionNode() {}

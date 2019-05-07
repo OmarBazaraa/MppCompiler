@@ -44,14 +44,15 @@ struct BlockNode : public StatementNode {
  */
 struct VarDeclarationNode : public DeclarationNode {
     ExpressionNode* value;
-    bool isConst;
+    bool constant;
 
-    VarDeclarationNode(TypeNode* type, IdentifierNode* ident, ExpressionNode* value = NULL, bool isConst = false)
+    VarDeclarationNode(TypeNode* type, IdentifierNode* ident, ExpressionNode* value = NULL, bool constant = false)
             : DeclarationNode(type->loc) {
         this->type = type;
         this->ident = ident;
         this->value = value;
-        this->isConst = isConst;
+        this->constant = constant;
+        this->initialized = (value != NULL);
     }
 
     virtual ~VarDeclarationNode() {
@@ -73,11 +74,11 @@ struct VarDeclarationNode : public DeclarationNode {
     }
 
     virtual string declaredHeader() {
-        return (isConst ? "const " : "") + type->toString() + " " + ident->name;
+        return (constant ? "const " : "") + type->toString() + " " + ident->name;
     }
 
     virtual string declaredType() {
-        return (isConst ? "const " : "") + type->toString();
+        return (constant ? "const " : "") + type->toString();
     }
 };
 

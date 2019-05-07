@@ -151,7 +151,7 @@ struct ValueNode : public ExpressionNode {
     ValueNode(const Location& loc, DataType type, const char* value) : ExpressionNode(loc) {
         this->type = type;
         this->value = value;
-        this->isConst = true;
+        this->constant = true;
     }
 
     virtual string generateQuad(GenerationContext* generationContext);

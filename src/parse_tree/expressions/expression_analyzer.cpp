@@ -12,7 +12,7 @@ bool ExprContainerNode::analyze(ScopeContext* context, bool valueUsed) {
 
     type = expr->type;
     reference = expr->reference;
-    isConst = expr->isConst;
+    constant = expr->constant;
     used = valueUsed;
 
     return ret;
@@ -32,7 +32,7 @@ bool AssignOprNode::analyze(ScopeContext* context, bool valueUsed) {
         context->printError("lvalue required as left operand of assignment", lhs->loc);
         return false;
     }
-    if (lhs->reference && lhs->isConst) {
+    if (lhs->reference && lhs->constant) {
         context->printError("assignment of read-only variable '" + lhs->reference->declaredHeader() + "'", lhs->loc);
         return false;
     }
@@ -43,8 +43,10 @@ bool AssignOprNode::analyze(ScopeContext* context, bool valueUsed) {
 
     type = lhs->type;
     reference = lhs->reference;
-    isConst = lhs->isConst;
+    constant = lhs->constant;
     used = valueUsed;
+
+    reference->initialized = true;
 
     return true;
 }
@@ -68,7 +70,7 @@ bool BinaryOprNode::analyze(ScopeContext* context, bool valueUsed) {
         type = max(lhs->type, rhs->type);
     }
 
-    isConst = (lhs->isConst && rhs->isConst);
+    constant = (lhs->constant && rhs->constant);
     used = valueUsed;
 
     return true;
@@ -90,7 +92,7 @@ bool UnaryOprNode::analyze(ScopeContext* context, bool valueUsed) {
             context->printError("lvalue required as an operand of increment/decrement operator", expr->loc);
             return false;
         }
-        if (expr->reference && expr->isConst) {
+        if (expr->reference && expr->constant) {
             context->printError("increment/decrement of read-only variable '" + expr->reference->declaredHeader() + "'", expr->loc);
             return false;
         }
@@ -98,7 +100,7 @@ bool UnaryOprNode::analyze(ScopeContext* context, bool valueUsed) {
 
     type = (Utils::isLogicalOpr(opr) ? DTYPE_BOOL : expr->type);
     reference = (opr == OPR_PRE_INC || opr == OPR_PRE_DEC ? expr->reference : NULL);
-    isConst = expr->isConst;
+    constant = expr->constant;
     used = valueUsed;
 
     return true;
@@ -118,13 +120,18 @@ bool IdentifierNode::analyze(ScopeContext* context, bool valueUsed) {
         type = DTYPE_FUNC_PTR;
     } else {
         type = ptr->type->type;
-        isConst = ((VarDeclarationNode*) ptr)->isConst;
+        constant = ((VarDeclarationNode*) ptr)->constant;
     }
 
     used = valueUsed;
 
     if (used) {
-        ptr->used++;
+        reference->used++;
+    }
+
+    if (used && !reference->initialized) {
+        context->printError("variable or field '" + name + "' used without being initialized", loc);
+        return false;
     }
 
     return true;

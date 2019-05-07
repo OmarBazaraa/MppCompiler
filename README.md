@@ -55,9 +55,10 @@ Run `make run` to run the recently built compiler.
 4. Invalid operand types. (i.e. operands of type `void` or pointer to function).
 5. Float operand to modulus operator.
 6. Float operand to bitwise operators.
-7. Increment and decrement operators with `rvalue` operand.
-8. `switch` and `case` statements with non integer expression.
-9. `case`-statement with non-constant expression.
+7. Use of uninitialized variable.
+8. Increment and decrement operators with `rvalue` operand.
+9. `switch` and `case` statements with non integer expression.
+10. `case`-statement with non-constant expression.
 
 ### Function-related errors
 1. Value returned in `void` function and vice-versa.
