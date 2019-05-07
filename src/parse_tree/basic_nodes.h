@@ -107,6 +107,10 @@ struct ExpressionNode : public StatementNode {
     ExpressionNode() {}
 
     ExpressionNode(const Location& loc) : StatementNode(loc) {}
+
+    virtual int getConstIntValue() {
+        return -1;
+    }
     
     virtual bool analyze(ScopeContext* context) {
         return analyze(context, false);

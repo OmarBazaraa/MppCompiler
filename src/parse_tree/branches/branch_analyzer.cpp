@@ -35,7 +35,7 @@ bool CaseLabelNode::analyze(ScopeContext* context) {
     bool ret = true;
 
     if (switchStmt->initializedVars.size() > 0) {
-        context->log("jump to case label", expr->loc);
+        context->log("jump to case label", expr->loc, LOG_ERROR);
         ret = false;
 
         const VarList& list = switchStmt->initializedVars;
@@ -57,15 +57,15 @@ bool CaseLabelNode::analyze(ScopeContext* context) {
             ret = false;
         }
         if (ret && expr->constant && Utils::isIntegerType(expr->type)) {
-            // TODO: calculate this value
-            // int val = 0;
+            int val = expr->getConstIntValue();
 
-            // if (switchStmt->labels.count(val)) {
-            //     context->log("duplicate case value", loc);
-            //     ret = false;
-            // }
+            if (switchStmt->caseMap.count(val)) {
+                context->log("duplicate case value", loc, LOG_ERROR);
+                context->log("previously used here", switchStmt->caseMap[val]->loc, LOG_NOTE);
+                ret = false;
+            }
 
-            // switchStmt->labels.insert(val);
+            switchStmt->caseMap[val] = this;
         }
     }
     else {          // default label

@@ -11,6 +11,7 @@ add_executable(MppCompiler
 
         src/parse_tree/expressions/expression_analyzer.cpp
         src/parse_tree/expressions/expression_generator.cpp
+        src/parse_tree/expressions/expression_evaluator.cpp
 
         src/parse_tree/branches/branch_analyzer.cpp
         src/parse_tree/branches/branch_generator.cpp

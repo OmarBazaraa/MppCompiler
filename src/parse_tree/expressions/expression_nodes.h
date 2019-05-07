@@ -18,6 +18,10 @@ struct ExprContainerNode : public ExpressionNode {
         if (expr) delete expr;
     }
 
+    virtual int getConstIntValue() {
+        return expr->getConstIntValue();
+    }
+
     virtual bool analyze(ScopeContext* context, bool valueUsed);
 
     virtual string generateQuad(GenerationContext* generationContext);
@@ -72,6 +76,8 @@ struct BinaryOprNode : public ExpressionNode {
         if (rhs) delete rhs;
     }
 
+    virtual int getConstIntValue();
+
     virtual bool analyze(ScopeContext* context, bool valueUsed);
 
     virtual string generateQuad(GenerationContext* generationContext);
@@ -100,6 +106,8 @@ struct UnaryOprNode : public ExpressionNode {
     virtual ~UnaryOprNode() {
         if (expr) delete expr;
     }
+
+    virtual int getConstIntValue();
 
     virtual bool analyze(ScopeContext* context, bool valueUsed);
 
@@ -133,6 +141,8 @@ struct IdentifierNode : public ExpressionNode {
         this->name = name;
     }
 
+    virtual int getConstIntValue();
+
     virtual bool analyze(ScopeContext* context, bool valueUsed);
 
     virtual string generateQuad(GenerationContext* generationContext);
@@ -153,6 +163,8 @@ struct ValueNode : public ExpressionNode {
         this->value = value;
         this->constant = true;
     }
+
+    virtual int getConstIntValue();
 
     virtual string generateQuad(GenerationContext* generationContext);
 
