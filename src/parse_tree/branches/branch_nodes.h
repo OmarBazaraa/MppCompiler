@@ -45,7 +45,7 @@ struct IfNode : public StatementNode {
 };
 
 /**
- * The node class holding a case statement in the parse tree.
+ * The node class holding a case label in the parse tree.
  */
 struct CaseLabelNode : public StatementNode {
     ExpressionNode* expr;
@@ -83,6 +83,8 @@ struct SwitchNode : public StatementNode {
     bool hasDefaultLabel = false;       // Whether this switch has default label or not
     vector<ExpressionNode*> caseLabels; // List of all case labels in this switch
     vector<StmtList> caseStmts;         // List of statements corresponding to each case label
+
+    int caseLabelCnt = 0;               // Counter for case labels, used to detect cross variables initialization
 
     SwitchNode(const Location& loc, ExpressionNode* cond, StatementNode* body) : StatementNode(loc) {
         this->cond = cond;

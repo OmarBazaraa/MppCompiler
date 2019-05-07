@@ -53,5 +53,12 @@ bool VarDeclarationNode::analyze(ScopeContext* context) {
         ret = false;
     }
 
+    SwitchNode* switchStmt = context->getSwitchScope();
+
+    if (switchStmt != NULL && switchStmt->caseLabelCnt < switchStmt->caseLabels.size() && value != NULL) {
+        context->printError("cross initialization of '" + declaredHeader() + "'", ident->loc);
+        ret = false;
+    }
+
     return ret;
 }

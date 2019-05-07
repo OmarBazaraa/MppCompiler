@@ -34,6 +34,8 @@ bool CaseLabelNode::analyze(ScopeContext* context) {
 
     bool ret = true;
 
+    switchStmt->caseLabelCnt++;
+
     if (expr) {     // case label
         ret = expr->analyze(context, true);
 
@@ -79,6 +81,8 @@ bool SwitchNode::analyze(ScopeContext* context) {
 
     bool ret = true;
 
+    populate(); // Pre-compute switch cases and statements
+
     context->addScope(SCOPE_SWITCH, this);
 
     ret &= cond->analyze(context, true);
@@ -91,10 +95,6 @@ bool SwitchNode::analyze(ScopeContext* context) {
     ret &= body->analyze(context);
 
     context->popScope();
-
-    if (ret) {
-        populate();
-    }
 
     return ret;
 }
