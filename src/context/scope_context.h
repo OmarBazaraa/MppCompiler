@@ -88,12 +88,12 @@ public:
         for (auto& it : scope->table) {
             DeclarationNode* sym = it.second;
 
-            if (sym->used > 0) {
+            if (sym->used <= 0) {
                 if (dynamic_cast<VarDeclarationNode*>(sym)) {
-                    printWarning("the value of variable '" + sym->declaredHeader() + "' is never used", sym->loc);
+                    printWarning("the value of variable '" + sym->declaredHeader() + "' is never used", sym->ident->loc);
                 }
                 else if (sym->ident->name != "main") {
-                    printWarning("function '" + sym->declaredHeader() + "' is never called", sym->loc);
+                    printWarning("function '" + sym->declaredHeader() + "' is never called", sym->ident->loc);
                 }
             }
             
