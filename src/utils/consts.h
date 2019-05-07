@@ -46,7 +46,7 @@ enum Operator {
 /**
  * Enum holding all the possible data types in our language.
  * 
- * Note that order matter.
+ * Note that order does matter.
  * DON'T CHANGE ENUM ORDER.
  */
 enum DataType {
@@ -69,6 +69,15 @@ enum ScopeType {
     SCOPE_LOOP,
     SCOPE_IF,
     SCOPE_SWITCH,
+};
+
+/**
+ * Enum holding different logging levels.
+ */
+enum LogLevel {
+    LOG_ERROR,
+    LOG_WARNING,
+    LOG_NOTE
 };
 
 #endif

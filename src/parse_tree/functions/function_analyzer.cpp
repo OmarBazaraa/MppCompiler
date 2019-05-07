@@ -4,14 +4,14 @@
 
 bool FunctionNode::analyze(ScopeContext* context) {
     if (!context->isGlobalScope()) {
-        context->printError("a function-definition is not allowed here", ident->loc);
+        context->log("a function-definition is not allowed here", ident->loc);
         return false;
     }
 
     bool ret = true;
 
     if (!context->declareSymbol(this)) {
-        context->printError("'" + declaredHeader() + "' redeclared", ident->loc);
+        context->log("'" + declaredHeader() + "' redeclared", ident->loc);
         ret = false;
     }
 
@@ -37,19 +37,19 @@ bool FunctionCallNode::analyze(ScopeContext* context, bool valueUsed) {
     func = dynamic_cast<FunctionNode*>(ptr);
 
     if (ptr == NULL) {
-        context->printError("'" + ident->name + "' was not declared in this scope", loc);
+        context->log("'" + ident->name + "' was not declared in this scope", loc);
         ret = false;
     }
     else if (func == NULL) {
-        context->printError("'" + ident->name + "' cannot be used as a function", loc);
+        context->log("'" + ident->name + "' cannot be used as a function", loc);
         ret = false;
     }
     else if (argList.size() > func->paramList.size()) {
-        context->printError("too many arguments to function '" + func->declaredHeader() + "'", loc);
+        context->log("too many arguments to function '" + func->declaredHeader() + "'", loc);
         ret = false;
     }
     else if (argList.size() < func->paramList.size()) {
-        context->printError("too few arguments to function '" + func->declaredHeader() + "'", loc);
+        context->log("too few arguments to function '" + func->declaredHeader() + "'", loc);
         ret = false;
     } else {
         type = ptr->type->type;
@@ -62,9 +62,9 @@ bool FunctionCallNode::analyze(ScopeContext* context, bool valueUsed) {
         }
 
         if (func && argList[i]->type == DTYPE_VOID || argList[i]->type == DTYPE_FUNC_PTR) {
-            context->printError("invalid conversion from '" + argList[i]->exprTypeStr() + "' to '" +
-                func->paramList[i]->type->toString() + "' in function '" +
-                func->declaredHeader() + "' call", argList[i]->loc);
+            context->log("invalid conversion from '" + argList[i]->exprTypeStr() + "' to '" +
+                         func->paramList[i]->type->toString() + "' in function '" +
+                         func->declaredHeader() + "' call", argList[i]->loc);
             return false;
         }
     }
@@ -82,7 +82,7 @@ bool ReturnStmtNode::analyze(ScopeContext* context) {
     func = context->getFunctionScope();
 
     if (func == NULL) {
-        context->printError("return-statement not within function", loc);
+        context->log("return-statement not within function", loc);
         return false;
     }
 
@@ -92,13 +92,14 @@ bool ReturnStmtNode::analyze(ScopeContext* context) {
         }
 
         if (func->type->type == DTYPE_VOID && value->type != DTYPE_VOID) {
-            context->printError("return-statement with '" + value->exprTypeStr() + "' value, in function returning 'void'", value->loc);
+            context->log("return-statement with '" + value->exprTypeStr() + "' value, in function returning 'void'",
+                         value->loc);
             return false;
         }
     }
     else {          // No return expression
         if (func->type->type != DTYPE_VOID) {
-            context->printError("return-statement with no value, in function returning '" + func->type->toString() + "'", loc);
+            context->log("return-statement with no value, in function returning '" + func->type->toString() + "'", loc);
             return false;
         }
     }

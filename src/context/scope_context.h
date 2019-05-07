@@ -90,10 +90,10 @@ public:
 
             if (sym->used <= 0) {
                 if (dynamic_cast<VarDeclarationNode*>(sym)) {
-                    printWarning("the value of variable '" + sym->declaredHeader() + "' is never used", sym->ident->loc);
+                    log("the value of variable '" + sym->declaredHeader() + "' is never used", sym->ident->loc, LOG_WARNING);
                 }
                 else if (sym->ident->name != "main") {
-                    printWarning("function '" + sym->declaredHeader() + "' is never called", sym->ident->loc);
+                    log("function '" + sym->declaredHeader() + "' is never called", sym->ident->loc, LOG_WARNING);
                 }
             }
             
@@ -254,25 +254,28 @@ public:
     }
 
     /**
-     * Prints warning message at the given location in this context..
+     * Logs the given message at the given location in this context.
+     *
+     * @param what  the message to log.
+     * @param loc   the location of the token to point upon in this context.
+     * @param level the log level of this message.
      */
-    void printWarning(const string& what, const Location& loc) {
-        fprintf(stdout, "%s:%d:%d: warning: %s\n", sourceFilename.c_str(), loc.lineNum, loc.pos, what.c_str());
-        fprintf(stdout, "%s\n", sourceCode[loc.lineNum - 1].c_str());
-        fprintf(stdout, "%*s", loc.pos, "^");
+    void log(const string& what, const Location& loc, LogLevel level = LOG_ERROR) {
+        string logLvl;
 
-        if (loc.len > 1) {
-            fprintf(stdout, "%s", string(loc.len - 1, '~').c_str());
+        switch (level) {
+            case LOG_ERROR:
+                logLvl = "error";
+                break;
+            case LOG_WARNING:
+                logLvl = "warning";
+                break;
+            case LOG_NOTE:
+                logLvl = "note";
+                break;
         }
 
-        fprintf(stdout, "\n");
-    }
-
-    /**
-     * Prints error message at the given location in this context.
-     */
-    void printError(const string& what, const Location& loc) {
-        fprintf(stdout, "%s:%d:%d: error: %s\n", sourceFilename.c_str(), loc.lineNum, loc.pos, what.c_str());
+        fprintf(stdout, "%s:%d:%d: %s: %s\n", sourceFilename.c_str(), loc.lineNum, loc.pos, logLvl.c_str(), what.c_str());
         fprintf(stdout, "%s\n", sourceCode[loc.lineNum - 1].c_str());
         fprintf(stdout, "%*s", loc.pos, "^");
 

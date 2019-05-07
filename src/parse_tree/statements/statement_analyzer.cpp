@@ -3,13 +3,13 @@
 
 
 bool ErrorNode::analyze(ScopeContext* context) {
-    context->printError(what, loc);
+    context->log(what, loc);
     return false;
 }
 
 bool BlockNode::analyze(ScopeContext* context) {
     if (context->isGlobalScope()) {
-        context->printError("block is not allowed in global scope", loc);
+        context->log("block is not allowed in global scope", loc);
         return false;
     }
 
@@ -30,11 +30,11 @@ bool VarDeclarationNode::analyze(ScopeContext* context) {
     bool ret = true;
 
     if (type->type == DTYPE_VOID) {
-        context->printError("variable or field '" + ident->name + "' declared void", ident->loc);
+        context->log("variable or field '" + ident->name + "' declared void", ident->loc);
         ret = false;
     }
     else if (!context->declareSymbol(this)) {
-        context->printError("'" + declaredHeader() + "' redeclared", ident->loc);
+        context->log("'" + declaredHeader() + "' redeclared", ident->loc);
         ret = false;
     }
 
@@ -45,19 +45,18 @@ bool VarDeclarationNode::analyze(ScopeContext* context) {
     }
 
     if (context->declareFuncParams && value != NULL) {
-        context->printError("default function parameters are not allowed", value->loc);
+        context->log("default function parameters are not allowed", value->loc);
         ret = false;
     }
     else if (constant && value == NULL && !context->declareFuncParams) {
-        context->printError("uninitialized const '" + ident->name + "'", ident->loc);
+        context->log("uninitialized const '" + ident->name + "'", ident->loc);
         ret = false;
     }
 
     SwitchNode* switchStmt = context->getSwitchScope();
 
-    if (switchStmt != NULL && switchStmt->caseLabelCnt < switchStmt->caseLabels.size() && value != NULL) {
-        context->printError("cross initialization of '" + declaredHeader() + "'", ident->loc);
-        ret = false;
+    if (switchStmt != NULL && value != NULL) {
+        switchStmt->initializedVars.push_back(this);
     }
 
     return ret;
