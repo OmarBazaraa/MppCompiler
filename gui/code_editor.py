@@ -33,7 +33,7 @@ class CodeEditor(QPlainTextEdit):
         self.blockCountChanged.connect(self.updateLineNumberAreaWidth)
         self.updateRequest.connect(self.updateLineNumberArea)
         self.cursorPositionChanged.connect(self.highlightCurrentLine)
-        self.setStyleSheet("background: #ffffff; font-family: Courier New; font-size: 18px;")
+        self.setStyleSheet("font-family: Courier New; font-size: 18px;")
         self.setTabStopWidth(40)
         self.updateLineNumberAreaWidth(0)
 
