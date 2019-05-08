@@ -82,7 +82,7 @@ struct SwitchNode : public StatementNode {
     //
     bool hasDefaultLabel = false;                   // Whether this switch has default label or not
     unordered_map<int, CaseLabelNode*> caseMap;     // Map of all case constant integer values
-    ExprList caseExpressions;                       // List of all case expression nodes in this switch
+    ExprList caseLabels;                            // List of all case expression nodes in this switch
     vector<StmtList> caseStmts;                     // List of statements corresponding to each case label
     VarList initializedVars;                        // List of declared variables with initialization, used to detect cross variables initialization
 
@@ -114,7 +114,7 @@ struct SwitchNode : public StatementNode {
         CaseLabelNode* caseLabel;
 
         while (caseLabel = dynamic_cast<CaseLabelNode*>(stmt)) {
-            caseExpressions.push_back(caseLabel->expr);
+            caseLabels.push_back(caseLabel->expr);
             caseStmts.push_back(StmtList());
 
             stmt = caseLabel->stmt;
@@ -140,9 +140,9 @@ struct SwitchNode : public StatementNode {
         // string ret = string(ind, ' ') + "switch (" + cond->toString() + ")\n";
         // ret += string(ind, ' ') + "{\n";
         //
-        // for (int i = 0; i < caseExpressions.size(); ++i) {
-        //     if (caseExpressions[i] != NULL) {
-        //         ret += string(ind, ' ') + "case " + caseExpressions[i]->toString() + ":\n";
+        // for (int i = 0; i < caseLabels.size(); ++i) {
+        //     if (caseLabels[i] != NULL) {
+        //         ret += string(ind, ' ') + "case " + caseLabels[i]->toString() + ":\n";
         //     } else {
         //         ret += string(ind, ' ') + "default:\n";
         //     }

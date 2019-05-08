@@ -264,6 +264,8 @@ public:
         string logLvl;
 
         switch (level) {
+            // In future we may change the output stream of each level
+            // and change th colors of the log level and the intended token
             case LOG_ERROR:
                 logLvl = "error";
                 break;

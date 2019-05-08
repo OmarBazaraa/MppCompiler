@@ -5,11 +5,11 @@
 string IfNode::generateQuad(GenerationContext* generationContext) {
     string ret;
     int label1 = generationContext->labelCounter++;
-    
+
     ret += cond->generateQuad(generationContext);
     ret += Utils::oprToQuad(OPR_JZ, cond->type) + " L" + to_string(label1) + "\n";
     ret += ifBody->generateQuad(generationContext);
-    
+
     if (elseBody) {
         int label2 = generationContext->labelCounter++;
 
@@ -30,56 +30,57 @@ string SwitchNode::generateQuad(GenerationContext* generationContext) {
     vector<pair<int, int>> labelPairs;
     int defaultLabel = -1;
     int breakLabel = generationContext->labelCounter++;
-    
+
     ret += cond->generateQuad(generationContext);
     ret += Utils::oprToQuad(OPR_POP, cond->type) + " SWITCH_COND@" + to_string(breakLabel) + "\n";
     generationContext->breakLabels.push(breakLabel);
-    
-    for (int i = 0; i < caseExpressions.size(); i++) {
+
+    for (int i = 0; i < caseLabels.size(); i++) {
         int label1 = generationContext->labelCounter++;
-        if (caseExpressions[i] == NULL) {
+        if (caseLabels[i] == NULL) {
             defaultLabel = label1;
             labelPairs.push_back({-1, label1});
-        } 
+        }
         else {
             int label2 = generationContext->labelCounter++;
             labelPairs.push_back({label1, label2});
         }
     }
-    
-    for (int i = 0; i < caseExpressions.size(); i++) {
-        if (caseExpressions[i]) {
-            if (i  > 0) {
-                ret += Utils::oprToQuad(OPR_JMP, DTYPE_ERROR) + " L" + to_string(labelPairs[i].second) + "\n";
+
+    for (int i = 0; i < caseLabels.size(); i++) {
+        if (caseLabels[i]) {
+            if (i > 0) {
+                ret += Utils::oprToQuad(OPR_JMP) + " L" + to_string(labelPairs[i].second) + "\n";
             }
-            DataType resultedType = max(cond->type, caseExpressions[i]->type);
-            
+
+            DataType resultType = max(cond->type, caseLabels[i]->type);
+
             ret += "L" + to_string(labelPairs[i].first) + ":\n";
             ret += Utils::oprToQuad(OPR_PUSH, cond->type) + " SWITCH_COND@" + to_string(generationContext->breakLabels.top()) + "\n";
-            ret += Utils::dtypeConvQuad(cond->type, resultedType);
-            ret += caseExpressions[i]->generateQuad(generationContext);
-            ret += Utils::dtypeConvQuad(caseExpressions[i]->type, resultedType);
-            ret += Utils::oprToQuad(OPR_EQUAL, resultedType) + "\n";
+            ret += Utils::dtypeConvQuad(cond->type, resultType);
+            ret += Utils::oprToQuad(OPR_PUSH, caseLabels[i]->type) + " " + to_string(caseLabels[i]->getConstIntValue()) + "\n";
+            ret += Utils::dtypeConvQuad(caseLabels[i]->type, resultType);
+            ret += Utils::oprToQuad(OPR_EQUAL, resultType) + "\n";
             ret += Utils::oprToQuad(OPR_JZ, DTYPE_BOOL) + " L";
-            
-            if (i == caseExpressions.size() - 1) {               // my case label is last
+
+            if (i == caseLabels.size() - 1) {               // my case label is last
                 ret += (hasDefaultLabel ? to_string(defaultLabel) : to_string(breakLabel)) + "\n";
             }
             else if (labelPairs[i + 1].first == -1) {       // my next label is default
-                ret += ((i + 1 == caseExpressions.size() - 1) ? to_string(defaultLabel) : to_string(labelPairs[i + 2].first)) + "\n";
+                ret += ((i + 1 == caseLabels.size() - 1) ? to_string(defaultLabel) : to_string(labelPairs[i + 2].first)) + "\n";
             }
             else {                                          // my next is case
                 ret += to_string(labelPairs[i + 1].first) + "\n";
             }
         }
-        
+
         ret += "L" + to_string(labelPairs[i].second) + ":\n";
-            
+
         for (int j = 0;j < caseStmts[i].size();j++) {
             ret += caseStmts[i][j]->generateQuad(generationContext);
         }
     }
-    
+
     generationContext->breakLabels.pop();
     ret += "L" + to_string(breakLabel) + ":\n";
 
@@ -162,7 +163,7 @@ string ForNode::generateQuad(GenerationContext* generationContext) {
         ret += cond->generateQuad(generationContext);
         ret += Utils::oprToQuad(OPR_JZ, cond->type) + " L" + to_string(label3) + "\n";
     }
-    
+
     generationContext->breakLabels.push(label3);
     generationContext->continueLabels.push(label2);
 
@@ -170,13 +171,13 @@ string ForNode::generateQuad(GenerationContext* generationContext) {
 
     generationContext->continueLabels.pop();
     generationContext->breakLabels.pop();
-    
+
     ret += "L" + to_string(label2) + ":\n";
-    
+
     if (inc) {
         ret += inc->generateQuad(generationContext);
     }
-        
+
     ret += Utils::oprToQuad(OPR_JMP) + " L" + to_string(label1) + "\n";
     ret += "L" + to_string(label3) + ":\n";
 
