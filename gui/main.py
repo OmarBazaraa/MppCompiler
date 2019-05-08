@@ -19,13 +19,15 @@ class MppCompiler(QWidget):
 
     TITLE = "M++ Compiler";
     BACKGROUND_COLOR = QColor(255, 255, 255);
-    MPP_COMPILER_PATH = "/Users/ibrahimradwan/Development/MppCompiler/build/MppCompiler"
-    MPP_QUADRUPLES_PATH = "/Users/ibrahimradwan/Desktop/quads.txt"
-    MPP_SYMBOL_TABLE_PATH = "/Users/ibrahimradwan/Desktop/symbols_table.txt"
-    MPP_TMP_PATH = "/Users/ibrahimradwan/Desktop/tmp.txt"
 
-    def __init__(self):
+
+    def __init__(self, args):
         super(QWidget, self).__init__()
+
+        self.mpp_compiler_path = args[1] if len(args) >= 2 else "/Users/ibrahimradwan/Development/MppCompiler/build/MppCompiler"
+        self.mpp_quadruples_path = args[2] if len(args) >= 3 else "/Users/ibrahimradwan/Desktop/quads.txt"
+        self.mpp_symbols_table_path = args[3] if len(args) >= 4 else "/Users/ibrahimradwan/Desktop/symbols_table.txt"
+        self.mpp_tmp_path = args[4] if len(args) >= 5 else "/Users/ibrahimradwan/Desktop/tmp.txt"
 
         self.file_path = ""
 
@@ -223,22 +225,22 @@ class MppCompiler(QWidget):
     def compile(self):
         print("Compiling")
 
-        with open(MppCompiler.MPP_TMP_PATH, 'w') as f:
+        with open(self.mpp_tmp_path, 'w') as f:
             f.write(self.input_code_editor.toPlainText())
 
         # Compile
-        result = subprocess.check_output([MppCompiler.MPP_COMPILER_PATH, "-o", MppCompiler.MPP_QUADRUPLES_PATH, "-s", MppCompiler.MPP_SYMBOL_TABLE_PATH, MppCompiler.MPP_TMP_PATH], stderr=subprocess.PIPE)
+        result = subprocess.check_output([self.mpp_compiler_path, "-o", self.mpp_quadruples_path, "-s", self.mpp_symbols_table_path, self.mpp_tmp_path], stderr=subprocess.PIPE)
         
         self.logs_view.clear()
         self.logs_view.insertPlainText(result)
 
-        with open(MppCompiler.MPP_QUADRUPLES_PATH, 'r') as f:
+        with open(self.mpp_quadruples_path, 'r') as f:
             content = f.read()
 
             self.quadruples_view.clear()
             self.quadruples_view.insertPlainText(content)
 
-        with open(MppCompiler.MPP_SYMBOL_TABLE_PATH, 'r') as f:
+        with open(self.mpp_symbols_table_path, 'r') as f:
             content = f.read()
 
             self.symbols_view.clear()
@@ -296,5 +298,5 @@ class TaskThread(QtCore.QThread):
 
 if __name__ == '__main__':
     app = QApplication(sys.argv)
-    mpp = MppCompiler()
+    mpp = MppCompiler(sys.argv)
     sys.exit(app.exec_())
