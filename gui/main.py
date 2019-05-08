@@ -19,9 +19,10 @@ class MppCompiler(QWidget):
 
     TITLE = "M++ Compiler";
     BACKGROUND_COLOR = QColor(255, 255, 255);
-    MPP_COMPILER_PATH = "/Users/ibrahimradwan/Desktop/a.out"
+    MPP_COMPILER_PATH = "/Users/ibrahimradwan/Development/MppCompiler/build/MppCompiler"
     MPP_QUADRUPLES_PATH = "/Users/ibrahimradwan/Desktop/quads.txt"
     MPP_SYMBOL_TABLE_PATH = "/Users/ibrahimradwan/Desktop/symbols_table.txt"
+    MPP_TMP_PATH = "/Users/ibrahimradwan/Desktop/tmp.txt"
 
     def __init__(self):
         super(QWidget, self).__init__()
@@ -204,10 +205,14 @@ class MppCompiler(QWidget):
                 content = content_file.read()
 
                 self.input_code_editor.clear()
+                self.quadruples_view.clear()
+                self.logs_view.clear()
+                self.symbols_view.clear()
+
                 self.input_code_editor.insertPlainText(content)
 
     def on_compilation_started(self): 
-        if (len(self.file_path.strip()) == 0): return
+        if (len(self.input_code_editor.toPlainText()) == 0): return
 
         self.overlay.show()
         self.compilingTask.start()
@@ -218,11 +223,12 @@ class MppCompiler(QWidget):
     def compile(self):
         print("Compiling")
 
-        print(MppCompiler.MPP_COMPILER_PATH)
+        with open(MppCompiler.MPP_TMP_PATH, 'w') as f:
+            f.write(self.input_code_editor.toPlainText())
 
         # Compile
-        result = subprocess.check_output([MppCompiler.MPP_COMPILER_PATH, "-o", MppCompiler.MPP_QUADRUPLES_PATH, "-s", MppCompiler.MPP_SYMBOL_TABLE_PATH, self.file_path])
-
+        result = subprocess.check_output([MppCompiler.MPP_COMPILER_PATH, "-o", MppCompiler.MPP_QUADRUPLES_PATH, "-s", MppCompiler.MPP_SYMBOL_TABLE_PATH, MppCompiler.MPP_TMP_PATH], stderr=subprocess.PIPE)
+        
         self.logs_view.clear()
         self.logs_view.insertPlainText(result)
 
@@ -260,7 +266,7 @@ class MppCompiler(QWidget):
 
 class HoverButton(QToolButton):
 
-    def __init__(self, text, BKColor = "#3498db", hoverBKColor = "#3cb0fd", color = "#ffffff", padding = "8px 18px 8px 18px", fontSize="18px", parent=None):
+    def __init__(self, text, BKColor="#3498db", hoverBKColor="#3cb0fd", color="#ffffff", padding="8px 18px 8px 18px", fontSize="18px", parent=None):
         super(HoverButton, self).__init__(parent)
         
         self.setMouseTracking(True)
