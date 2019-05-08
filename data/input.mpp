@@ -1,2 +1,24 @@
 
-$
+
+int main(int argc) {
+    const int __X__ = 5-4;
+
+    int x = 9;
+    int y = 5;
+
+    switch (x) {
+
+        case 5:
+         int y = 1;
+        case 6:
+            ;
+    }
+
+    while ((x - y) * 5) {
+        while (true) {
+
+            int x = 1;
+            break;
+        }
+    }
+}

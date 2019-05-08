@@ -144,8 +144,8 @@ StatementNode* programRoot = NULL;
 <exprNode> <typeNode> <valueNode> <identifierNode>
 
 // =====================================================================================================
-// Precendence & Associativity
-// ===========================
+// Precedence & Associativity
+// ==========================
 
 // Note that order matters here
 %right      '='
