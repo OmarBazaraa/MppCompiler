@@ -260,7 +260,7 @@ public:
      * @param loc   the location of the token to point upon in this context.
      * @param level the log level of this message.
      */
-    void log(const string& what, const Location& loc, LogLevel level = LOG_ERROR) {
+    void log(const string& what, const Location& loc, LogLevel level) {
         string logLvl;
 
         switch (level) {
