@@ -20,7 +20,6 @@ class MppCompiler(QWidget):
     TITLE = "M++ Compiler";
     BACKGROUND_COLOR = QColor(255, 255, 255);
 
-
     def __init__(self, args):
         super(QWidget, self).__init__()
 
