@@ -93,3 +93,13 @@ Where `<output>.c` is the name of the generated lexer C file, and `<lexer_name>.
 
 ### More About Lex
 For more information about lex, please refer to this [link](https://github.com/OmarBazaraa/Compiler/blob/master/README_LEX.md).
+
+# How to Use GUI
+The GUI is built using python2.7 and PyQt5.
+
+To start the GUI:
+1. Navigate to the `gui/` folder.
+2. Run 
+    ```Console 
+    python2.7 main.py <MppCompiler> <Quadruplues>.txt <SymbolsTable>.txt
+    ```

@@ -26,7 +26,7 @@ class MppCompiler(QWidget):
         self.mpp_compiler_path = args[1] if len(args) >= 2 else "/Users/ibrahimradwan/Development/MppCompiler/build/MppCompiler"
         self.mpp_quadruples_path = args[2] if len(args) >= 3 else "/Users/ibrahimradwan/Desktop/quads.txt"
         self.mpp_symbols_table_path = args[3] if len(args) >= 4 else "/Users/ibrahimradwan/Desktop/symbols_table.txt"
-        self.mpp_tmp_path = args[4] if len(args) >= 5 else "/Users/ibrahimradwan/Desktop/tmp.txt"
+        self.mpp_tmp_path = "MppCompilerTmp.txt"
 
         self.file_path = ""
 
