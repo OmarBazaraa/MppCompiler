@@ -201,6 +201,8 @@ stmt:               ';'                         { $$ = new StatementNode($<locat
     |               function                    { $$ = $1; }
     |               return_stmt ';'             { $$ = $1; }
     |               error ';'                   { $$ = new ErrorNode(curLoc, "invalid syntax"); yyerrok; }
+    |               error ')'                   { $$ = new ErrorNode(curLoc, "invalid syntax"); yyerrok; }
+    |               error '}'                   { $$ = new ErrorNode(curLoc, "invalid syntax"); yyerrok; }
     ;
 
 branch_body:        stmt                        { $$ = $1; }
