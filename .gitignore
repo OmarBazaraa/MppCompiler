@@ -20,4 +20,4 @@ out/*
 *.mpp
 *.txt
 *.quad
-.pyc
+*.pyc
