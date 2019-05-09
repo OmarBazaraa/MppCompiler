@@ -260,10 +260,12 @@ public:
      * @param loc   the location of the token to point upon in this context.
      * @param level the log level of this message.
      */
-    void log(const string& what, const Location& loc, LogLevel level = LOG_ERROR) {
+    void log(const string& what, const Location& loc, LogLevel level) {
         string logLvl;
 
         switch (level) {
+            // In future we may change the output stream of each level
+            // and change th colors of the log level and the intended token
             case LOG_ERROR:
                 logLvl = "error";
                 break;

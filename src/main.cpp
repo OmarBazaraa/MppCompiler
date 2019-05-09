@@ -30,7 +30,6 @@ extern StatementNode* programRoot;
 string inputFilename;
 string outputFilename = "out.o";
 string symbolTableFilename;
-bool buildFailed = false;
 
 //
 // Functions prototypes
@@ -73,7 +72,7 @@ int main(int argc, char* argv[]) {
         writeToFile(programRoot->generateQuad(&genContext), outputFilename);
         writeToFile(scopeContext.getSymbolTableStr(), symbolTableFilename);
     } else {
-        buildFailed = true;
+        writeToFile("", outputFilename);
     }
 
     // Finalize and release allocated memory
@@ -83,7 +82,7 @@ int main(int argc, char* argv[]) {
         delete programRoot;
     }
 
-    return buildFailed;
+    return 0;
 }
 
 /**

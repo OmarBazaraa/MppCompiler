@@ -1,17 +1,2 @@
 
-int main() {
-    int x;
-
-    x++;
-
-    int y = (x = 0);
-
-
-    switch (y) {
-    case 1:
-    case 2:
-    case 3:
-        int f = 1;
-        break;
-    }
-}
+$

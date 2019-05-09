@@ -13,14 +13,17 @@ comp:
 		out/main.cpp \
 		\
 		out/parse_tree/statements/statement_analyzer.cpp \
-		out/parse_tree/expressions/expression_analyzer.cpp \
-		out/parse_tree/branches/branch_analyzer.cpp \
-		out/parse_tree/functions/function_analyzer.cpp \
-		\
 		out/parse_tree/statements/statement_generator.cpp \
+		\
+		out/parse_tree/expressions/expression_analyzer.cpp \
 		out/parse_tree/expressions/expression_generator.cpp \
+		out/parse_tree/expressions/expression_evaluator.cpp \
+		\
+		out/parse_tree/branches/branch_analyzer.cpp \
 		out/parse_tree/branches/branch_generator.cpp \
+		\
 		out/parse_tree/functions/function_generator.cpp \
+		out/parse_tree/functions/function_analyzer.cpp \
 		\
 		out/rules/lexer.cpp \
 		out/rules/parser.cpp

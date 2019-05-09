@@ -4,7 +4,7 @@
 
 bool IfNode::analyze(ScopeContext* context) {
     if (context->isGlobalScope()) {
-        context->log("if-statement is not allowed in global scope", loc);
+        context->log("if-statement is not allowed in global scope", loc, LOG_ERROR);
         return false;
     }
 
@@ -28,14 +28,14 @@ bool CaseLabelNode::analyze(ScopeContext* context) {
     SwitchNode* switchStmt = context->getSwitchScope();
 
     if (switchStmt == NULL) {
-        context->log("case label not within switch statement", loc);
+        context->log("case label not within switch statement", loc, LOG_ERROR);
         return false;
     }
 
     bool ret = true;
 
     if (switchStmt->initializedVars.size() > 0) {
-        context->log("jump to case label", expr->loc);
+        context->log("jump to case label", expr->loc, LOG_ERROR);
         ret = false;
 
         const VarList& list = switchStmt->initializedVars;
@@ -49,28 +49,28 @@ bool CaseLabelNode::analyze(ScopeContext* context) {
         ret = expr->analyze(context, true);
 
         if (ret && !expr->constant) {
-            context->log("constant expression required in case label", expr->loc);
+            context->log("constant expression required in case label", expr->loc, LOG_ERROR);
             ret = false;
         }
         if (ret && !Utils::isIntegerType(expr->type)) {
-            context->log("case quantity not an integer", expr->loc);
+            context->log("case quantity not an integer", expr->loc, LOG_ERROR);
             ret = false;
         }
         if (ret && expr->constant && Utils::isIntegerType(expr->type)) {
-            // TODO: calculate this value
-            // int val = 0;
+            int val = expr->getConstIntValue();
 
-            // if (switchStmt->labels.count(val)) {
-            //     context->log("duplicate case value", loc);
-            //     ret = false;
-            // }
+            if (switchStmt->caseMap.count(val)) {
+                context->log("duplicate case value", loc, LOG_ERROR);
+                context->log("previously used here", switchStmt->caseMap[val]->loc, LOG_NOTE);
+                ret = false;
+            }
 
-            // switchStmt->labels.insert(val);
+            switchStmt->caseMap[val] = this;
         }
     }
     else {          // default label
         if (switchStmt->hasDefaultLabel) {
-            context->log("multiple default labels in one switch", loc);
+            context->log("multiple default labels in one switch", loc, LOG_ERROR);
             ret = false;
         }
 
@@ -84,7 +84,7 @@ bool CaseLabelNode::analyze(ScopeContext* context) {
 
 bool SwitchNode::analyze(ScopeContext* context) {
     if (context->isGlobalScope()) {
-        context->log("switch-statement is not allowed in global scope", loc);
+        context->log("switch-statement is not allowed in global scope", loc, LOG_ERROR);
         return false;
     }
 
@@ -97,7 +97,7 @@ bool SwitchNode::analyze(ScopeContext* context) {
     ret &= cond->analyze(context, true);
 
     if (!Utils::isIntegerType(cond->type)) {
-        context->log("switch quantity not an integer", cond->loc);
+        context->log("switch quantity not an integer", cond->loc, LOG_ERROR);
         ret = false;
     }
 
@@ -110,7 +110,7 @@ bool SwitchNode::analyze(ScopeContext* context) {
 
 bool WhileNode::analyze(ScopeContext* context) {
     if (context->isGlobalScope()) {
-        context->log("while-statement is not allowed in global scope", loc);
+        context->log("while-statement is not allowed in global scope", loc, LOG_ERROR);
         return false;
     }
 
@@ -128,7 +128,7 @@ bool WhileNode::analyze(ScopeContext* context) {
 
 bool DoWhileNode::analyze(ScopeContext* context) {
     if (context->isGlobalScope()) {
-        context->log("do-while-statement is not allowed in global scope", loc);
+        context->log("do-while-statement is not allowed in global scope", loc, LOG_ERROR);
         return false;
     }
 
@@ -146,7 +146,7 @@ bool DoWhileNode::analyze(ScopeContext* context) {
 
 bool ForNode::analyze(ScopeContext* context) {
     if (context->isGlobalScope()) {
-        context->log("for-statement is not allowed in global scope", loc);
+        context->log("for-statement is not allowed in global scope", loc, LOG_ERROR);
         return false;
     }
 
@@ -166,7 +166,7 @@ bool ForNode::analyze(ScopeContext* context) {
 
 bool BreakStmtNode::analyze(ScopeContext* context) {
     if (!context->hasBreakScope()) {
-        context->log("break-statement not within loop or switch", loc);
+        context->log("break-statement not within loop or switch", loc, LOG_ERROR);
         return false;
     }
 
@@ -175,7 +175,7 @@ bool BreakStmtNode::analyze(ScopeContext* context) {
 
 bool ContinueStmtNode::analyze(ScopeContext* context) {
     if (!context->hasLoopScope()) {
-        context->log("continue-statement not within loop", loc);
+        context->log("continue-statement not within loop", loc, LOG_ERROR);
         return false;
     }
 

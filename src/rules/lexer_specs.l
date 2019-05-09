@@ -36,8 +36,8 @@ Location curLoc = {1,0,0};
 %}
 
 DIGIT               [0-9]
-INTEGER             [-+]?[0-9]+
-FLOAT               [-+]?(([0-9]*\.[0-9]+)|([0-9]+\.[0-9]*))
+INTEGER             [0-9]+
+FLOAT               (([0-9]*\.[0-9]+)|([0-9]+\.[0-9]*))
 EXP                 ([eE][-+]?{INTEGER})
 REAL                ({INTEGER}{EXP}|{FLOAT}{EXP}?)
 LETTER              [a-zA-Z_]

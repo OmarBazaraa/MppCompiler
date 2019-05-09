@@ -80,10 +80,11 @@ struct SwitchNode : public StatementNode {
     //
     // NOTE: the following variables will be computed after calling analyze function
     //
-    bool hasDefaultLabel = false;       // Whether this switch has default label or not
-    ExprList caseLabels;                // List of all case labels in this switch
-    vector<StmtList> caseStmts;         // List of statements corresponding to each case label
-    VarList initializedVars;            // List of declared variables with initialization, used to detect cross variables initialization
+    bool hasDefaultLabel = false;                   // Whether this switch has default label or not
+    unordered_map<int, CaseLabelNode*> caseMap;     // Map of all case constant integer values
+    ExprList caseLabels;                            // List of all case expression nodes in this switch
+    vector<StmtList> caseStmts;                     // List of statements corresponding to each case label
+    VarList initializedVars;                        // List of declared variables with initialization, used to detect cross variables initialization
 
 
     SwitchNode(const Location& loc, ExpressionNode* cond, StatementNode* body) : StatementNode(loc) {

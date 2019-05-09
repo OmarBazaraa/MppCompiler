@@ -69,7 +69,7 @@ Run `make run` to run the recently built compiler.
 
 ### Other errors
 1. Multiple `default`-labels in `switch` scope.
-2. Multiple `case`-labels with the same constant expression in `switch` scope. _[TODO]_
+2. Multiple `case`-labels with the same constant expression in `switch` scope.
 3. Cross variables initialization in `switch`-statement.
 
 # Lex Usage
