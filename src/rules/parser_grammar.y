@@ -28,29 +28,30 @@ StatementNode* programRoot = NULL;
 // ============
 
 %union {
-    BlockNode*          blockNode;
-    StatementNode*      stmtNode;
-    VarDeclarationNode* varDeclNode;
-    IfNode*             ifNode;
-    SwitchNode*         switchNode;
-    CaseLabelNode*      caseStmtNode;
-    WhileNode*          whileNode;
-    DoWhileNode*        doWhileNode;
-    ForNode*            forNode;
-    FunctionNode*       functionNode;
-    FunctionCallNode*   functionCallNode;
-    ReturnStmtNode*     returnStmtNode;
-    ExpressionNode*     exprNode;
-    TypeNode*           typeNode;
-    ValueNode*          valueNode;
-    IdentifierNode*     identifierNode;
+    BlockNode*                  blockNode;
+    StatementNode*              stmtNode;
+    VarDeclarationNode*         varDeclNode;
+    MultiVarDeclarationNode*    multiVarDeclNode;
+    IfNode*                     ifNode;
+    SwitchNode*                 switchNode;
+    CaseLabelNode*              caseStmtNode;
+    WhileNode*                  whileNode;
+    DoWhileNode*                doWhileNode;
+    ForNode*                    forNode;
+    FunctionNode*               functionNode;
+    FunctionCallNode*           functionCallNode;
+    ReturnStmtNode*             returnStmtNode;
+    ExpressionNode*             exprNode;
+    TypeNode*                   typeNode;
+    ValueNode*                  valueNode;
+    IdentifierNode*             identifierNode;
 
-    StmtList*           stmtList;
-    ExprList*           exprList;
-    VarList*            varList;
+    StmtList*                   stmtList;
+    ExprList*                   exprList;
+    VarList*                    varList;
 
-    Token               token;
-    Location            location;
+    Token                       token;
+    Location                    location;
 }
 
 // =====================================================================================================
@@ -104,7 +105,8 @@ StatementNode* programRoot = NULL;
 %type <blockNode>           program stmt_block
 %type <stmtNode>            stmt branch_body for_init_stmt
 %type <stmtList>            stmt_list
-%type <varDeclNode>         var_decl var_decl_uninit var_decl_init
+%type <varDeclNode>         var_decl
+%type <multiVarDeclNode>    multi_var_decl
 %type <ifNode>              if_stmt unmatched_if_stmt matched_if_stmt
 %type <switchNode>          switch_stmt
 %type <caseStmtNode>        case_stmt
@@ -136,7 +138,7 @@ StatementNode* programRoot = NULL;
         // printf(">> DESTRUCTOR NULL\n");
     }
 }
-<blockNode> <stmtNode> <varDeclNode>
+<blockNode> <stmtNode> <varDeclNode> <multiVarDeclNode>
 <ifNode> <switchNode> <caseStmtNode>
 <whileNode> <doWhileNode> <forNode>
 <functionNode> <functionCallNode> <returnStmtNode>
@@ -144,8 +146,8 @@ StatementNode* programRoot = NULL;
 <exprNode> <typeNode> <valueNode> <identifierNode>
 
 // =====================================================================================================
-// Precendence & Associativity
-// ===========================
+// Precedence & Associativity
+// ==========================
 
 // Note that order matters here
 %right      '='
@@ -192,6 +194,7 @@ stmt:               ';'                         { $$ = new StatementNode($<locat
     |               CONTINUE ';'                { $$ = new ContinueStmtNode($<location>1); }
     |               expression ';'              { $$ = new ExprContainerNode($1->loc, $1); }
     |               var_decl ';'                { $$ = $1; }
+    |               multi_var_decl ';'          { $$ = $1; }
     |               if_stmt                     { $$ = $1; }
     |               switch_stmt                 { $$ = $1; }
     |               case_stmt                   { $$ = $1; }
@@ -214,17 +217,16 @@ branch_body:        stmt                        { $$ = $1; }
 // Declaration Rules
 //
 
-var_decl:           var_decl_uninit
-    |               var_decl_init
-    ;
-
-var_decl_uninit:    type ident                              { $$ = new VarDeclarationNode($1, $2); }
+var_decl:           type ident                              { $$ = new VarDeclarationNode($1, $2); }
     |               CONST type ident                        { $$ = new VarDeclarationNode($2, $3, NULL, true); }
-    ;
-
-var_decl_init:      type ident '=' expression               { $$ = new VarDeclarationNode($1, $2, $4); }
+    |               type ident '=' expression               { $$ = new VarDeclarationNode($1, $2, $4); }
     |               CONST type ident '=' expression         { $$ = new VarDeclarationNode($2, $3, $5, true); }
     ;
+
+multi_var_decl:     var_decl ',' ident                      { $$ = new MultiVarDeclarationNode($1); $$->addVar($3); }
+    |               var_decl ',' ident '=' expression       { $$ = new MultiVarDeclarationNode($1); $$->addVar($3, $5); }
+    |               multi_var_decl ',' ident                { $$ = $1; $$->addVar($3); }
+    |               multi_var_decl ',' ident '=' expression { $$ = $1; $$->addVar($3, $5); }
 
 // ------------------------------------------------------------
 //
@@ -399,7 +401,5 @@ ident:              IDENTIFIER      { $$ = new IdentifierNode($1.loc, $1.value);
 // ========================
 
 void yyerror(const char* s) {
-    // fprintf(stderr, "%s\n", s); 
-    // printf("%s\n", sourceCode[curLineNum - 1].c_str());
-    // printf("%*s\n", curCursorPos, "^");
+    
 }

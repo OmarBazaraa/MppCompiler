@@ -43,7 +43,6 @@ REAL                ({INTEGER}{EXP}|{FLOAT}{EXP}?)
 LETTER              [a-zA-Z_]
 IDENTIFIER          {LETTER}({LETTER}|{DIGIT})*
 LINE_COMMENT        "//"(.)*
-WHITESPACE          [ \t]+
 
 %%
 
@@ -57,6 +56,7 @@ WHITESPACE          [ \t]+
 // Token localization
 %}
 \n                                  curLoc.lineNum++; curLoc.pos = 0;
+\r                                  ;
 \t                                  curLoc.pos += 4;
 " "                                 curLoc.pos++;
 

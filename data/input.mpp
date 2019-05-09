@@ -1,2 +1,11 @@
 
-$
+
+int main(int argc) {
+
+
+    int x=0,y=0,z=0,i=0;
+
+    const int MAX = 100, DAY = 24, WEEK, YEAR = 365;
+
+    (((++x) = y++) = (8 * 7 - MAX) ^ (1 << i)) = (z = 3);
+}

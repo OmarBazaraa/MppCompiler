@@ -14,8 +14,8 @@ using namespace std;
 // Compiler definitions
 //
 #define LANG_NAME           "M++"
-#define VERSION             "0.1"
-#define VERSION_DATE        "May 5, 2019"
+#define VERSION             "1.0"
+#define VERSION_DATE        "May 9, 2019"
 
 //
 // External functions & variables
@@ -67,8 +67,7 @@ int main(int argc, char* argv[]) {
 
     // Apply semantic check and quadruple generation
     if (programRoot != NULL && programRoot->analyze(&scopeContext)) {
-        cout << programRoot->toString() << endl;
-
+        // cout << programRoot->toString() << endl;
         writeToFile(programRoot->generateQuad(&genContext), outputFilename);
         writeToFile(scopeContext.getSymbolTableStr(), symbolTableFilename);
     } else {

@@ -82,4 +82,42 @@ struct VarDeclarationNode : public DeclarationNode {
     }
 };
 
+/**
+ * The node class holding multiple variables or constants declaration statement in the parse tree.
+ */
+struct MultiVarDeclarationNode : public StatementNode {
+    TypeNode* type;
+    VarList vars;
+    bool constant;
+
+    MultiVarDeclarationNode(VarDeclarationNode* var) {
+        this->type = new TypeNode(*(var->type));
+        this->constant = var->constant;
+        this->vars.push_back(var);
+    }
+
+    virtual ~MultiVarDeclarationNode() {
+        delete type;
+        for (int i = 0; i < vars.size(); ++i) {
+            delete vars[i];
+        }
+    }
+
+    virtual void addVar(IdentifierNode* ident, ExpressionNode* value = NULL) {
+        vars.push_back(new VarDeclarationNode(new TypeNode(*type), ident, value, constant));
+    }
+
+    virtual bool analyze(ScopeContext* context);
+
+    virtual string generateQuad(GenerationContext* generationContext);
+
+    virtual string toString(int ind = 0) {
+        string ret = string(ind, ' ') + type->toString();
+        for (int i = 0; i < vars.size(); ++i) {
+            ret += (i > 0 ? ", " : "") + vars[i]->toString();
+        }
+        return ret;
+    }
+};
+
 #endif
