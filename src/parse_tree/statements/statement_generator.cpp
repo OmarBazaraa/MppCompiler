@@ -26,3 +26,13 @@ string VarDeclarationNode::generateQuad(GenerationContext* generationContext) {
 
     return ret;
 }
+
+string MultiVarDeclarationNode::generateQuad(GenerationContext* generationContext) {
+    string ret;
+
+    for (int i = 0; i < vars.size(); ++i) {
+        ret += vars[i]->generateQuad(generationContext);
+    }
+
+    return ret;
+}

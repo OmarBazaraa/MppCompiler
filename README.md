@@ -41,7 +41,6 @@ Run `make run` to run the recently built compiler.
 3. `break`-statement outside `for`, `while`, `do-while`, or `switch` scopes.
 4. `return`-statement outside function scope.
 5. `case` and `default` labels outside switch scope.
-6. Function definition outside the global scope.
 
 ### Other errors
 1. Variable or constant declared with type `void`.
@@ -57,20 +56,21 @@ Run `make run` to run the recently built compiler.
 6. Float operand to bitwise operators.
 7. Use of uninitialized variable.
 8. Increment and decrement operators with `rvalue` operand.
-9. `switch` and `case` statements with non integer expression.
-10. `case`-statement with non-constant expression.
+
+### Switch-statement-related errors
+1. `switch` and `case` statements with non integer expression.
+2. `case`-statement with non-constant expression.
+3. Multiple `default`-labels in `switch` scope.
+4. Multiple `case`-labels with the same constant expression in `switch` scope.
+5. Cross variables initialization in `switch`-statement.
 
 ### Function-related errors
 1. Value returned in `void` function and vice-versa.
-2. Variable or constant call as a function.
-3. Function call with more/less arguments than its parameters.
-4. Function call with invalid argument type (i.e. argument of type `void` or pointer to function).
-5. Function parameter with default value.
-
-### Other errors
-1. Multiple `default`-labels in `switch` scope.
-2. Multiple `case`-labels with the same constant expression in `switch` scope.
-3. Cross variables initialization in `switch`-statement.
+2. Void returned in value-typed function.
+3. Variable or constant call as a function.
+4. Function call with more/less arguments than its parameters.
+5. Function call with invalid argument type (i.e. argument of type `void` or pointer to function).
+6. Function parameter with default value.
 
 # Lex Usage
 

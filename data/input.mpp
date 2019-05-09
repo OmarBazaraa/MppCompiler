@@ -1,24 +1,11 @@
 
 
 int main(int argc) {
-    const int __X__ = 5-4;
 
-    int x = 9;
-    int y = 5;
 
-    switch (x) {
+    int x=0,y=0,z=0,i=0;
 
-        case 5:
-         int y = 1;
-        case 6:
-            ;
-    }
+    const int MAX = 100, DAY = 24, WEEK, YEAR = 365;
 
-    while ((x - y) * 5) {
-        while (true) {
-
-            int x = 1;
-            break;
-        }
-    }
+    (((++x) = y++) = (8 * 7 - MAX) ^ (1 << i)) = (z = 3);
 }
