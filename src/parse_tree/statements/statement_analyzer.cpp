@@ -48,7 +48,7 @@ bool VarDeclarationNode::analyze(ScopeContext* context) {
         context->initializeVar = false;
     }
 
-    if (ret && value != NULL && value->type == DTYPE_VOID) {
+    if (ret && value != NULL && (value->type == DTYPE_VOID || value->type == DTYPE_FUNC_PTR)) {
         context->log("invalid conversion from '" + value->exprTypeStr() + "' to '" + type->toString() + "'", value->loc, LOG_ERROR);
         ret = false;
     }
