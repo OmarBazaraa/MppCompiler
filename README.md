@@ -1,6 +1,8 @@
 # M++ Compiler
 M++ is a simple programming language compiler similar to C++ built using Lex and Yacc.
 
+For more information about M++, please refer to this [link](https://github.com/OmarBazaraa/MppCompiler/blob/master/docs/M%2B%2B%20Description.pdf).
+
 # How to Use
 ### 1. Install Lex & Yacc  
 Download and install **Lex** & **Yacc** compiler generating packages.
