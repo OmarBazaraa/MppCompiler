@@ -27,7 +27,7 @@ struct BlockNode : public StatementNode {
 
     virtual bool analyze(ScopeContext* context);
 
-    virtual string generateQuad(GenerationContext* generationContext);
+    virtual string generateQuad(GenerationContext* context);
 
     virtual string toString(int ind = 0) {
         string ret = string(ind, ' ') + "{\n";
@@ -63,7 +63,7 @@ struct VarDeclarationNode : public DeclarationNode {
 
     virtual bool analyze(ScopeContext* context);
 
-    virtual string generateQuad(GenerationContext* generationContext);
+    virtual string generateQuad(GenerationContext* context);
 
     virtual string toString(int ind = 0) {
         string ret = string(ind, ' ') + declaredHeader();
@@ -109,7 +109,7 @@ struct MultiVarDeclarationNode : public StatementNode {
 
     virtual bool analyze(ScopeContext* context);
 
-    virtual string generateQuad(GenerationContext* generationContext);
+    virtual string generateQuad(GenerationContext* context);
 
     virtual string toString(int ind = 0) {
         string ret = string(ind, ' ') + type->toString();

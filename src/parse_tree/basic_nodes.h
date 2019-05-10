@@ -48,7 +48,7 @@ struct Node {
         return true;
     }
 
-    virtual string generateQuad(GenerationContext* generationContext) {
+    virtual string generateQuad(GenerationContext* context) {
         return "";
     }
 

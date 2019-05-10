@@ -2,15 +2,15 @@
 #include "../../context/generation_context.h"
 
 
-string ExprContainerNode::generateQuad(GenerationContext* generationContext) {
-    return expr->generateQuad(generationContext);
+string ExprContainerNode::generateQuad(GenerationContext* context) {
+    return expr->generateQuad(context);
 }
 
-string AssignOprNode::generateQuad(GenerationContext* generationContext) {
+string AssignOprNode::generateQuad(GenerationContext* context) {
     string ret;
 
-    ret += lhs->generateQuad(generationContext);
-    ret += rhs->generateQuad(generationContext);
+    ret += lhs->generateQuad(context);
+    ret += rhs->generateQuad(context);
     ret += Utils::dtypeConvQuad(rhs->type, type);
     ret += Utils::oprToQuad(OPR_POP, type) + " " + lhs->reference->alias + "\n";
 
@@ -21,32 +21,32 @@ string AssignOprNode::generateQuad(GenerationContext* generationContext) {
     return ret;
 }
 
-string BinaryOprNode::generateQuad(GenerationContext* generationContext) {
+string BinaryOprNode::generateQuad(GenerationContext* context) {
     string ret;
     
     DataType t = max(lhs->type, rhs->type);
 
     if (used) {
-        ret += lhs->generateQuad(generationContext);
+        ret += lhs->generateQuad(context);
         ret += Utils::dtypeConvQuad(lhs->type, t);
 
-        ret += rhs->generateQuad(generationContext);
+        ret += rhs->generateQuad(context);
         ret += Utils::dtypeConvQuad(rhs->type, t);
 
         ret += Utils::oprToQuad(opr, t) + "\n";
     }
     else {
-        ret += lhs->generateQuad(generationContext);
-        ret += rhs->generateQuad(generationContext);
+        ret += lhs->generateQuad(context);
+        ret += rhs->generateQuad(context);
     }
 
     return ret;
 }
 
-string UnaryOprNode::generateQuad(GenerationContext* generationContext) {
+string UnaryOprNode::generateQuad(GenerationContext* context) {
     string ret;
     
-    ret += expr->generateQuad(generationContext);
+    ret += expr->generateQuad(context);
 
     if (used) {
         ret += Utils::dtypeConvQuad(expr->type, type);
@@ -83,7 +83,7 @@ string UnaryOprNode::generateQuad(GenerationContext* generationContext) {
     return ret;
 }
 
-string IdentifierNode::generateQuad(GenerationContext* generationContext) {
+string IdentifierNode::generateQuad(GenerationContext* context) {
     string ret;
     if (used) {
         ret += Utils::oprToQuad(OPR_PUSH, type) + " " + reference->alias + "\n";;
@@ -91,7 +91,7 @@ string IdentifierNode::generateQuad(GenerationContext* generationContext) {
     return ret;
 }
 
-string ValueNode::generateQuad(GenerationContext* generationContext) {
+string ValueNode::generateQuad(GenerationContext* context) {
     string ret;
     if (used) {
         ret += Utils::oprToQuad(OPR_PUSH, type) + " " + value + "\n";

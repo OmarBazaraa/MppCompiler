@@ -24,7 +24,7 @@ struct ExprContainerNode : public ExpressionNode {
 
     virtual bool analyze(ScopeContext* context, bool valueUsed);
 
-    virtual string generateQuad(GenerationContext* generationContext);
+    virtual string generateQuad(GenerationContext* context);
 
     virtual string toString(int ind = 0) {
         return expr->toString(ind);
@@ -50,7 +50,7 @@ struct AssignOprNode : public ExpressionNode {
 
     virtual bool analyze(ScopeContext* context, bool valueUsed);
 
-    virtual string generateQuad(GenerationContext* generationContext);
+    virtual string generateQuad(GenerationContext* context);
 
     virtual string toString(int ind = 0) {
         return string(ind, ' ') + "(" + lhs->toString() + " = " + rhs->toString() + ")";
@@ -80,7 +80,7 @@ struct BinaryOprNode : public ExpressionNode {
 
     virtual bool analyze(ScopeContext* context, bool valueUsed);
 
-    virtual string generateQuad(GenerationContext* generationContext);
+    virtual string generateQuad(GenerationContext* context);
 
     virtual string getOpr() {
         return "binary operator '" + Utils::oprToStr(opr) + "'";
@@ -111,7 +111,7 @@ struct UnaryOprNode : public ExpressionNode {
 
     virtual bool analyze(ScopeContext* context, bool valueUsed);
 
-    virtual string generateQuad(GenerationContext* generationContext);
+    virtual string generateQuad(GenerationContext* context);
 
     virtual string getOpr() {
         return "unary operator '" + Utils::oprToStr(opr) + "'";
@@ -145,7 +145,7 @@ struct IdentifierNode : public ExpressionNode {
 
     virtual bool analyze(ScopeContext* context, bool valueUsed);
 
-    virtual string generateQuad(GenerationContext* generationContext);
+    virtual string generateQuad(GenerationContext* context);
 
     virtual string toString(int ind = 0) {
         return string(ind, ' ') + name;
@@ -166,7 +166,7 @@ struct ValueNode : public ExpressionNode {
 
     virtual int getConstIntValue();
 
-    virtual string generateQuad(GenerationContext* generationContext);
+    virtual string generateQuad(GenerationContext* context);
 
     virtual string toString(int ind = 0) {
         return string(ind, ' ') + value;
