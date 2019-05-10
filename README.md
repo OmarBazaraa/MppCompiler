@@ -36,7 +36,122 @@ Run `make run` to run the recently built compiler.
 | `-o` or `--output` `<filename>`                 | Specify the output filename.                                     |
 | `-s` or `--sym_table` `<filename>`              | Output the symbol table to the given file                        |
 
-# Syntax Errors Detected by M++
+# Overview
+In this section, we are going to give a brief descriptions and examples for the syntax and semantics allowed by M++. As we said, it is almost identical to C-language but with less features.
+
+## Data Types
+In M++, we support the basic data types but unfortunately, we do not support arrays or pointers.
+The supported types:
+-	`void`: is only valid as a function return type to tell that it has no value to return.
+-	`int`: is an integer numeric value data type.
+-	`float`: is a real numeric value data type.
+-	`char`: is a character value data type.
+-	`bool`: is a Boolean value data type that accepts either `true` or `false`.
+
+## Variable/Constant Declarations
+In M++, we support scoped variables and constants declaration. Each variable or constant has its own scope, and multiple variable/constants can be declared with the same identifier only if they are in different scopes. As in C-language, constants must be initialized while being declared.
+
+**e.g.**
+
+```C++
+const float PI = 3.14;
+const float EPS = 1e-9;
+int x;
+char c = 'c';
+bool flag = true;
+int a = 0, b, MAX = 100;
+```
+
+## If-Else Control Statements
+We support if-else control statement in almost the exact same way as in C-language. If the if-condition evaluates to a non-zero value, then the if-body will be executed. Otherwise, the else-body will be executed if exists. If-body and else-body can either be one statement, or can be multiple statements enclosed by a block.
+
+**e.g.**
+
+```C++
+if (x) {
+    if (y > 0)
+        /* if-body */
+    else if (z & 1)
+        /* else-if-body */
+    else
+        /* else-body */
+}
+```
+
+## Switch Statements
+Like if-statement, we support switch-statement in almost the exact same way as in C-language. The switch-expression must be of integer value, and the case-expression must be a constant integer value. Also, multiple case-expressions that evaluate to the same value is not allowed. Like C, the code of the matched case will be executed and the execution will continue to the below code of other cases until a break-statement is found.
+
+
+**e.g.**
+
+```C++
+switch (state) {
+case 1:
+case 2:
+    /* do something */
+case RUNNING: // RUNNING must be defined as constant
+    /* do something */
+    break;
+default:
+    /* default */
+}
+```
+
+## For/While/Do-While Loops
+M++ supports loops in almost the exact same way as in C-language. We support for-loops, while-loops, and do-while loops. Break-statements and continue-statements are supported within the scope of a loop, and they function like in C-language, they break or continue the execution of the inner most loop.
+
+**e.g.**
+```C++
+for (int i = 0; i < n; ++i) {
+    for (int j = 0; j < m; ++j) {
+        while (i < j) // do something
+        continue;
+    }
+}
+
+do {
+    if (cond)
+        break;
+    // do something
+} while (true);
+```
+
+## Functions
+M++ supports functions but with limited functionalities than that of the C-language. We do not support default parameters. We do not support neither function prototyping nor function overloading.
+Return-statements are allowed within the scope of a function. And functions can only be defined in the global scope.
+
+**e.g.**
+```C++
+int fibonacci(int n) {
+    return fibonacci(n - 1) + fibonacci(n - 2);
+}
+```
+
+## Expressions
+In M++, we support complex expressions similar to those of C-language. We support almost the entire set of operators supported by C-language with the same precedence and associativity.
+
+**e.g.**
+```C++
+(((++x) = y++) = (8 * 7 - MAX) ^ (1 << i)) = (z = 3);
+```
+
+## Comments
+M++ supports the same comment styles as in C-language. The comments can either be:
+-	Line comment
+   ```C++
+   // This is a line comment
+   ```
+-	Block comment (multi-line comment)
+  ```C++
+  /**
+   * This is a block comment
+   * that can span
+   * multiple lines
+   */
+  ```
+
+# Errors Detected by M++
+## Syntax Errors
 ### Scope-related errors
 1. Code blocks or statements (other than variable, constants, and function declaration/definition) in the global scope.
 2. `continue`-statement outside `for`, `while`, or `do-while` scopes.
@@ -48,7 +163,7 @@ Run `make run` to run the recently built compiler.
 1. Variable or constant declared with type `void`.
 2. Constant declaration without initialization.
 
-# Semantic Errors Detected by M++
+## Semantic Errors
 ### Identifier/Expression-related errors
 1. Identifier re-declaration in the same scope.
 2. Undeclared identifier access.
