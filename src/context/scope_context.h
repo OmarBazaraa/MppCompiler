@@ -50,6 +50,7 @@ private:
     vector<Scope*> scopes;
     unordered_map<string, int> aliases;
     vector<pair<int, DeclarationNode*>> symbols;    // Used just for printing the symbol table. NOT IMPORTANT!
+    bool warn;
 
 public:
     //
@@ -62,10 +63,14 @@ public:
 
     /**
      * Constructs a new context object.
+     *
+     * @param sourceFilename the filename of the source code to compile.
+     * @param warn           whether to show warning messages or not.
      */
-    ScopeContext(const string& sourceFilename) {
+    ScopeContext(const string& sourceFilename, bool warn = false) {
         this->sourceFilename = sourceFilename;
         this->readSourceCode();
+        this->warn = warn;
     }
 
     /**
@@ -270,6 +275,10 @@ public:
                 logLvl = "error";
                 break;
             case LOG_WARNING:
+                if (!warn) {
+                    // Suppress  warnings
+                    return;
+                }
                 logLvl = "warning";
                 break;
             case LOG_NOTE:

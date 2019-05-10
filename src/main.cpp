@@ -30,6 +30,7 @@ extern StatementNode* programRoot;
 string inputFilename;
 string outputFilename = "out.o";
 string symbolTableFilename;
+bool warn = false;
 
 //
 // Functions prototypes
@@ -51,7 +52,7 @@ int main(int argc, char* argv[]) {
     parseArguments(argc, argv);
 
     // Construct context objects
-    ScopeContext scopeContext(inputFilename);
+    ScopeContext scopeContext(inputFilename, warn);
     GenerationContext genContext;
 
     // Open input file for Lex & Yacc
@@ -115,9 +116,10 @@ void printHelp() {
     printf("%s version %s, %s\n\n", LANG_NAME, VERSION, VERSION_DATE);
     printf("Usage: %s [switches] <input_file>\n", LANG_NAME);
     printf("    -h, --help                   Print the help menu and exit.\n");
-    printf("    -v, --version                Print the installed version number and exit.\n");
     printf("    -o, --output <filename>      Specify the output filename.\n");
     printf("    -s, --sym_table <filename>   Output the symbol table to the given file\n");
+    printf("    -v, --version                Print the installed version number and exit.\n");
+    printf("    -w, --warn                   Show warning messages.\n");
     exit(0);
 }
 
@@ -148,6 +150,10 @@ void parseArguments(int argc, char* argv[]) {
             // Print version
             else if (strcmp(*argv, "-v") == 0 || strcmp(*argv, "--version") == 0) {
                 printVersion();
+            }
+            // Show warnings
+            else if (strcmp(*argv, "-w") == 0 || strcmp(*argv, "--warn") == 0) {
+                warn = true;
             }
             // Set output filename
             else if (strcmp(*argv, "-o") == 0 || strcmp(*argv, "--output") == 0) {
