@@ -233,6 +233,9 @@ class MppCompiler(QWidget):
         self.logs_view.clear()
         self.logs_view.insertPlainText(result)
 
+        if (not os.path.isfile(self.mpp_quadruples_path) or not os.path.isfile(self.mpp_symbols_table_path)):
+            return
+            
         with open(self.mpp_quadruples_path, 'r') as f:
             content = f.read()
 
