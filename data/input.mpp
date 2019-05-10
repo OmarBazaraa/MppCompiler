@@ -1,11 +1,13 @@
+int fib(int n) {
+    return fib(n) + fib(n-1);
+}
 
+void func() {
 
-int main(int argc) {
+}
 
+int main() {
+    fib(10);
 
-    int x=0,y=0,z=0,i=0;
-
-    const int MAX = 100, DAY = 24, WEEK, YEAR = 365;
-
-    (((++x) = y++) = (8 * 7 - MAX) ^ (1 << i)) = (z = 3);
+    int x = func();
 }

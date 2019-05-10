@@ -29,7 +29,7 @@ struct IfNode : public StatementNode {
 
     virtual bool analyze(ScopeContext* context);
 
-    virtual string generateQuad(GenerationContext* generationContext);
+    virtual string generateQuad(GenerationContext* context);
 
     virtual string toString(int ind = 0) {
         string ret = string(ind, ' ') + "if (" + cond->toString() + ")\n";
@@ -127,7 +127,7 @@ struct SwitchNode : public StatementNode {
 
     virtual bool analyze(ScopeContext* context);
 
-    virtual string generateQuad(GenerationContext* generationContext);
+    virtual string generateQuad(GenerationContext* context);
 
     virtual string toString(int ind = 0) {
         string ret = string(ind, ' ') + "switch (" + cond->toString() + ")\n";
@@ -177,7 +177,7 @@ struct WhileNode : public StatementNode {
 
     virtual bool analyze(ScopeContext* context);
 
-    virtual string generateQuad(GenerationContext* generationContext);
+    virtual string generateQuad(GenerationContext* context);
 
     virtual string toString(int ind = 0) {
         string ret = string(ind, ' ') + "while (" + cond->toString() + ") \n";
@@ -205,7 +205,7 @@ struct DoWhileNode : public StatementNode {
 
     virtual bool analyze(ScopeContext* context);
 
-    virtual string generateQuad(GenerationContext* generationContext);
+    virtual string generateQuad(GenerationContext* context);
 
     virtual string toString(int ind = 0) {
         string ret = string(ind, ' ') + "do\n";
@@ -241,7 +241,7 @@ struct ForNode : public StatementNode {
 
     virtual bool analyze(ScopeContext* context);
 
-    virtual string generateQuad(GenerationContext* generationContext);
+    virtual string generateQuad(GenerationContext* context);
 
     virtual string toString(int ind = 0) {
         string ret = string(ind, ' ') + "for (";
@@ -262,7 +262,7 @@ struct BreakStmtNode : public StatementNode {
 
     virtual bool analyze(ScopeContext* context);
 
-    virtual string generateQuad(GenerationContext* generationContext);
+    virtual string generateQuad(GenerationContext* context);
 
     virtual string toString(int ind = 0) {
         return string(ind, ' ') + "break";
@@ -278,7 +278,7 @@ struct ContinueStmtNode : public StatementNode {
 
     virtual bool analyze(ScopeContext* context);
 
-    virtual string generateQuad(GenerationContext* generationContext);
+    virtual string generateQuad(GenerationContext* context);
 
     virtual string toString(int ind = 0) {
         return string(ind, ' ') + "continue";

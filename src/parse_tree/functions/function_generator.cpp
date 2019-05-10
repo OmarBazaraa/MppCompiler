@@ -2,28 +2,28 @@
 #include "../../context/generation_context.h"
 
 
-string FunctionNode::generateQuad(GenerationContext* generationContext) {
+string FunctionNode::generateQuad(GenerationContext* context) {
     string ret;
 
     ret += "PROC " + alias + "\n";
-    generationContext->declareFuncParams = true;
+    context->declareFuncParams = true;
 
     for (int i = 0; i < paramList.size(); ++i) {
-        ret += paramList[i]->generateQuad(generationContext);
+        ret += paramList[i]->generateQuad(context);
     }
 
-    generationContext->declareFuncParams = false;
-    ret += body->generateQuad(generationContext);
+    context->declareFuncParams = false;
+    ret += body->generateQuad(context);
     ret += "ENDP " + alias + "\n";
 
     return ret;
 }
 
-string FunctionCallNode::generateQuad(GenerationContext* generationContext) {
+string FunctionCallNode::generateQuad(GenerationContext* context) {
     string ret;
 
     for (int i = (int) argList.size() - 1; i >= 0; --i) {
-        ret += argList[i]->generateQuad(generationContext);
+        ret += argList[i]->generateQuad(context);
         ret += Utils::dtypeConvQuad(argList[i]->type, func->paramList[i]->type->type);
     }
 
@@ -32,11 +32,11 @@ string FunctionCallNode::generateQuad(GenerationContext* generationContext) {
     return ret;
 }
 
-string ReturnStmtNode::generateQuad(GenerationContext* generationContext) {
+string ReturnStmtNode::generateQuad(GenerationContext* context) {
     string ret;
 
     if (value) {
-        ret += value->generateQuad(generationContext);
+        ret += value->generateQuad(context);
         ret += Utils::dtypeConvQuad(value->type, func->type->type);
     }
 

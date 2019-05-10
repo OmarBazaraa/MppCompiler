@@ -33,7 +33,7 @@ struct FunctionNode : public DeclarationNode {
 
     virtual bool analyze(ScopeContext* context);
 
-    virtual string generateQuad(GenerationContext* generationContext);
+    virtual string generateQuad(GenerationContext* context);
 
     virtual string toString(int ind = 0) {
         string ret = string(ind, ' ') + type->toString() + " " + ident->toString() + "(";
@@ -87,7 +87,7 @@ struct FunctionCallNode : public ExpressionNode {
 
     virtual bool analyze(ScopeContext* context, bool valueUsed);
 
-    virtual string generateQuad(GenerationContext* generationContext);
+    virtual string generateQuad(GenerationContext* context);
 
     virtual string toString(int ind = 0) {
         string ret = string(ind, ' ') + ident->name + "(";
@@ -116,7 +116,7 @@ struct ReturnStmtNode : public StatementNode {
 
     virtual bool analyze(ScopeContext* context);
 
-    virtual string generateQuad(GenerationContext* generationContext);
+    virtual string generateQuad(GenerationContext* context);
 
     virtual string toString(int ind = 0) {
         string ret = string(ind, ' ') + "return";

@@ -38,13 +38,21 @@ bool VarDeclarationNode::analyze(ScopeContext* context) {
         ret = false;
     }
 
+    if (context->declareFuncParams) {
+        initialized = true;
+    }
+
     if (value) {
         context->initializeVar = true;
         ret &= value->analyze(context, true);
         context->initializeVar = false;
     }
 
-    if (context->declareFuncParams && value != NULL) {
+    if (ret && value != NULL && (value->type == DTYPE_VOID || value->type == DTYPE_FUNC_PTR)) {
+        context->log("invalid conversion from '" + value->exprTypeStr() + "' to '" + type->toString() + "'", value->loc, LOG_ERROR);
+        ret = false;
+    }
+    else if (context->declareFuncParams && value != NULL) {
         context->log("default function parameters are not allowed", value->loc, LOG_ERROR);
         ret = false;
     }
