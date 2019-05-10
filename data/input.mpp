@@ -1,13 +1,39 @@
-int fib(int n) {
-    return fib(n) + fib(n-1);
+/**
+ * Compares two integers.
+ * 
+ * @param a the first integer.
+ * @param b the second integer.
+ *
+ * @return {@code true} if a is less than b; {@code false} otherwise.
+ */
+bool lessThan(int a, int b) {
+    return a < b;
 }
 
-void func() {
-
+/**
+ * Prints the given integer to the standard output.
+ * 
+ * @param x the integer to print.
+ */
+void printInt(int x) {
+    // Print integer
 }
 
 int main() {
-    fib(10);
+    int a = 1, b = 2;
+    int z;
 
-    int x = func();
+    if (lessThan(a++, --b)) {
+        z = 1;
+    }
+
+    int n = 100, sum = 0;
+
+    for (int i = 0; i < n; ++i) {
+        sum = sum + i;
+    }
+
+    printInt(sum);
+
+    return 0;
 }
