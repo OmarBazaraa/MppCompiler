@@ -3,6 +3,14 @@ M++ is a simple programming language compiler similar to C++ built using Lex and
 
 For more information about M++, please refer to this [link](https://github.com/OmarBazaraa/MppCompiler/blob/master/docs/M%2B%2B%20Description.pdf).
 
+# M++ IDE
+M++ comes with a very simple IDE that enables us view, edit, and compile `mpp` files, and display
+the resulting quadruples and symbol table.
+
+![alt text](https://raw.githubusercontent.com/OmarBazaraa/MppCompiler/master/img/ide.png)
+
+For more information on how to build and use, please refer to the [gui branch](https://github.com/OmarBazaraa/MppCompiler/tree/gui). 
+
 # How to Use
 ### 1. Install Lex & Yacc  
 Download and install **Lex** & **Yacc** compiler generating packages.
@@ -16,12 +24,12 @@ This compiler is built on:
 
 **Download links:** [Windows](https://github.com/lexxmark/winflexbison/releases), Linux, Mac
 
-### 2. Install GCC compiler.
+### 2. Install GCC compiler
 
-### 3. Build M++ compiler.
+### 3. Build M++ compiler
 Run `make build` from the repository's main folder to build the compiler.
 
-### 4. Run M++ compiler.
+### 4. Run M++ compiler
 Run `make run` to run the recently built compiler.  
 
 **_Note:_** You can change the input file from the `Makefile`.
