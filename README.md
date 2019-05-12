@@ -35,7 +35,8 @@ Run `make run` to run the recently built compiler.
 **_Note:_** You can change the input file from the `Makefile`.
 
 # M++ Compiler Commands
-**Syntax**: `M++ [-h|--help] [-v|--version] [-w|--warn] [-o|--output <output_file>] [-s|--sym_table <filename>]  <input_file>`
+**Syntax**:  
+`M++ [-h|--help] [-v|--version] [-w|--warn] [-o|--output <output_file>] [-s|--sym_table <filename>]  <input_file>`
 
 | Command                                         | Description                                                      |
 | ----------------------------------------------- | ---------------------------------------------------------------- |
@@ -178,10 +179,11 @@ M++ supports the same comment styles as in C-language. The comments can either b
 2. Undeclared identifier access.
 3. Constant assignment after declaration.
 4. Invalid operand types. (i.e. operands of type `void` or pointer to function).
-5. Float operand to modulus operator.
-6. Float operand to bitwise operators.
-7. Use of uninitialized variable.
-8. Increment and decrement operators with `rvalue` operand.
+5. Branch condition not Boolean convertible.
+6. Float operand to modulus operator.
+7. Float operand to bitwise operators.
+8. Use of uninitialized variable.
+9. Increment and decrement operators with `rvalue` operand.
 
 ### Switch-statement-related errors
 1. `switch` and `case` statements with non integer expression.

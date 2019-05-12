@@ -13,6 +13,12 @@ bool IfNode::analyze(ScopeContext* context) {
     context->addScope(SCOPE_IF, this);
 
     ret &= cond->analyze(context, true);
+
+    if (ret && cond->type == DTYPE_VOID) {
+        context->log("invalid conversion from '" + cond->exprTypeStr() + "' to 'bool'", cond->loc, LOG_ERROR);
+        ret = false;
+    }
+
     ret &= ifBody->analyze(context);
 
     if (elseBody) {
@@ -119,6 +125,12 @@ bool WhileNode::analyze(ScopeContext* context) {
     context->addScope(SCOPE_LOOP, this);
 
     ret &= cond->analyze(context, true);
+
+    if (ret && cond->type == DTYPE_VOID) {
+        context->log("invalid conversion from '" + cond->exprTypeStr() + "' to 'bool'", cond->loc, LOG_ERROR);
+        ret = false;
+    }
+
     ret &= body->analyze(context);
 
     context->popScope();
@@ -137,6 +149,12 @@ bool DoWhileNode::analyze(ScopeContext* context) {
     context->addScope(SCOPE_LOOP, this);
 
     ret &= cond->analyze(context, true);
+
+    if (ret && cond->type == DTYPE_VOID) {
+        context->log("invalid conversion from '" + cond->exprTypeStr() + "' to 'bool'", cond->loc, LOG_ERROR);
+        ret = false;
+    }
+
     ret &= body->analyze(context);
 
     context->popScope();
@@ -154,9 +172,23 @@ bool ForNode::analyze(ScopeContext* context) {
 
     context->addScope(SCOPE_LOOP, this);
 
-    if (initStmt) ret &= initStmt->analyze(context);
-    if (cond) ret &= cond->analyze(context, true);
-    if (inc) ret &= inc->analyze(context, false);
+    if (initStmt) {
+        ret &= initStmt->analyze(context);
+    }
+
+    if (cond) {
+        ret &= cond->analyze(context, true);
+
+        if (ret && cond->type == DTYPE_VOID) {
+            context->log("invalid conversion from '" + cond->exprTypeStr() + "' to 'bool'", cond->loc, LOG_ERROR);
+            ret = false;
+        }
+    }
+
+    if (inc) {
+        ret &= inc->analyze(context, false);
+    }
+
     ret &= body->analyze(context);
 
     context->popScope();
